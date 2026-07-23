@@ -1,0 +1,1 @@
+"""Configuration values for ABDM APIs."""# Gateway ConfigurationCLIENT_ID = "SBXID_046112"CLIENT_SECRET = "42a2b6e4-59a2-45f4-9a67-0e8225038813"GATEWAY_BASE_URL = "https://dev.abdm.gov.in/api/hiecm/gateway/v3"ABHA_BASE_URL = "https://abhasbx.abdm.gov.in/abha/api/v3"HIECM_BASE_URL = "https://dev.abdm.gov.in/api/hiecm"# EnvironmentX_CM_ID = "sbx"
