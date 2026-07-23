@@ -1,0 +1,56 @@
+{
+    "headers": {
+        "host": "abdm-dev.aeglecare.in",
+        "user-agent": "ReactorNetty/1.1.19",
+        "content-length": "375",
+        "accept": "*/*",
+        "accept-encoding": "gzip, br",
+        "authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE3ODQ4MDQ2OTMsImlhdCI6MTc4NDgwMzQ5MywianRpIjoiM2EyZWY4YWUtZmZmZS00YWJlLTg3NWQtNWJjMmJmNzA1MzA4IiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJjMmQ5Y2EwMC01NDE4LTQ4ZjctODg2Zi03YjQzOTg1MGI4YzMiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJnYXRld2F5Iiwic2Vzc2lvbl9zdGF0ZSI6ImM3NGUwNjVmLTQ5OTUtNDIyYi05NjkzLTBkNmM0YTk2ZDc3YyIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo5MDAzIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJISVVfUEFZRVIiLCJoZnIiLCJvZmZsaW5lX2FjY2VzcyIsImhlYWx0aElkIiwiZ2F0ZXdheSIsIkhJUF9QQVlFUiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfSwiZ2F0ZXdheSI6eyJyb2xlcyI6WyJ1bWFfcHJvdGVjdGlvbiJdfX0sInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUiLCJjbGllbnRIb3N0IjoiMTAuMjAxLjc2LjEyNyIsImNsaWVudElkIjoiZ2F0ZXdheSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LWdhdGV3YXkiLCJjbGllbnRBZGRyZXNzIjoiMTAuMjAxLjc2LjEyNyJ9.X4Qd9tpoltCv4kqVBObKzdDkBG1tqNO0BDz1Zbq7dso9A05EmQt8MUjo4YyoSYWEN9mKhfjKHmucNTPDOfTwCOcduQFH9IUfPrWHquUBuIZZpOtVf7DcBrHCp8YO05xJuiCdboffBAB5HoTlD63gvI7kQLCMd8ifnAmUZWtgFHLeSbP2kepqK5VL1vA_6Zi2uz0jBULPFWHOR2nziLi5EoYw5_YTddLqsLCAbcYr25LShVjmYrwTAtJ5LX0NlmV9GxJva6Y6mpKbciujjMzAbmK-mpfCl6lvV0OmgEUq1--maFwqLsmvAAPW-AzjWZEM9xqSIov4di6jTMgyVnzNoQ",
+        "baggage": "Self=1-6a61f13a-43cb7d7a6a758fac126ad03f,xrsr=21b111cbfe6e8fca",
+        "cdn-loop": "cloudflare; loops=1",
+        "cf-connecting-ip": "13.203.245.166",
+        "cf-ipcountry": "IN",
+        "cf-ray": "a1fa1b4c1bc80b23-BOM",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "cf-warp-tag-id": "fcaf8386-91aa-4615-9c99-b33b71575dfe",
+        "connection": "keep-alive",
+        "content-type": "application/json",
+        "request-id": "ab33f580-f68a-4109-a645-a213c7f7823c",
+        "timestamp": "2026-07-23T10:47:22.221Z",
+        "traceparent": "00-6a61f13abbea47936373b26699d83b93-66b878212fcda6e3-00",
+        "tracestate": "xrsr=21b111cbfe6e8fca",
+        "x-amzn-trace-id": "Root=1-6a61f13a-bbea47936373b26699d83b93;Parent=66b878212fcda6e3;Sampled=0;Self=1-6a61f13a-43cb7d7a6a758fac126ad03f;xrsr=21b111cbfe6e8fca",
+        "x-forwarded-for": "13.203.245.166",
+        "x-forwarded-proto": "https",
+        "x-hip-id": "IN3310002220"
+    },
+    "body": {
+        "transactionId": "7487ec33-cdf1-4cca-8d17-b3211666f9b2",
+        "patient": {
+            "id": "aayushchordia1997@sbx",
+            "verifiedIdentifiers": [
+                {
+                    "type": "MOBILE",
+                    "value": "7904191949"
+                },
+                {
+                    "type": "ABHA_NUMBER",
+                    "value": "91-6182-1610-5253"
+                },
+                {
+                    "type": "abhaAddress",
+                    "value": "aayushchordia1997@sbx"
+                }
+            ],
+            "unverifiedIdentifiers": [
+                {
+                    "type": "MR",
+                    "value": "AC"
+                }
+            ],
+            "name": "Aayush Chordia",
+            "gender": "M",
+            "yearOfBirth": 1997
+        }
+    }
+}

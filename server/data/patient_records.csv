@@ -1,0 +1,11 @@
+abha_address,abha_number,mobile,mr_number,name,gender,year_of_birth,patient_reference,care_context_reference,care_context_display,hi_type
+aayushchordia1997@sbx,91-6182-1610-5253,7904191949,AC,Aayush Chordia,M,1997,PAT001,RX001,Prescription - Fever,Prescription
+aayushchordia1997@sbx,91-6182-1610-5253,7904191949,AC,Aayush Chordia,M,1997,PAT001,RX002,Prescription - Diabetes,Prescription
+aayushchordia1997@sbx,91-6182-1610-5253,7904191949,AC,Aayush Chordia,M,1997,PAT001,LAB001,CBC Report,DiagnosticReport
+aayushchordia1997@sbx,91-6182-1610-5253,7904191949,AC,Aayush Chordia,M,1997,PAT001,OP001,General Consultation,OPConsultation
+rahulsharma@sbx,74-1201-6789-5544,9876543210,RS,Rahul Sharma,M,1990,PAT002,RX003,Hypertension Prescription,Prescription
+rahulsharma@sbx,74-1201-6789-5544,9876543210,RS,Rahul Sharma,M,1990,PAT002,LAB002,Lipid Profile,DiagnosticReport
+priyapatel@sbx,83-4410-9923-8871,9123456780,PP,Priya Patel,F,1994,PAT003,RX004,Vitamin Prescription,Prescription
+priyapatel@sbx,83-4410-9923-8871,9123456780,PP,Priya Patel,F,1994,PAT003,OP002,Dermatology Visit,OPConsultation
+arjunmehta@sbx,56-9088-3312-4409,9988776655,AM,Arjun Mehta,M,1988,PAT004,LAB003,X-Ray Chest,DiagnosticReport
+snehajoshi@sbx,68-5512-1133-2278,9012345678,SJ,Sneha Joshi,F,1996,PAT005,RX005,Thyroid Medication,Prescription

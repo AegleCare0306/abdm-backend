@@ -1,0 +1,86 @@
+{
+    "headers": {
+        "host": "abdm-dev.aeglecare.in",
+        "user-agent": "ReactorNetty/1.1.19",
+        "content-length": "1340",
+        "accept": "*/*",
+        "accept-encoding": "gzip, br",
+        "authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE3ODQ4MTM0OTYsImlhdCI6MTc4NDgxMjI5NiwianRpIjoiNzhkNDQzZDMtNWZjMS00NmYwLWE3NzQtYmEzYjYzNTljM2MwIiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJjMmQ5Y2EwMC01NDE4LTQ4ZjctODg2Zi03YjQzOTg1MGI4YzMiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJnYXRld2F5Iiwic2Vzc2lvbl9zdGF0ZSI6IjlkOTQwY2ZhLWY3OWItNGQ1YS1hYjUyLTE5YmYyOTliMWY5YSIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo5MDAzIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJISVVfUEFZRVIiLCJoZnIiLCJvZmZsaW5lX2FjY2VzcyIsImhlYWx0aElkIiwiZ2F0ZXdheSIsIkhJUF9QQVlFUiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfSwiZ2F0ZXdheSI6eyJyb2xlcyI6WyJ1bWFfcHJvdGVjdGlvbiJdfX0sInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUiLCJjbGllbnRIb3N0IjoiMTAuMjAxLjg5LjIxNiIsImNsaWVudElkIjoiZ2F0ZXdheSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LWdhdGV3YXkiLCJjbGllbnRBZGRyZXNzIjoiMTAuMjAxLjg5LjIxNiJ9.d2CRD3qciY9sMZ_nrfNMIGi3Ro2xZlWRcmbKNmkHyOWgiikZ6lrOmHkEAwfabVP56dpza_GBX4OF6kCnRxuUXZJS0GOH3j0Ybr2Kw-TnBhKt8VSFVKS9vjzaczYasHj9grHp6o5X3Zkhr2pCMfWnaQMqx-MlzUBnw64I-gTZcMYG1wB1hn4uevZLVok3KRALM0xeFOkqx_mSdhDiFsMIsdXs38wV2pStcfNqTLqfIq03Z1dprvtuID-O-DhR-zXMXoh-G0FNe_nAdBlQRFkms4uruNTx4NsiSW3Kh_zetqBkkrFNssoedKipWUPaj_CXj5GMj-yF_RXOMW-bChAYfA",
+        "cdn-loop": "cloudflare; loops=1",
+        "cf-connecting-ip": "13.203.243.253",
+        "cf-ipcountry": "IN",
+        "cf-ray": "a1faf5aa4af1d263-BOM",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "cf-warp-tag-id": "fcaf8386-91aa-4615-9c99-b33b71575dfe",
+        "connection": "keep-alive",
+        "content-type": "application/json",
+        "request-id": "5113f8a3-12c9-42e4-9d18-e04b24c1def1",
+        "timestamp": "2026-07-23T13:16:26.588Z",
+        "traceparent": "00-6a62142aee0025e28b05aefc791bbcea-d4e8606ab48a1d2f-00",
+        "tracestate": "xrsr=21b111cbfe6e8fca",
+        "x-amzn-trace-id": "Root=1-6a62142a-ee0025e28b05aefc791bbcea;Parent=d4e8606ab48a1d2f;Sampled=0;xrsr=21b111cbfe6e8fca",
+        "x-forwarded-for": "13.203.243.253",
+        "x-forwarded-proto": "https",
+        "x-hip-id": "IN3310002215"
+    },
+    "body": {
+        "notification": {
+            "status": "GRANTED",
+            "consentId": "22f0066e-d5ef-4641-a84c-25ea94d3f313",
+            "consentDetail": {
+                "schemaVersion": "v3",
+                "consentId": "22f0066e-d5ef-4641-a84c-25ea94d3f313",
+                "createdAt": "2026-07-23T13:16:26.518Z",
+                "patient": {
+                    "id": "aayushchordia1997@sbx"
+                },
+                "careContexts": [
+                    {
+                        "patientReference": "AC001",
+                        "careContextReference": "b90fab26-ee8b-4080-8103-3a3933abf889"
+                    },
+                    {
+                        "patientReference": "AC001",
+                        "careContextReference": "1fdd7cb4-4d6a-413c-a63e-4925b31e8415"
+                    }
+                ],
+                "purpose": {
+                    "text": "Self Requested",
+                    "code": "PATRQT",
+                    "refUri": "www.abdm.gov.in"
+                },
+                "hip": {
+                    "id": "IN3310002215"
+                },
+                "consentManager": {
+                    "id": "sbx"
+                },
+                "hiTypes": [
+                    "Prescription",
+                    "DiagnosticReport",
+                    "OPConsultation",
+                    "DischargeSummary",
+                    "ImmunizationRecord",
+                    "HealthDocumentRecord",
+                    "WellnessRecord",
+                    "Invoice"
+                ],
+                "permission": {
+                    "accessMode": "VIEW",
+                    "dateRange": {
+                        "from": "1926-07-23T13:16:26.276Z",
+                        "to": "2026-07-23T13:16:26.276Z"
+                    },
+                    "dataEraseAt": "2126-07-23T13:16:26.276Z",
+                    "frequency": {
+                        "unit": "DAY",
+                        "value": 0,
+                        "repeats": 2
+                    }
+                }
+            },
+            "signature": "dTf3KxSSiQEykSvKuxCyQYsPOfbbYjY2jcaISv0YjWWKFVzo1tfd8Fo1Rkjb/cenB6FpakzZaLoGdje1/aNTwwaUK7BnJRf7265pI8tduSV0C9rBupYV4RNQ3vwGK/uPJAp6aXR8qkhqs0TC24Tmu4gFgxwkXPaHPCLO5dgm9iJhAQ2/u/8DaNA5WIQ+DP+O5lbqFRXnFxB3kSe6gyPyypaNDA3dr6DJbgDdai/e6S+5ZVsegJ/ZyiWWDoZJsmWzDxhPSvhpAXOzwzuU0fQ2OtXy/nAypu3Uo4Fu3a0xFG6uNjr6SzAK1i747X8Ewy1zqIf99ckfzLvilrnW81NiJw==",
+            "grantAcknowledgement": false
+        }
+    }
+}

@@ -1,7 +1,7 @@
 import requests
 
-from config import HIECM_BASE_URL, X_CM_ID
-from utils import generate_request_id, generate_timestamp
+from server.config import HIECM_BASE_URL, X_CM_ID
+from server.utils import generate_request_id, generate_timestamp, get_gateway_token
 
 def discover_patient(
     token,
@@ -52,6 +52,103 @@ def discover_patient(
 
     response = requests.post(
         url=url,
+        headers=headers,
+        json=payload,
+    )
+
+    return response
+
+def send_on_discover(
+    transaction_id,
+    request_id,
+    patient_data
+):
+    """
+    Sends the on-discover response to ABDM Gateway.
+    """
+
+    url = (
+        f"{HIECM_BASE_URL}"
+        "/user-initiated-linking/v3/patient/care-context/on-discover"
+    )
+
+    payload = {
+        "transactionId": transaction_id,
+        "patient": patient_data,
+        "matchedBy": ["MR"],
+        "response": {
+            "requestId": request_id
+        }
+    }
+
+    headers = {
+        "REQUEST-ID": generate_request_id(),
+        "TIMESTAMP": generate_timestamp(),
+        "X-CM-ID": X_CM_ID,
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {get_gateway_token()}",
+    }
+
+    response = requests.post(
+        url,
+        headers=headers,
+        json=payload,
+    )
+
+    print("\n===== ON DISCOVER RESPONSE =====")
+    print("Status :", response.status_code)
+
+    try:
+        print(json.dumps(response.json(), indent=4))
+    except Exception:
+        print(response.text)
+
+    return response
+
+def send_on_init(
+    transaction_id,
+    request_id,
+    link_reference_number,
+    authentication_type,
+    communication_medium,
+    communication_hint,
+    communication_expiry,
+):
+    """
+    Sends the on-init response to the ABDM Gateway.
+    """
+
+    url = (
+        f"{HIECM_BASE_URL}"
+        "/user-initiated-linking/v3/link/care-context/on-init"
+    )
+
+    payload = {
+        "transactionId": transaction_id,
+        "link": {
+            "referenceNumber": link_reference_number,
+            "authenticationType": authentication_type,
+            "meta": {
+                "communicationMedium": communication_medium,
+                "communicationHint": communication_hint,
+                "communicationExpiry": communication_expiry,
+            },
+        },
+        "response": {
+            "requestId": request_id,
+        },
+    }
+
+    headers = {
+        "REQUEST-ID": generate_request_id(),
+        "TIMESTAMP": generate_timestamp(),
+        "X-CM-ID": X_CM_ID,
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {get_gateway_token()}",
+    }
+
+    response = requests.post(
+        url,
         headers=headers,
         json=payload,
     )
