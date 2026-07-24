@@ -8,12 +8,8 @@ import json
 async def process_discover(callback_data):
 
     headers = callback_data["headers"]
-    request_id = headers.get("request-id")
     body = callback_data["body"]
-
     patient = body["patient"]
-
-    transaction_id = body.get("transactionId")
 
     verified = patient.get("verifiedIdentifiers", [])
     unverified = patient.get("unverifiedIdentifiers", [])
@@ -43,11 +39,10 @@ async def process_discover(callback_data):
     gender = patient.get("gender")
     year_of_birth = patient.get("yearOfBirth")
 
-    print("\n===== DISCOVER CALLBACK =====")
+    transaction_id = body.get("transactionId")
+    request_id = headers.get("request-id")
 
-    print("Transaction ID :", transaction_id)
-    print("Request ID     :", request_id)
-    print("Patient        :", patient)
+    print("\n===== DISCOVER CALLBACK =====")
 
     patient_data = search_patient(abha_address=abha_address)
     patient_payload = build_patient_payload(patient_data)

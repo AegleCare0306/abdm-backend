@@ -5,6 +5,7 @@ from server.callbacks.utils.storage import save_callback
 
 from server.callbacks.handlers.discover import handle_discover
 from server.callbacks.handlers.link_init import handle_link_init
+from server.callbacks.handlers.link_confirm import handle_link_confirm
 
 
 async def dispatch_callback(
@@ -30,6 +31,7 @@ async def dispatch_callback(
     handlers = {
         "discover": handle_discover,
         "care_context_init": handle_link_init,
+        "care_context_confirm": handle_link_confirm,
     }
 
     handler = handlers.get(callback_type)

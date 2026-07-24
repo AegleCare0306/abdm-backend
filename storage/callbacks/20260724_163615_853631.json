@@ -1,0 +1,53 @@
+{
+    "headers": {
+        "host": "abdm-dev.aeglecare.in",
+        "user-agent": "ReactorNetty/1.1.19",
+        "content-length": "327",
+        "accept": "*/*",
+        "accept-encoding": "gzip, br",
+        "authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE3ODQ4OTIzNjMsImlhdCI6MTc4NDg5MTE2MywianRpIjoiNzQ5YzY2NjUtMTg1My00ODFkLTlhYmEtMzA3NmMwM2FkMDMyIiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiJjMmQ5Y2EwMC01NDE4LTQ4ZjctODg2Zi03YjQzOTg1MGI4YzMiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJnYXRld2F5Iiwic2Vzc2lvbl9zdGF0ZSI6IjJlNmYzMmViLTQ2Y2ItNDE1Yi1iMzgyLWM4NDc5ZGNjNzNkMiIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cDovL2xvY2FsaG9zdDo5MDAzIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJISVVfUEFZRVIiLCJoZnIiLCJvZmZsaW5lX2FjY2VzcyIsImhlYWx0aElkIiwiZ2F0ZXdheSIsIkhJUF9QQVlFUiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfSwiZ2F0ZXdheSI6eyJyb2xlcyI6WyJ1bWFfcHJvdGVjdGlvbiJdfX0sInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUiLCJjbGllbnRIb3N0IjoiMTAuMjAxLjg5LjIxNiIsImNsaWVudElkIjoiZ2F0ZXdheSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LWdhdGV3YXkiLCJjbGllbnRBZGRyZXNzIjoiMTAuMjAxLjg5LjIxNiJ9.cfC1I-O3ynsDBsMq5V5yJTHz4VFQn_Imx1EHGRPChPmL6X5qXdNRggztE4UQC3iDsU0A0yWJe0_vqldI-hMjqLYdPPuFJ3bg8INAuZ5Hv7bJVToLD4oAQ0wwvTGf3j6vXXxTwR76W1UHJVgF2YxUl6ZjpA4i8zjEzvu4PNqtnhqn8jsrrkK55N35bBUyPBdWQ8QbzLEvKusf1oNmGt1ThLkpGdMBE3vhe2EkQXYo4GxQL_1GG_YJHu6LKe3k3e7FsxQemwNViJPz-3MMqB71hTmFD66JGOAbN1X10nqDImxA3R-hN1jZGCT_PB3v6RblODljbDJv8nsufUZ1E1z9wA",
+        "baggage": "Self=1-6a634727-39519629198ce1f9702a10dc,xrsr=21b111cbfe6e8fca",
+        "cdn-loop": "cloudflare; loops=1",
+        "cf-connecting-ip": "65.0.113.207",
+        "cf-ipcountry": "IN",
+        "cf-ray": "a2027457abab49a6-BOM",
+        "cf-visitor": "{\"scheme\":\"https\"}",
+        "cf-warp-tag-id": "fcaf8386-91aa-4615-9c99-b33b71575dfe",
+        "connection": "keep-alive",
+        "content-type": "application/json",
+        "request-id": "33d9764a-509d-4ff7-9572-2bf93c55277b",
+        "timestamp": "2026-07-24T11:06:15.633Z",
+        "traceparent": "00-6a634727e17a1f2943bda23736395fdc-5162e21c47a4bf6d-00",
+        "tracestate": "xrsr=21b111cbfe6e8fca",
+        "x-amzn-trace-id": "Root=1-6a634727-e17a1f2943bda23736395fdc;Parent=5162e21c47a4bf6d;Sampled=0;Self=1-6a634727-39519629198ce1f9702a10dc;xrsr=21b111cbfe6e8fca",
+        "x-forwarded-for": "65.0.113.207",
+        "x-forwarded-proto": "https",
+        "x-hip-id": "IN3310002220"
+    },
+    "body": {
+        "transactionId": "8bbf4bbe-f933-43da-ad56-ac99798adb6f",
+        "abhaAddress": "aayushchordia1997@sbx",
+        "patient": [
+            {
+                "referenceNumber": "PAT001",
+                "careContexts": [
+                    {
+                        "referenceNumber": "RX001"
+                    }
+                ],
+                "hiType": "Prescription",
+                "count": 1
+            },
+            {
+                "referenceNumber": "PAT001",
+                "careContexts": [
+                    {
+                        "referenceNumber": "LAB001"
+                    }
+                ],
+                "hiType": "DiagnosticReport",
+                "count": 1
+            }
+        ]
+    }
+}

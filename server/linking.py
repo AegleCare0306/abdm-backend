@@ -154,3 +154,47 @@ def send_on_init(
     )
 
     return response
+
+def send_on_confirm(
+    patient,
+    request_id,
+):
+    """
+    Sends the ABDM on-confirm response.
+
+    Args:
+        patient (list): Patient array received during the Init callback.
+        request_id (str): Request ID received in the Confirm callback.
+
+    Returns:
+        requests.Response
+    """
+
+    url = (
+        f"{HIECM_BASE_URL}"
+        "/user-initiated-linking/v3/link/care-context/on-confirm"
+    )
+
+    payload = {
+        "patient": patient,
+        "response": {
+            "requestId": request_id
+        }
+    }
+
+    headers = {
+        "REQUEST-ID": generate_request_id(),
+        "TIMESTAMP": generate_timestamp(),
+        "X-CM-ID": X_CM_ID,
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {get_gateway_token()}",
+    }
+
+    response = requests.post(
+        url,
+        headers=headers,
+        json=payload,
+        timeout=30,
+    )
+
+    return response
