@@ -1,0 +1,5 @@
+from server.callbacks.services.health_information_request_service import process_health_information_request
+
+
+async def handle_health_information_request(callback_data):
+    return await process_health_information_request(callback_data)

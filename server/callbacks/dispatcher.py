@@ -2,10 +2,11 @@ from fastapi import Request
 
 from server.callbacks.utils.logger import log_callback
 from server.callbacks.utils.storage import save_callback
-
 from server.callbacks.handlers.discover import handle_discover
 from server.callbacks.handlers.link_init import handle_link_init
 from server.callbacks.handlers.link_confirm import handle_link_confirm
+from server.callbacks.handlers.consent_notify import handle_consent_notify
+from server.callbacks.handlers.health_information_request import handle_health_information_request
 
 
 async def dispatch_callback(
@@ -32,6 +33,8 @@ async def dispatch_callback(
         "discover": handle_discover,
         "care_context_init": handle_link_init,
         "care_context_confirm": handle_link_confirm,
+        "consent_notify": handle_consent_notify,
+        "health_information_request": handle_health_information_request,
     }
 
     handler = handlers.get(callback_type)

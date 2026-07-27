@@ -1,12 +1,10 @@
 from server.callbacks.repository.link_repository import get_link_session
 from server.callbacks.repository.patient_repository import search_patient
 from server.callbacks.transformers.patient_transformer import build_patient_payload
-
 from server.callbacks.services.otp_service import verify_otp
-
 from server.linking import send_on_confirm
-
 from server.utils import print_api_response
+from server.callbacks.repository.patient_identity_repository import get_patient_identity
 
 
 async def process_link_confirm(callback_data):
@@ -44,11 +42,14 @@ async def process_link_confirm(callback_data):
     # ---------------------------------------------------------
     # Search Patient Records
     # ---------------------------------------------------------
+    patient = get_patient_identity(
+        session["abha_address"]
+    )
 
     records = search_patient(
     abha_address=session["abha_address"],
     hip_id=patient["hip_id"],
-    patient_selection=session["patient_selection"])
+    patient_selection=session["selected_patient_records"])
     # ---------------------------------------------------------
     # Build ABDM Patient Payload
     # ---------------------------------------------------------
