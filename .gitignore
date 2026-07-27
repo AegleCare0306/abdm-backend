@@ -13,3 +13,7 @@ server/storage/
 
 # VS Code
 .vscode/
+
+.idea/
+
+storage/callbacks/*

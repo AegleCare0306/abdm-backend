@@ -1,11 +1,31 @@
-abha_address,abha_number,mobile,mr_number,name,gender,year_of_birth,patient_reference,care_context_reference,care_context_display,hi_type
-aayushchordia1997@sbx,91-6182-1610-5253,7904191949,AC,Aayush Chordia,M,1997,PAT001,RX001,Prescription - Fever,Prescription
-aayushchordia1997@sbx,91-6182-1610-5253,7904191949,AC,Aayush Chordia,M,1997,PAT001,RX002,Prescription - Diabetes,Prescription
-aayushchordia1997@sbx,91-6182-1610-5253,7904191949,AC,Aayush Chordia,M,1997,PAT001,LAB001,CBC Report,DiagnosticReport
-aayushchordia1997@sbx,91-6182-1610-5253,7904191949,AC,Aayush Chordia,M,1997,PAT001,OP001,General Consultation,OPConsultation
-rahulsharma@sbx,74-1201-6789-5544,9876543210,RS,Rahul Sharma,M,1990,PAT002,RX003,Hypertension Prescription,Prescription
-rahulsharma@sbx,74-1201-6789-5544,9876543210,RS,Rahul Sharma,M,1990,PAT002,LAB002,Lipid Profile,DiagnosticReport
-priyapatel@sbx,83-4410-9923-8871,9123456780,PP,Priya Patel,F,1994,PAT003,RX004,Vitamin Prescription,Prescription
-priyapatel@sbx,83-4410-9923-8871,9123456780,PP,Priya Patel,F,1994,PAT003,OP002,Dermatology Visit,OPConsultation
-arjunmehta@sbx,56-9088-3312-4409,9988776655,AM,Arjun Mehta,M,1988,PAT004,LAB003,X-Ray Chest,DiagnosticReport
-snehajoshi@sbx,68-5512-1133-2278,9012345678,SJ,Sneha Joshi,F,1996,PAT005,RX005,Thyroid Medication,Prescription
+patient_reference,name,mobile,abha_number,abha_address,mr_number,facility_id,care_context_reference,care_context_display,hi_type
+PAT001,Aayush Chordia,7904191949,91-6182-1610-5253,aayushchordia1997@sbx,MR001,IN3310002215,RX0011,Fever Consultation - 12 Jan 2026,Prescription
+PAT001,Aayush Chordia,7904191949,91-6182-1610-5253,aayushchordia1997@sbx,MR001,IN3310002215,RX0021,Hypertension Follow-up - 03 Mar 2026,Prescription
+PAT001,Aayush Chordia,7904191949,91-6182-1610-5253,aayushchordia1997@sbx,MR001,IN3310002215,LAB0011,Complete Blood Count - 12 Jan 2026,DiagnosticReport
+PAT001,Aayush Chordia,7904191949,91-6182-1610-5253,aayushchordia1997@sbx,MR001,IN3310002220,RX0031,Orthopedic Consultation - 21 Apr 2026,Prescription
+PAT001,Aayush Chordia,7904191949,91-6182-1610-5253,aayushchordia1997@sbx,MR001,IN3310002220,LAB0021,Knee X-Ray Report,DiagnosticReport
+PAT002,Neha Sharma,9876543210,78-2345-6789-1111,nehasharma@sbx,MR002,IN3310002215,RX101,Seasonal Allergy Consultation,Prescription
+PAT002,Neha Sharma,9876543210,78-2345-6789-1111,nehasharma@sbx,MR002,IN3310002215,LAB101,Allergy Blood Panel,DiagnosticReport
+PAT002,Neha Sharma,9876543210,78-2345-6789-1111,nehasharma@sbx,MR002,IN3310002215,OP101,ENT Follow-up Encounter,OPConsultation
+PAT003,Rohan Patel,9823456712,55-7834-9123-4412,rohanpatel@sbx,MR003,IN3310002220,RX201,Diabetes Initial Consultation,Prescription
+PAT003,Rohan Patel,9823456712,55-7834-9123-4412,rohanpatel@sbx,MR003,IN3310002220,RX202,Diabetes Review Visit,Prescription
+PAT003,Rohan Patel,9823456712,55-7834-9123-4412,rohanpatel@sbx,MR003,IN3310002220,LAB201,HbA1c Laboratory Report,DiagnosticReport
+PAT003,Rohan Patel,9823456712,55-7834-9123-4412,rohanpatel@sbx,MR003,IN3310002220,LAB202,Lipid Profile Report,DiagnosticReport
+PAT004,Meera Iyer,9811122233,44-9876-1122-7788,meeraiyer@sbx,MR004,IN3310002215,RX301,Migraine Consultation,Prescription
+PAT004,Meera Iyer,9811122233,44-9876-1122-7788,meeraiyer@sbx,MR004,IN3310002215,LAB301,MRI Brain Report,DiagnosticReport
+PAT004,Meera Iyer,9811122233,44-9876-1122-7788,meeraiyer@sbx,MR004,IN3310002215,DIS301,Discharge Summary - Neurology,DischargeSummary
+PAT005,Arjun Menon,9901234567,62-4567-9988-1212,arjunmenon@sbx,MR005,IN3310002220,RX401,Cardiology Consultation,Prescription
+PAT005,Arjun Menon,9901234567,62-4567-9988-1212,arjunmenon@sbx,MR005,IN3310002220,LAB401,ECG Report,DiagnosticReport
+PAT005,Arjun Menon,9901234567,62-4567-9988-1212,arjunmenon@sbx,MR005,IN3310002220,LAB402,2D Echo Report,DiagnosticReport
+PAT006,Priya Verma,9887766554,90-3211-1122-8877,priyaverma@sbx,MR006,IN3310002215,RX501,Pediatric Consultation,Prescription
+PAT007,Karan Malhotra,9819988776,34-1111-2233-7788,karanmalhotra@sbx,MR007,IN3310002215,RX601,Dermatology Consultation,Prescription
+PAT007,Karan Malhotra,9819988776,34-1111-2233-7788,karanmalhotra@sbx,MR007,IN3310002215,LAB601,Skin Biopsy Report,DiagnosticReport
+PAT007,Karan Malhotra,9819988776,34-1111-2233-7788,karanmalhotra@sbx,MR007,IN3310002220,RX602,Cosmetic Dermatology Follow-up,Prescription
+PAT008,Sneha Kapoor,9870011223,73-2233-4455-8899,snehakapoor@sbx,MR008,IN3310002220,RX701,Gynecology Consultation,Prescription
+PAT008,Sneha Kapoor,9870011223,73-2233-4455-8899,snehakapoor@sbx,MR008,IN3310002220,LAB701,Ultrasound Report,DiagnosticReport
+PAT008,Sneha Kapoor,9870011223,73-2233-4455-8899,snehakapoor@sbx,MR008,IN3310002220,DIS701,Maternity Discharge Summary,DischargeSummary
+PAT009,Vivek Rao,9845678901,88-4455-6677-3344,vivekrao@sbx,MR009,IN3310002215,RX801,Pulmonology Consultation,Prescription
+PAT009,Vivek Rao,9845678901,88-4455-6677-3344,vivekrao@sbx,MR009,IN3310002215,LAB801,Pulmonary Function Test,DiagnosticReport
+PAT010,Ananya Das,9765432109,21-9988-7766-5544,ananyadas@sbx,MR010,IN3310002220,RX901,Ophthalmology Consultation,Prescription
+PAT010,Ananya Das,9765432109,21-9988-7766-5544,ananyadas@sbx,MR010,IN3310002220,LAB901,Retina Scan Report,DiagnosticReport
+PAT010,Ananya Das,9765432109,21-9988-7766-5544,ananyadas@sbx,MR010,IN3310002220,LAB902,Vision Assessment Report,DiagnosticReport

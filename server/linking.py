@@ -4,7 +4,6 @@ from server.config import HIECM_BASE_URL, X_CM_ID
 from server.utils import generate_request_id, generate_timestamp, get_gateway_token
 
 def discover_patient(
-    token,
     x_auth_token,
     hiu_id,
     hip_id,
@@ -31,7 +30,7 @@ def discover_patient(
     )
 
     headers = {
-        "Authorization": f"Bearer {token}",
+        "Authorization": f"Bearer {get_gateway_token()}",
         "X-AUTH-TOKEN": f"Bearer {x_auth_token}",
         "X-CM-ID": X_CM_ID,
         "X-HIU-ID": hiu_id,
