@@ -1,0 +1,47 @@
+{
+  "resourceType": "Practitioner",
+  "id": "DOC0001",
+  "meta": {
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+    ]
+  },
+  "identifier": [
+    {
+      "type": {
+        "text": "Gujarat Medical Council"
+      },
+      "system": "https://doctor.ndhm.gov.in",
+      "value": "GMC100001"
+    }
+  ],
+  "name": [
+    {
+      "text": "Dr. Aayush Patel",
+      "family": "Patel",
+      "given": [
+        "Aayush"
+      ],
+      "prefix": [
+        "Dr."
+      ]
+    }
+  ],
+  "telecom": [
+    {
+      "system": "phone",
+      "value": "9276804025"
+    },
+    {
+      "system": "email",
+      "value": "dr.aayush.patel@aeglecare.in"
+    }
+  ],
+  "qualification": [
+    {
+      "code": {
+        "text": "MBBS, MD"
+      }
+    }
+  ]
+}

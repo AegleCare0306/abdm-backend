@@ -18,6 +18,24 @@ BILLING = {
 
         "Emergency Medicine": 1200,
 
+        "Pulmonology": 750,
+
+        "Endocrinology": 800,
+
+        "Pediatrics": 550,
+
+        "ENT": 650,
+
+        "Ophthalmology": 600,
+
+        "Neurology": 900,
+
+        "Urology": 800,
+
+        "Psychiatry": 700,
+
+        "General Surgery": 850,
+
     },
 
     "investigation_markup": 1.00,

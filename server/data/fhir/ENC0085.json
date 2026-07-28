@@ -1,0 +1,537 @@
+{
+  "resourceType": "Bundle",
+  "id": "BUNDLE-ENC0085",
+  "meta": {
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://ndhm.in",
+    "value": "BUNDLE-ENC0085"
+  },
+  "type": "document",
+  "timestamp": "2026-07-18T21:59:05+05:30",
+  "entry": [
+    {
+      "fullUrl": "Composition/COMP-ENC0085",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "COMP-ENC0085",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/OPConsultRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "371530004",
+              "display": "Clinical consultation report"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/PAT0020"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0085"
+        },
+        "date": "2026-07-18T21:59:05+05:30",
+        "author": [
+          {
+            "reference": "Practitioner/DOC0005"
+          }
+        ],
+        "title": "Follow-up - Chronic cough with breathlessness",
+        "custodian": {
+          "reference": "Organization/IN2410002587"
+        },
+        "section": [
+          {
+            "title": "Chief Complaint",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "422843007",
+                  "display": "Chief complaint section"
+                }
+              ]
+            },
+            "text": {
+              "status": "generated",
+              "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Chronic cough with breathlessness</div>"
+            }
+          },
+          {
+            "title": "Diagnosis",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "11450-4",
+                  "display": "Problem list"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Condition/CON0085"
+              }
+            ]
+          },
+          {
+            "title": "Medications",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "10160-0",
+                  "display": "History of medication use"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "MedicationRequest/MRQ0078"
+              }
+            ]
+          },
+          {
+            "title": "Vitals",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8716-3",
+                  "display": "Vital signs"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Observation/OBS0097"
+              },
+              {
+                "reference": "Observation/OBS0098"
+              }
+            ]
+          },
+          {
+            "title": "Procedures",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "47519-4",
+                  "display": "History of procedures"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Procedure/PRO0018"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Patient/PAT0020",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "PAT0020",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code",
+                  "code": "ABHA",
+                  "display": "Ayushman Bharat Health Account (ABHA) ID"
+                }
+              ],
+              "text": "ABHA Number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "82-1444-2375-8022"
+          },
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code",
+                  "code": "ABHA",
+                  "display": "Ayushman Bharat Health Account (ABHA) ID"
+                }
+              ],
+              "text": "ABHA Address"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "ananyasingh20@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Ananya Singh"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9032373782"
+          },
+          {
+            "system": "email",
+            "value": "ananya.singh@gmail.com"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2015-08-06"
+      }
+    },
+    {
+      "fullUrl": "Practitioner/DOC0005",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "DOC0005",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "text": "Gujarat Medical Council"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": "GMC100005"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Priya Mehta",
+            "family": "Mehta",
+            "given": [
+              "Priya"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9229661713"
+          },
+          {
+            "system": "email",
+            "value": "dr.priya.mehta@aeglecare.in"
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "text": "MBBS, MS"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Organization/IN2410002587",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "IN2410002587",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002587"
+          }
+        ],
+        "type": [
+          {
+            "text": "Hospital"
+          }
+        ],
+        "name": "MS Hospitals",
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "07940001003"
+          },
+          {
+            "system": "email",
+            "value": "contact@mshospitals.in"
+          }
+        ],
+        "address": [
+          {
+            "line": [
+              "SG Highway"
+            ],
+            "city": "Ahmedabad",
+            "state": "Gujarat",
+            "postalCode": "380060",
+            "country": "IN"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Encounter/ENC0085",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "ENC0085",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://facility.ndhm.gov.in/encounter",
+            "value": "MSH-2026-000018"
+          },
+          {
+            "system": "https://facility.ndhm.gov.in/mrn",
+            "value": "MR-MSH-000018"
+          }
+        ],
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "ambulatory"
+        },
+        "subject": {
+          "reference": "Patient/PAT0020"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/DOC0005"
+            }
+          }
+        ],
+        "period": {
+          "start": "2026-07-18T21:59:05+05:30"
+        },
+        "reasonCode": [
+          {
+            "text": "Chronic cough with breathlessness"
+          }
+        ],
+        "serviceProvider": {
+          "reference": "Organization/IN2410002587"
+        }
+      }
+    },
+    {
+      "fullUrl": "Condition/CON0085",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "CON0085",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Condition"
+          ]
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed"
+            }
+          ]
+        },
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "6736007",
+              "display": "Moderate"
+            }
+          ],
+          "text": "Moderate"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "13645005",
+              "display": "COPD"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10",
+              "code": "J44.9"
+            }
+          ],
+          "text": "COPD"
+        },
+        "subject": {
+          "reference": "Patient/PAT0020"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0085"
+        },
+        "onsetDateTime": "2026-07-18",
+        "recordedDate": "2026-07-18"
+      }
+    },
+    {
+      "fullUrl": "Observation/OBS0097",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "OBS0097",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "9279-1",
+              "display": "Respiratory Rate"
+            }
+          ],
+          "text": "Respiratory Rate"
+        },
+        "subject": {
+          "reference": "Patient/PAT0020"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0085"
+        },
+        "effectiveDateTime": "2026-07-18T21:59:05+05:30",
+        "valueQuantity": {
+          "value": 29.0,
+          "unit": "breaths/min",
+          "system": "http://unitsofmeasure.org",
+          "code": "/min"
+        }
+      }
+    },
+    {
+      "fullUrl": "Observation/OBS0098",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "OBS0098",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "59408-5",
+              "display": "Oxygen Saturation"
+            }
+          ],
+          "text": "Oxygen Saturation"
+        },
+        "subject": {
+          "reference": "Patient/PAT0020"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0085"
+        },
+        "effectiveDateTime": "2026-07-18T21:59:05+05:30",
+        "valueQuantity": {
+          "value": 88.0,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        }
+      }
+    },
+    {
+      "fullUrl": "MedicationRequest/MRQ0078",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "MRQ0078",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "text": "Salbutamol 100 mcg"
+        },
+        "subject": {
+          "reference": "Patient/PAT0020"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0085"
+        },
+        "authoredOn": "2026-07-18T21:59:05+05:30",
+        "dosageInstruction": [
+          {
+            "text": "As needed (SOS) for 30 days",
+            "route": {
+              "text": "Inhalation"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Procedure/PRO0018",
+      "resource": {
+        "resourceType": "Procedure",
+        "id": "PRO0018",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Procedure"
+          ]
+        },
+        "status": "completed",
+        "code": {
+          "text": "Nebulization"
+        },
+        "subject": {
+          "reference": "Patient/PAT0020"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0085"
+        },
+        "performedDateTime": "2026-07-18T21:59:05+05:30",
+        "outcome": {
+          "text": "Successful"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,127 @@
+"""
+generate_patient_records.py
+
+Generates server/data/patient_records.csv -- the care-context mapping file
+that server/callbacks/repository/patient_repository.py reads to serve the
+Discover and Link-Confirm callbacks.
+
+This replaces what was previously a hand-crafted CSV made during early
+manual testing. It's now built from the actual mock EMR data (patients.csv,
+encounters.csv, case_library.py) so care contexts reflect real generated
+encounters instead of a few manually-typed rows.
+
+Column schema is dictated by patient_repository.py (server/callbacks/
+repository/patient_repository.py) -- it is NOT changed by this script;
+this script only produces data in the shape that file already expects:
+    abha_address, abha_number, mobile, mr_number, facility_id,
+    patient_reference, name, care_context_reference, care_context_display,
+    hi_type
+
+One row is written per (encounter, hi_type) pair -- an encounter with both
+a Prescription and a Diagnostic Report produces two rows sharing the same
+care_context_reference (the encounter_reference) but different hi_type,
+matching how ABDM's discovery response groups care contexts by HI Type.
+
+HOW TO RUN
+----------
+    cd tools
+    python generate_dummy_emr.py     # make sure mock data is current
+    python generate_patient_records.py
+"""
+
+import csv
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from dummy_emr.config import MASTER_OUTPUT_FOLDER, TRANSACTION_OUTPUT_FOLDER
+from dummy_emr.case_library import CLINICAL_CASES
+
+
+OUTPUT_PATH = Path(__file__).resolve().parents[1] / "server" / "data" / "patient_records.csv"
+
+FIELDNAMES = [
+    "abha_address", "abha_number", "mobile", "mr_number", "facility_id",
+    "patient_reference", "name", "care_context_reference",
+    "care_context_display", "hi_type",
+]
+
+# case_library document_types (dummy EMR's own vocabulary) -> ABDM's actual
+# HealthInformationType codes. "Referral Note" has no direct ABDM HI type
+# and is covered by the base OPConsultation/DischargeSummary type instead.
+DOCUMENT_TYPE_TO_HI_TYPE = {
+    "Prescription": "Prescription",
+    "Diagnostic Report": "DiagnosticReport",
+    "Discharge Summary": "DischargeSummary",
+    "Wellness Record": "WellnessRecord",
+}
+
+# encounter_type -> the base ABDM HI type every care context of that kind
+# carries, regardless of which other document types it also has.
+BASE_HI_TYPE_BY_ENCOUNTER_TYPE = {
+    "OPD": "OPConsultation",
+    "IPD": "DischargeSummary",
+    "Emergency": "OPConsultation",
+}
+
+
+def load_csv(folder, filename):
+    with open(Path(folder) / filename, newline="", encoding="utf-8") as f:
+        return list(csv.DictReader(f))
+
+
+def hi_types_for_case(case):
+    hi_types = {BASE_HI_TYPE_BY_ENCOUNTER_TYPE.get(case["encounter"]["type"], "OPConsultation")}
+    for doc_type in case["document_types"]:
+        mapped = DOCUMENT_TYPE_TO_HI_TYPE.get(doc_type)
+        if mapped:
+            hi_types.add(mapped)
+    return hi_types
+
+
+def main():
+
+    print("\nGenerating patient_records.csv from mock EMR data...\n")
+
+    patients = load_csv(MASTER_OUTPUT_FOLDER, "patients.csv")
+    encounters = load_csv(TRANSACTION_OUTPUT_FOLDER, "encounters.csv")
+    case_lookup = {case["case_id"]: case for case in CLINICAL_CASES}
+    patient_lookup = {p["patient_reference"]: p for p in patients}
+
+    rows = []
+
+    for encounter in encounters:
+
+        patient = patient_lookup[encounter["patient_reference"]]
+        case = case_lookup[encounter["clinical_case"]]
+
+        care_context_display = f"{case['name']} - {encounter['encounter_datetime'][:10]}"
+
+        for hi_type in sorted(hi_types_for_case(case)):
+            rows.append(
+                {
+                    "abha_address": patient["abha_address"],
+                    "abha_number": patient["abha_number"],
+                    "mobile": patient["mobile"],
+                    "mr_number": encounter["mr_number"],
+                    "facility_id": encounter["hip_id"],
+                    "patient_reference": patient["patient_reference"],
+                    "name": patient["full_name"],
+                    "care_context_reference": encounter["encounter_reference"],
+                    "care_context_display": care_context_display,
+                    "hi_type": hi_type,
+                }
+            )
+
+    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(OUTPUT_PATH, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
+        writer.writeheader()
+        writer.writerows(rows)
+
+    print(f"Wrote {len(rows)} care-context row(s) (from {len(encounters)} encounters) to {OUTPUT_PATH}\n")
+
+
+if __name__ == "__main__":
+    main()

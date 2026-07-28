@@ -1,19 +1,24 @@
 practitioner_reference,hip_id,department,designation,joining_date,active
+DOC0001,IN3310002220,Gynecology,Consultant,2024-01-01,True
 DOC0001,IN3310002215,Gynecology,Consultant,2024-01-01,True
-DOC0001,IN3310002230,Gynecology,Consultant,2024-01-01,True
-DOC0002,IN3310002230,Dermatology,Consultant,2024-01-01,True
+DOC0001,IN2410002587,Gynecology,Consultant,2024-01-01,True
+DOC0002,IN3310002215,Dermatology,Consultant,2024-01-01,True
 DOC0003,IN3310002215,Cardiology,Consultant,2024-01-01,True
+DOC0003,IN2410002587,Cardiology,Consultant,2024-01-01,True
+DOC0003,IN2410002590,Cardiology,Consultant,2024-01-01,True
+DOC0003,IN3310002220,Cardiology,Consultant,2024-01-01,True
 DOC0004,IN3310002220,Psychiatry,Consultant,2024-01-01,True
+DOC0004,IN2410002590,Psychiatry,Consultant,2024-01-01,True
+DOC0004,IN2410002587,Psychiatry,Consultant,2024-01-01,True
 DOC0004,IN3310002215,Psychiatry,Consultant,2024-01-01,True
-DOC0004,IN3310002230,Psychiatry,Consultant,2024-01-01,True
-DOC0005,IN3310002230,Neurology,Consultant,2024-01-01,True
-DOC0006,IN3310002230,Neurology,Consultant,2024-01-01,True
-DOC0006,IN3310002215,Neurology,Consultant,2024-01-01,True
-DOC0007,IN3310002230,Orthopedics,Consultant,2024-01-01,True
+DOC0005,IN2410002587,Neurology,Consultant,2024-01-01,True
+DOC0005,IN3310002220,Neurology,Consultant,2024-01-01,True
+DOC0006,IN2410002590,Neurology,Consultant,2024-01-01,True
+DOC0006,IN2410002587,Neurology,Consultant,2024-01-01,True
+DOC0006,IN3310002220,Neurology,Consultant,2024-01-01,True
 DOC0007,IN3310002220,Orthopedics,Consultant,2024-01-01,True
-DOC0008,IN3310002230,General Medicine,Consultant,2024-01-01,True
-DOC0009,IN3310002230,ENT,Consultant,2024-01-01,True
-DOC0009,IN3310002215,ENT,Consultant,2024-01-01,True
+DOC0008,IN3310002215,General Medicine,Consultant,2024-01-01,True
+DOC0008,IN3310002220,General Medicine,Consultant,2024-01-01,True
 DOC0009,IN3310002220,ENT,Consultant,2024-01-01,True
-DOC0010,IN3310002230,Gynecology,Consultant,2024-01-01,True
-DOC0010,IN3310002220,Gynecology,Consultant,2024-01-01,True
+DOC0010,IN3310002215,Gynecology,Consultant,2024-01-01,True
+DOC0010,IN2410002590,Gynecology,Consultant,2024-01-01,True

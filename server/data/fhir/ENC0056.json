@@ -1,0 +1,634 @@
+{
+  "resourceType": "Bundle",
+  "id": "BUNDLE-ENC0056",
+  "meta": {
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://ndhm.in",
+    "value": "BUNDLE-ENC0056"
+  },
+  "type": "document",
+  "timestamp": "2025-02-13T04:59:05+05:30",
+  "entry": [
+    {
+      "fullUrl": "Composition/COMP-ENC0056",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "COMP-ENC0056",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/OPConsultRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "371530004",
+              "display": "Clinical consultation report"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/PAT0011"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0056"
+        },
+        "date": "2025-02-13T04:59:05+05:30",
+        "author": [
+          {
+            "reference": "Practitioner/DOC0010"
+          }
+        ],
+        "title": "Follow-up - Increased thirst and frequent urination",
+        "custodian": {
+          "reference": "Organization/IN2410002590"
+        },
+        "section": [
+          {
+            "title": "Chief Complaint",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "422843007",
+                  "display": "Chief complaint section"
+                }
+              ]
+            },
+            "text": {
+              "status": "generated",
+              "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Increased thirst and frequent urination</div>"
+            }
+          },
+          {
+            "title": "Diagnosis",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "11450-4",
+                  "display": "Problem list"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Condition/CON0056"
+              }
+            ]
+          },
+          {
+            "title": "Medications",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "10160-0",
+                  "display": "History of medication use"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "MedicationRequest/MRQ0057"
+              }
+            ]
+          },
+          {
+            "title": "Vitals",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8716-3",
+                  "display": "Vital signs"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Observation/OBS0065"
+              },
+              {
+                "reference": "Observation/OBS0066"
+              }
+            ]
+          },
+          {
+            "title": "Investigations",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "30954-2",
+                  "display": "Relevant diagnostic tests/laboratory data"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "DiagnosticReport/DRP0036"
+              },
+              {
+                "reference": "DiagnosticReport/DRP0037"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Patient/PAT0011",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "PAT0011",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code",
+                  "code": "ABHA",
+                  "display": "Ayushman Bharat Health Account (ABHA) ID"
+                }
+              ],
+              "text": "ABHA Number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "45-2137-5573-6753"
+          },
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code",
+                  "code": "ABHA",
+                  "display": "Ayushman Bharat Health Account (ABHA) ID"
+                }
+              ],
+              "text": "ABHA Address"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "ananyatrivedi11@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Ananya Trivedi"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9919192147"
+          },
+          {
+            "system": "email",
+            "value": "ananya.trivedi@gmail.com"
+          }
+        ],
+        "gender": "female",
+        "birthDate": "2003-09-11"
+      }
+    },
+    {
+      "fullUrl": "Practitioner/DOC0010",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "DOC0010",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "text": "Gujarat Medical Council"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": "GMC100010"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Nisha Shah",
+            "family": "Shah",
+            "given": [
+              "Nisha"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9175750309"
+          },
+          {
+            "system": "email",
+            "value": "dr.nisha.shah@aeglecare.in"
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "text": "MBBS, MD"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Organization/IN2410002590",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "IN2410002590",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002590"
+          }
+        ],
+        "type": [
+          {
+            "text": "Urgent Care"
+          }
+        ],
+        "name": "Aegle Urgent Care",
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "07940001004"
+          },
+          {
+            "system": "email",
+            "value": "contact@aegleurgentcare.in"
+          }
+        ],
+        "address": [
+          {
+            "line": [
+              "Satellite Road"
+            ],
+            "city": "Ahmedabad",
+            "state": "Gujarat",
+            "postalCode": "380015",
+            "country": "IN"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Encounter/ENC0056",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "ENC0056",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://facility.ndhm.gov.in/encounter",
+            "value": "AUC-2025-000021"
+          },
+          {
+            "system": "https://facility.ndhm.gov.in/mrn",
+            "value": "MR-AUC-000021"
+          }
+        ],
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "ambulatory"
+        },
+        "subject": {
+          "reference": "Patient/PAT0011"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/DOC0010"
+            }
+          }
+        ],
+        "period": {
+          "start": "2025-02-13T04:59:05+05:30"
+        },
+        "reasonCode": [
+          {
+            "text": "Increased thirst and frequent urination"
+          }
+        ],
+        "serviceProvider": {
+          "reference": "Organization/IN2410002590"
+        }
+      }
+    },
+    {
+      "fullUrl": "Condition/CON0056",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "CON0056",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Condition"
+          ]
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed"
+            }
+          ]
+        },
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "6736007",
+              "display": "Moderate"
+            }
+          ],
+          "text": "Moderate"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "44054006",
+              "display": "Type 2 Diabetes Mellitus"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10",
+              "code": "E11"
+            }
+          ],
+          "text": "Type 2 Diabetes Mellitus"
+        },
+        "subject": {
+          "reference": "Patient/PAT0011"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0056"
+        },
+        "onsetDateTime": "2025-02-13",
+        "recordedDate": "2025-02-13"
+      }
+    },
+    {
+      "fullUrl": "Observation/OBS0065",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "OBS0065",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "85354-9",
+              "display": "Blood Pressure"
+            }
+          ],
+          "text": "Blood Pressure"
+        },
+        "subject": {
+          "reference": "Patient/PAT0011"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0056"
+        },
+        "effectiveDateTime": "2025-02-13T04:59:05+05:30",
+        "component": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8480-6",
+                  "display": "Systolic blood pressure"
+                }
+              ]
+            },
+            "valueQuantity": {
+              "value": 111.0,
+              "unit": "mmHg",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8462-4",
+                  "display": "Diastolic blood pressure"
+                }
+              ]
+            },
+            "valueQuantity": {
+              "value": 72.0,
+              "unit": "mmHg",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Observation/OBS0066",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "OBS0066",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "2339-0",
+              "display": "Blood Glucose"
+            }
+          ],
+          "text": "Blood Glucose"
+        },
+        "subject": {
+          "reference": "Patient/PAT0011"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0056"
+        },
+        "effectiveDateTime": "2025-02-13T04:59:05+05:30",
+        "valueQuantity": {
+          "value": 165.0,
+          "unit": "mg/dL",
+          "system": "http://unitsofmeasure.org",
+          "code": "mg/dL"
+        }
+      }
+    },
+    {
+      "fullUrl": "MedicationRequest/MRQ0057",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "MRQ0057",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "text": "Metformin 500 mg"
+        },
+        "subject": {
+          "reference": "Patient/PAT0011"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0056"
+        },
+        "authoredOn": "2025-02-13T04:59:05+05:30",
+        "dosageInstruction": [
+          {
+            "text": "Once daily for 90 days",
+            "route": {
+              "text": "Oral"
+            }
+          }
+        ],
+        "dispenseRequest": {
+          "quantity": {
+            "value": 90.0,
+            "unit": "Tablet"
+          }
+        }
+      }
+    },
+    {
+      "fullUrl": "DiagnosticReport/DRP0036",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "DRP0036",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DiagnosticReportLab"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "LAB",
+                "display": "Laboratory"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "4548-4",
+              "display": "HbA1c"
+            }
+          ],
+          "text": "HbA1c"
+        },
+        "subject": {
+          "reference": "Patient/PAT0011"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0056"
+        },
+        "issued": "2025-02-13T04:59:05+05:30",
+        "conclusion": "HbA1c | Result: 9.0 % | Reference range: 4.0-5.6 | Interpretation: High"
+      }
+    },
+    {
+      "fullUrl": "DiagnosticReport/DRP0037",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "DRP0037",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DiagnosticReportLab"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "LAB",
+                "display": "Laboratory"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "2339-0",
+              "display": "Blood Glucose"
+            }
+          ],
+          "text": "Blood Glucose"
+        },
+        "subject": {
+          "reference": "Patient/PAT0011"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0056"
+        },
+        "issued": "2025-02-13T04:59:05+05:30",
+        "conclusion": "Blood Glucose | Result: 215 mg/dL | Reference range: 70-110 | Interpretation: High"
+      }
+    }
+  ]
+}

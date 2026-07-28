@@ -1,0 +1,496 @@
+{
+  "resourceType": "Bundle",
+  "id": "BUNDLE-ENC0004",
+  "meta": {
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://ndhm.in",
+    "value": "BUNDLE-ENC0004"
+  },
+  "type": "document",
+  "timestamp": "2025-12-17T02:59:05+05:30",
+  "entry": [
+    {
+      "fullUrl": "Composition/COMP-ENC0004",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "COMP-ENC0004",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/OPConsultRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "371530004",
+              "display": "Clinical consultation report"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/PAT9001"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0004"
+        },
+        "date": "2025-12-17T02:59:05+05:30",
+        "author": [
+          {
+            "reference": "Practitioner/DOC0003"
+          }
+        ],
+        "title": "Follow-up - Ear pain and irritability",
+        "custodian": {
+          "reference": "Organization/IN2410002590"
+        },
+        "section": [
+          {
+            "title": "Chief Complaint",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "422843007",
+                  "display": "Chief complaint section"
+                }
+              ]
+            },
+            "text": {
+              "status": "generated",
+              "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Ear pain and irritability</div>"
+            }
+          },
+          {
+            "title": "Diagnosis",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "11450-4",
+                  "display": "Problem list"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Condition/CON0004"
+              }
+            ]
+          },
+          {
+            "title": "Medications",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "10160-0",
+                  "display": "History of medication use"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "MedicationRequest/MRQ0005"
+              },
+              {
+                "reference": "MedicationRequest/MRQ0006"
+              }
+            ]
+          },
+          {
+            "title": "Vitals",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8716-3",
+                  "display": "Vital signs"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Observation/OBS0004"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Patient/PAT9001",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "PAT9001",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code",
+                  "code": "ABHA",
+                  "display": "Ayushman Bharat Health Account (ABHA) ID"
+                }
+              ],
+              "text": "ABHA Number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "91-6182-1610-5253"
+          },
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code",
+                  "code": "ABHA",
+                  "display": "Ayushman Bharat Health Account (ABHA) ID"
+                }
+              ],
+              "text": "ABHA Address"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "aayushchordia1997@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Aayush Chordia"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "7904191949"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Practitioner/DOC0003",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "DOC0003",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "text": "Gujarat Medical Council"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": "GMC100003"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Neha Shah",
+            "family": "Shah",
+            "given": [
+              "Neha"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9086875935"
+          },
+          {
+            "system": "email",
+            "value": "dr.neha.shah@aeglecare.in"
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "text": "MBBS, DNB"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Organization/IN2410002590",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "IN2410002590",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002590"
+          }
+        ],
+        "type": [
+          {
+            "text": "Urgent Care"
+          }
+        ],
+        "name": "Aegle Urgent Care",
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "07940001004"
+          },
+          {
+            "system": "email",
+            "value": "contact@aegleurgentcare.in"
+          }
+        ],
+        "address": [
+          {
+            "line": [
+              "Satellite Road"
+            ],
+            "city": "Ahmedabad",
+            "state": "Gujarat",
+            "postalCode": "380015",
+            "country": "IN"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Encounter/ENC0004",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "ENC0004",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://facility.ndhm.gov.in/encounter",
+            "value": "AUC-2025-000001"
+          },
+          {
+            "system": "https://facility.ndhm.gov.in/mrn",
+            "value": "MR-AUC-000001"
+          }
+        ],
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "ambulatory"
+        },
+        "subject": {
+          "reference": "Patient/PAT9001"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/DOC0003"
+            }
+          }
+        ],
+        "period": {
+          "start": "2025-12-17T02:59:05+05:30"
+        },
+        "reasonCode": [
+          {
+            "text": "Ear pain and irritability"
+          }
+        ],
+        "serviceProvider": {
+          "reference": "Organization/IN2410002590"
+        }
+      }
+    },
+    {
+      "fullUrl": "Condition/CON0004",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "CON0004",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Condition"
+          ]
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed"
+            }
+          ]
+        },
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "6736007",
+              "display": "Moderate"
+            }
+          ],
+          "text": "Moderate"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "65363002",
+              "display": "Otitis Media"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10",
+              "code": "H66.90"
+            }
+          ],
+          "text": "Otitis Media"
+        },
+        "subject": {
+          "reference": "Patient/PAT9001"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0004"
+        },
+        "onsetDateTime": "2025-12-17",
+        "recordedDate": "2025-12-17"
+      }
+    },
+    {
+      "fullUrl": "Observation/OBS0004",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "OBS0004",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8310-5",
+              "display": "Body Temperature"
+            }
+          ],
+          "text": "Body Temperature"
+        },
+        "subject": {
+          "reference": "Patient/PAT9001"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0004"
+        },
+        "effectiveDateTime": "2025-12-17T02:59:05+05:30",
+        "valueQuantity": {
+          "value": 40.0,
+          "unit": "\u00b0C",
+          "system": "http://unitsofmeasure.org",
+          "code": "Cel"
+        }
+      }
+    },
+    {
+      "fullUrl": "MedicationRequest/MRQ0005",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "MRQ0005",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "text": "Amoxicillin 500 mg"
+        },
+        "subject": {
+          "reference": "Patient/PAT9001"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0004"
+        },
+        "authoredOn": "2025-12-17T02:59:05+05:30",
+        "dosageInstruction": [
+          {
+            "text": "Thrice daily for 5 days",
+            "route": {
+              "text": "Oral"
+            }
+          }
+        ],
+        "dispenseRequest": {
+          "quantity": {
+            "value": 15.0,
+            "unit": "Capsule"
+          }
+        }
+      }
+    },
+    {
+      "fullUrl": "MedicationRequest/MRQ0006",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "MRQ0006",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "text": "Paracetamol 500 mg"
+        },
+        "subject": {
+          "reference": "Patient/PAT9001"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0004"
+        },
+        "authoredOn": "2025-12-17T02:59:05+05:30",
+        "dosageInstruction": [
+          {
+            "text": "Twice daily for 7 days",
+            "route": {
+              "text": "Oral"
+            }
+          }
+        ],
+        "dispenseRequest": {
+          "quantity": {
+            "value": 14.0,
+            "unit": "Tablet"
+          }
+        }
+      }
+    }
+  ]
+}

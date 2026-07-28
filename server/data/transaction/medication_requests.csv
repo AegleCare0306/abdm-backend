@@ -1,0 +1,84 @@
+medication_request_reference,encounter_reference,patient_reference,medication_reference,generic_name,brand_name,strength,dosage_form,route,frequency,duration_days,quantity,status,authored_on
+MRQ0001,ENC0001,PAT9001,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,5,10,active,2025-08-04 08:44:34
+MRQ0002,ENC0002,PAT9001,MED000004,Metformin,Glycomet,500 mg,Tablet,Oral,Once daily,90,90,active,2026-06-27 08:44:34
+MRQ0003,ENC0003,PAT9001,MED000010,Cetirizine,Cetzine,10 mg,Tablet,Oral,Once daily,30,30,active,2025-11-26 09:44:34
+MRQ0004,ENC0003,PAT9001,MED000021,Clobetasol Propionate,Tenovate,0.05%,Cream,Topical,Apply twice daily,30,60,active,2025-11-26 09:44:34
+MRQ0005,ENC0004,PAT9001,MED000009,Amoxicillin,Mox,500 mg,Capsule,Oral,Thrice daily,5,15,active,2025-12-17 04:44:34
+MRQ0006,ENC0004,PAT9001,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,7,14,active,2025-12-17 04:44:34
+MRQ0007,ENC0005,PAT9001,MED000002,Amlodipine,Amlong,5 mg,Tablet,Oral,Once daily,30,30,active,2024-11-14 00:44:34
+MRQ0008,ENC0006,PAT9002,MED000006,ORS,Electral,Standard,Powder,Oral,As directed after each loose stool,5,,active,2026-07-02 07:44:34
+MRQ0009,ENC0006,PAT9002,MED000008,Pantoprazole,Pantocid,40 mg,Tablet,Oral,Twice daily,5,10,active,2026-07-02 07:44:34
+MRQ0010,ENC0007,PAT9002,MED000008,Pantoprazole,Pantocid,40 mg,Tablet,Oral,Once daily,30,30,active,2026-01-06 10:44:34
+MRQ0011,ENC0008,PAT9003,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Once daily,30,30,active,2024-08-27 02:44:34
+MRQ0012,ENC0009,PAT9003,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,14,28,active,2025-08-07 03:44:34
+MRQ0013,ENC0010,PAT9003,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,7,14,active,2024-10-03 06:44:34
+MRQ0014,ENC0011,PAT9004,MED000006,ORS,Electral,Standard,Powder,Oral,As directed after each loose stool,5,,active,2025-07-23 01:44:34
+MRQ0015,ENC0011,PAT9004,MED000008,Pantoprazole,Pantocid,40 mg,Tablet,Oral,Twice daily,5,10,active,2025-07-23 01:44:34
+MRQ0016,ENC0012,PAT9004,MED000007,Iron + Folic Acid,IFA,100 mg,Tablet,Oral,Twice daily,14,28,active,2025-02-09 01:44:34
+MRQ0017,ENC0013,PAT0001,MED000007,Iron + Folic Acid,IFA,100 mg,Tablet,Oral,Twice daily,14,28,active,2024-11-29 07:44:34
+MRQ0018,ENC0014,PAT0001,MED000009,Amoxicillin,Mox,500 mg,Capsule,Oral,Thrice daily,5,15,active,2026-05-01 07:44:34
+MRQ0019,ENC0015,PAT0001,MED000022,Chloramphenicol,Chloromycetin,0.5%,Eye Drops,Ophthalmic,Instill twice daily in the affected eye,7,14,active,2024-12-22 02:44:34
+MRQ0020,ENC0016,PAT0001,MED000004,Metformin,Glycomet,500 mg,Tablet,Oral,Once daily,90,90,active,2025-08-30 09:44:34
+MRQ0021,ENC0017,PAT0002,MED000018,Sodium Valproate,Encorate,200 mg,Tablet,Oral,Once daily,60,60,active,2025-08-14 07:44:34
+MRQ0022,ENC0018,PAT0002,MED000002,Amlodipine,Amlong,5 mg,Tablet,Oral,Once daily,30,30,active,2026-01-14 10:44:34
+MRQ0023,ENC0018,PAT0002,MED000003,Telmisartan,Telma,40 mg,Tablet,Oral,Once daily,30,30,active,2026-01-14 10:44:34
+MRQ0024,ENC0019,PAT0002,MED000009,Amoxicillin,Mox,500 mg,Capsule,Oral,Thrice daily,5,15,active,2025-11-24 00:44:34
+MRQ0025,ENC0022,PAT0003,MED000007,Iron + Folic Acid,IFA,100 mg,Tablet,Oral,Twice daily,14,28,active,2025-01-11 06:44:34
+MRQ0026,ENC0023,PAT0003,MED000009,Amoxicillin,Mox,500 mg,Capsule,Oral,Thrice daily,5,15,active,2025-11-13 08:44:34
+MRQ0027,ENC0023,PAT0003,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,7,14,active,2025-11-13 08:44:34
+MRQ0028,ENC0024,PAT0003,MED000002,Amlodipine,Amlong,5 mg,Tablet,Oral,Once daily,30,30,active,2026-03-28 00:44:34
+MRQ0029,ENC0025,PAT0003,MED000002,Amlodipine,Amlong,5 mg,Tablet,Oral,Once daily,60,60,active,2025-03-20 07:44:34
+MRQ0030,ENC0025,PAT0003,MED000003,Telmisartan,Telma,40 mg,Tablet,Oral,Once daily,60,60,active,2025-03-20 07:44:34
+MRQ0031,ENC0026,PAT0004,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,7,14,active,2025-07-24 09:44:34
+MRQ0032,ENC0026,PAT0004,MED000005,Salbutamol,Asthalin,100 mcg,Inhaler,Inhalation,As needed (SOS),7,,active,2025-07-24 09:44:34
+MRQ0033,ENC0027,PAT0004,MED000022,Chloramphenicol,Chloromycetin,0.5%,Eye Drops,Ophthalmic,Instill twice daily in the affected eye,7,14,active,2026-03-21 07:44:34
+MRQ0034,ENC0028,PAT0004,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,5,10,active,2024-08-13 09:44:34
+MRQ0035,ENC0030,PAT0005,MED000004,Metformin,Glycomet,500 mg,Tablet,Oral,Once daily,90,90,active,2026-06-06 07:44:34
+MRQ0036,ENC0032,PAT0005,MED000010,Cetirizine,Cetzine,10 mg,Tablet,Oral,Twice daily,7,14,active,2026-06-04 09:44:34
+MRQ0037,ENC0033,PAT0005,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,5,10,active,2025-11-16 10:44:34
+MRQ0038,ENC0033,PAT0005,MED000006,ORS,Electral,Standard,Powder,Oral,As directed after each loose stool,5,,active,2025-11-16 10:44:34
+MRQ0039,ENC0034,PAT0005,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,14,28,active,2025-07-04 04:44:34
+MRQ0040,ENC0037,PAT0006,MED000005,Salbutamol,Asthalin,100 mcg,Inhaler,Inhalation,As needed (SOS),30,,active,2026-05-06 09:44:34
+MRQ0041,ENC0038,PAT0006,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,5,10,active,2026-02-18 11:44:34
+MRQ0042,ENC0039,PAT0006,MED000010,Cetirizine,Cetzine,10 mg,Tablet,Oral,Once daily,30,30,active,2025-04-03 07:44:34
+MRQ0043,ENC0040,PAT0007,MED000022,Chloramphenicol,Chloromycetin,0.5%,Eye Drops,Ophthalmic,Instill twice daily in the affected eye,7,14,active,2024-08-08 04:44:34
+MRQ0044,ENC0041,PAT0007,MED000005,Salbutamol,Asthalin,100 mcg,Inhaler,Inhalation,As needed (SOS),30,,active,2025-10-30 23:44:34
+MRQ0045,ENC0042,PAT0008,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,5,10,active,2024-10-03 09:44:34
+MRQ0046,ENC0043,PAT0008,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,7,14,active,2026-02-08 23:44:34
+MRQ0047,ENC0045,PAT0009,MED000010,Cetirizine,Cetzine,10 mg,Tablet,Oral,Once daily,30,30,active,2024-08-11 05:44:34
+MRQ0048,ENC0046,PAT0009,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,5,10,active,2025-05-06 10:44:34
+MRQ0049,ENC0047,PAT0009,MED000022,Chloramphenicol,Chloromycetin,0.5%,Eye Drops,Ophthalmic,Instill twice daily in the affected eye,60,120,active,2024-11-17 07:44:34
+MRQ0050,ENC0048,PAT0009,MED000002,Amlodipine,Amlong,5 mg,Tablet,Oral,Once daily,30,30,active,2024-09-06 02:44:34
+MRQ0051,ENC0048,PAT0009,MED000003,Telmisartan,Telma,40 mg,Tablet,Oral,Once daily,30,30,active,2024-09-06 02:44:34
+MRQ0052,ENC0051,PAT0010,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,7,14,active,2025-04-03 06:44:34
+MRQ0053,ENC0053,PAT0011,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,7,14,active,2025-06-12 23:44:34
+MRQ0054,ENC0053,PAT0011,MED000005,Salbutamol,Asthalin,100 mcg,Inhaler,Inhalation,As needed (SOS),7,,active,2025-06-12 23:44:34
+MRQ0055,ENC0054,PAT0011,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,5,10,active,2025-11-12 06:44:34
+MRQ0056,ENC0054,PAT0011,MED000006,ORS,Electral,Standard,Powder,Oral,As directed after each loose stool,5,,active,2025-11-12 06:44:34
+MRQ0057,ENC0056,PAT0011,MED000004,Metformin,Glycomet,500 mg,Tablet,Oral,Once daily,90,90,active,2025-02-13 06:44:34
+MRQ0058,ENC0057,PAT0012,MED000014,Apixaban,Eliquis,5 mg,Tablet,Oral,Once daily,30,30,active,2025-01-12 09:44:34
+MRQ0059,ENC0058,PAT0012,MED000019,Escitalopram,Nexito,10 mg,Tablet,Oral,Once daily,30,30,active,2025-03-19 10:44:34
+MRQ0060,ENC0059,PAT0012,MED000025,Clotrimazole,Candid,1%,Cream,Topical,Apply twice daily,14,28,active,2025-11-25 00:44:34
+MRQ0061,ENC0060,PAT0012,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,5,10,active,2025-01-09 05:44:34
+MRQ0062,ENC0063,PAT0013,MED000009,Amoxicillin,Mox,500 mg,Capsule,Oral,Thrice daily,5,15,active,2025-04-01 08:44:34
+MRQ0063,ENC0064,PAT0014,MED000002,Amlodipine,Amlong,5 mg,Tablet,Oral,Once daily,30,30,active,2024-11-22 03:44:34
+MRQ0064,ENC0065,PAT0014,MED000009,Amoxicillin,Mox,500 mg,Capsule,Oral,Thrice daily,5,15,active,2025-05-30 06:44:34
+MRQ0065,ENC0065,PAT0014,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,7,14,active,2025-05-30 06:44:34
+MRQ0066,ENC0066,PAT0014,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,7,14,active,2025-09-26 02:44:34
+MRQ0067,ENC0066,PAT0014,MED000005,Salbutamol,Asthalin,100 mcg,Inhaler,Inhalation,As needed (SOS),7,,active,2025-09-26 02:44:34
+MRQ0068,ENC0068,PAT0014,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Once daily,30,30,active,2025-07-07 04:44:34
+MRQ0069,ENC0072,PAT0015,MED000007,Iron + Folic Acid,IFA,100 mg,Tablet,Oral,Once daily,60,60,active,2024-12-01 06:44:34
+MRQ0070,ENC0073,PAT0016,MED000006,ORS,Electral,Standard,Powder,Oral,As directed after each loose stool,5,,active,2025-04-17 11:44:34
+MRQ0071,ENC0075,PAT0017,MED000021,Clobetasol Propionate,Tenovate,0.05%,Cream,Topical,Apply twice daily,60,120,active,2025-06-16 01:44:34
+MRQ0072,ENC0076,PAT0017,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,14,28,active,2025-01-28 05:44:34
+MRQ0073,ENC0078,PAT0017,MED000010,Cetirizine,Cetzine,10 mg,Tablet,Oral,Twice daily,7,14,active,2025-10-07 08:44:34
+MRQ0074,ENC0080,PAT0018,MED000010,Cetirizine,Cetzine,10 mg,Tablet,Oral,Once daily,30,30,active,2026-06-29 11:44:34
+MRQ0075,ENC0081,PAT0018,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,7,14,active,2025-07-10 05:44:34
+MRQ0076,ENC0081,PAT0018,MED000005,Salbutamol,Asthalin,100 mcg,Inhaler,Inhalation,As needed (SOS),7,,active,2025-07-10 05:44:34
+MRQ0077,ENC0083,PAT0019,MED000025,Clotrimazole,Candid,1%,Cream,Topical,Apply twice daily,14,28,active,2025-07-02 02:44:34
+MRQ0078,ENC0085,PAT0020,MED000005,Salbutamol,Asthalin,100 mcg,Inhaler,Inhalation,As needed (SOS),30,,active,2026-07-18 23:44:34
+MRQ0079,ENC0086,PAT0020,MED000009,Amoxicillin,Mox,500 mg,Capsule,Oral,Thrice daily,5,15,active,2026-02-17 10:44:34
+MRQ0080,ENC0086,PAT0020,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,7,14,active,2026-02-17 10:44:34
+MRQ0081,ENC0088,PAT0020,MED000001,Paracetamol,Crocin,500 mg,Tablet,Oral,Twice daily,14,28,active,2025-09-22 08:44:34
+MRQ0082,ENC0089,PAT0020,MED000006,ORS,Electral,Standard,Powder,Oral,As directed after each loose stool,5,,active,2025-07-03 02:44:34
+MRQ0083,ENC0089,PAT0020,MED000008,Pantoprazole,Pantocid,40 mg,Tablet,Oral,Twice daily,5,10,active,2025-07-03 02:44:34

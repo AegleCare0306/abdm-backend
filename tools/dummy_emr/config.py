@@ -76,7 +76,7 @@ HIPS = [
         "email": "contact@prithvihealth.in",
     },
     {
-        "hip_id": "IN3310002230",
+        "hip_id": "IN2410002587",
         "name": "MS Hospitals",
         "prefix": "MSH",
         "city": "Ahmedabad",
@@ -86,6 +86,18 @@ HIPS = [
         "pincode": "380060",
         "phone": "07940001003",
         "email": "contact@mshospitals.in",
+    },
+    {
+        "hip_id": "IN2410002590",
+        "name": "Aegle Urgent Care",
+        "prefix": "AUC",
+        "city": "Ahmedabad",
+        "state": "Gujarat",
+        "organization_type": "Urgent Care",
+        "address_line1": "Satellite Road",
+        "pincode": "380015",
+        "phone": "07940001004",
+        "email": "contact@aegleurgentcare.in",
     },
 ]
 

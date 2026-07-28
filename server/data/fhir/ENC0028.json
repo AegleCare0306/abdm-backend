@@ -1,0 +1,461 @@
+{
+  "resourceType": "Bundle",
+  "id": "BUNDLE-ENC0028",
+  "meta": {
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://ndhm.in",
+    "value": "BUNDLE-ENC0028"
+  },
+  "type": "document",
+  "timestamp": "2024-08-13T07:59:05+05:30",
+  "entry": [
+    {
+      "fullUrl": "Composition/COMP-ENC0028",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "COMP-ENC0028",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/OPConsultRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "371530004",
+              "display": "Clinical consultation report"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/PAT0004"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0028"
+        },
+        "date": "2024-08-13T07:59:05+05:30",
+        "author": [
+          {
+            "reference": "Practitioner/DOC0001"
+          }
+        ],
+        "title": "Follow-up - Fever for 2 days",
+        "custodian": {
+          "reference": "Organization/IN3310002215"
+        },
+        "section": [
+          {
+            "title": "Chief Complaint",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "422843007",
+                  "display": "Chief complaint section"
+                }
+              ]
+            },
+            "text": {
+              "status": "generated",
+              "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Fever for 2 days</div>"
+            }
+          },
+          {
+            "title": "Diagnosis",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "11450-4",
+                  "display": "Problem list"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Condition/CON0028"
+              }
+            ]
+          },
+          {
+            "title": "Medications",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "10160-0",
+                  "display": "History of medication use"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "MedicationRequest/MRQ0034"
+              }
+            ]
+          },
+          {
+            "title": "Vitals",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8716-3",
+                  "display": "Vital signs"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Observation/OBS0036"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Patient/PAT0004",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "PAT0004",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code",
+                  "code": "ABHA",
+                  "display": "Ayushman Bharat Health Account (ABHA) ID"
+                }
+              ],
+              "text": "ABHA Number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "47-4566-1958-9883"
+          },
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code",
+                  "code": "ABHA",
+                  "display": "Ayushman Bharat Health Account (ABHA) ID"
+                }
+              ],
+              "text": "ABHA Address"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "adityajoshi4@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Aditya Joshi"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9049505800"
+          },
+          {
+            "system": "email",
+            "value": "aditya.joshi@gmail.com"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2007-06-02"
+      }
+    },
+    {
+      "fullUrl": "Practitioner/DOC0001",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "DOC0001",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "text": "Gujarat Medical Council"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": "GMC100001"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Aayush Patel",
+            "family": "Patel",
+            "given": [
+              "Aayush"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9276804025"
+          },
+          {
+            "system": "email",
+            "value": "dr.aayush.patel@aeglecare.in"
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "text": "MBBS, MD"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Organization/IN3310002215",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "IN3310002215",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN3310002215"
+          }
+        ],
+        "type": [
+          {
+            "text": "Clinic"
+          }
+        ],
+        "name": "Aayush Health Care",
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "07940001001"
+          },
+          {
+            "system": "email",
+            "value": "contact@aayushhealthcare.in"
+          }
+        ],
+        "address": [
+          {
+            "line": [
+              "Satellite Road"
+            ],
+            "city": "Ahmedabad",
+            "state": "Gujarat",
+            "postalCode": "380015",
+            "country": "IN"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Encounter/ENC0028",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "ENC0028",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://facility.ndhm.gov.in/encounter",
+            "value": "AHC-2024-000007"
+          },
+          {
+            "system": "https://facility.ndhm.gov.in/mrn",
+            "value": "MR-AHC-000007"
+          }
+        ],
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "ambulatory"
+        },
+        "subject": {
+          "reference": "Patient/PAT0004"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/DOC0001"
+            }
+          }
+        ],
+        "period": {
+          "start": "2024-08-13T07:59:05+05:30"
+        },
+        "reasonCode": [
+          {
+            "text": "Fever for 2 days"
+          }
+        ],
+        "serviceProvider": {
+          "reference": "Organization/IN3310002215"
+        }
+      }
+    },
+    {
+      "fullUrl": "Condition/CON0028",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "CON0028",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Condition"
+          ]
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed"
+            }
+          ]
+        },
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "255604002",
+              "display": "Mild"
+            }
+          ],
+          "text": "Mild"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "386661006",
+              "display": "Childhood Fever"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10",
+              "code": "R50.9"
+            }
+          ],
+          "text": "Childhood Fever"
+        },
+        "subject": {
+          "reference": "Patient/PAT0004"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0028"
+        },
+        "onsetDateTime": "2024-08-13",
+        "recordedDate": "2024-08-13"
+      }
+    },
+    {
+      "fullUrl": "Observation/OBS0036",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "OBS0036",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8310-5",
+              "display": "Body Temperature"
+            }
+          ],
+          "text": "Body Temperature"
+        },
+        "subject": {
+          "reference": "Patient/PAT0004"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0028"
+        },
+        "effectiveDateTime": "2024-08-13T07:59:05+05:30",
+        "valueQuantity": {
+          "value": 39.5,
+          "unit": "\u00b0C",
+          "system": "http://unitsofmeasure.org",
+          "code": "Cel"
+        }
+      }
+    },
+    {
+      "fullUrl": "MedicationRequest/MRQ0034",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "MRQ0034",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "text": "Paracetamol 500 mg"
+        },
+        "subject": {
+          "reference": "Patient/PAT0004"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0028"
+        },
+        "authoredOn": "2024-08-13T07:59:05+05:30",
+        "dosageInstruction": [
+          {
+            "text": "Twice daily for 5 days",
+            "route": {
+              "text": "Oral"
+            }
+          }
+        ],
+        "dispenseRequest": {
+          "quantity": {
+            "value": 10.0,
+            "unit": "Tablet"
+          }
+        }
+      }
+    }
+  ]
+}

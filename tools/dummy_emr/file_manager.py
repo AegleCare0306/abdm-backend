@@ -27,17 +27,25 @@ def create_output_folders():
 
 def clear_output_folder():
     """
-    Deletes every generated CSV.
+    Deletes generated transaction CSVs only.
+
+    Master data (organizations, practitioners, practitioner_organizations,
+    patients) is treated as a persistent directory/identity layer, not
+    disposable per-run output, so it is left untouched here. It is still
+    rewritten in place by write_csv() on every run (which always overwrites
+    rather than appends), so it stays in sync with config.py and the fixed
+    patient list in patients.py — it just isn't blown away by clear step,
+    which matters if it's ever hand-edited between runs.
     """
 
     create_output_folders()
 
     deleted = 0
 
-    for file in BASE_OUTPUT_FOLDER.rglob("*.csv"):
+    for file in TRANSACTION_OUTPUT_FOLDER.rglob("*.csv"):
 
         file.unlink()
 
         deleted += 1
 
-    print(f"Deleted {deleted} CSV files.")
+    print(f"Deleted {deleted} transaction CSV files (master data preserved).")

@@ -1,0 +1,57 @@
+{
+  "resourceType": "Condition",
+  "id": "CON0001",
+  "meta": {
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Condition"
+    ]
+  },
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+        "code": "active"
+      }
+    ]
+  },
+  "verificationStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+        "code": "confirmed"
+      }
+    ]
+  },
+  "severity": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "255604002",
+        "display": "Mild"
+      }
+    ],
+    "text": "Mild"
+  },
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "386661006",
+        "display": "Childhood Fever"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10",
+        "code": "R50.9"
+      }
+    ],
+    "text": "Childhood Fever"
+  },
+  "subject": {
+    "reference": "Patient/PAT9001"
+  },
+  "encounter": {
+    "reference": "Encounter/ENC0001"
+  },
+  "onsetDateTime": "2025-08-04",
+  "recordedDate": "2025-08-04"
+}

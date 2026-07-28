@@ -51,7 +51,11 @@ def generate_encounters(
             doctor = random.choice(
                 practitioner_map[hip_id]
             )
-            case = random.choice(CLINICAL_CASES)
+            case = random.choices(
+                CLINICAL_CASES,
+                weights=[c["selection_weight"] for c in CLINICAL_CASES],
+                k=1,
+            )[0]
             facility_visit_counter.setdefault(
                 hip_id,
                 1,
@@ -83,7 +87,7 @@ def generate_encounters(
                     "visit_reason": case["encounter"]["visit_reason"],
                     "chief_complaint": case["encounter"]["chief_complaint"],
                     "encounter_status": "finished",
-                    "department": case["encounter"]["department"],
+                    "department_reference": case["department_reference"],
                     "clinical_case": case["case_id"],
                 }
             )

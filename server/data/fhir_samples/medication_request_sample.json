@@ -1,0 +1,35 @@
+{
+  "resourceType": "MedicationRequest",
+  "id": "MRQ0001",
+  "meta": {
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+    ]
+  },
+  "status": "active",
+  "intent": "order",
+  "medicationCodeableConcept": {
+    "text": "Paracetamol 500 mg"
+  },
+  "subject": {
+    "reference": "Patient/PAT9001"
+  },
+  "encounter": {
+    "reference": "Encounter/ENC0001"
+  },
+  "authoredOn": "2025-08-04T06:59:05+05:30",
+  "dosageInstruction": [
+    {
+      "text": "Twice daily for 5 days",
+      "route": {
+        "text": "Oral"
+      }
+    }
+  ],
+  "dispenseRequest": {
+    "quantity": {
+      "value": 10.0,
+      "unit": "Tablet"
+    }
+  }
+}

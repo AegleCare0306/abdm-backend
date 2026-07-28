@@ -1,0 +1,634 @@
+{
+  "resourceType": "Bundle",
+  "id": "BUNDLE-ENC0013",
+  "meta": {
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://ndhm.in",
+    "value": "BUNDLE-ENC0013"
+  },
+  "type": "document",
+  "timestamp": "2024-11-29T05:59:05+05:30",
+  "entry": [
+    {
+      "fullUrl": "Composition/COMP-ENC0013",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "COMP-ENC0013",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/OPConsultRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "371530004",
+              "display": "Clinical consultation report"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/PAT0001"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0013"
+        },
+        "date": "2024-11-29T05:59:05+05:30",
+        "author": [
+          {
+            "reference": "Practitioner/DOC0010"
+          }
+        ],
+        "title": "Follow-up - Routine antenatal check-up",
+        "custodian": {
+          "reference": "Organization/IN2410002590"
+        },
+        "section": [
+          {
+            "title": "Chief Complaint",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "422843007",
+                  "display": "Chief complaint section"
+                }
+              ]
+            },
+            "text": {
+              "status": "generated",
+              "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Routine antenatal check-up</div>"
+            }
+          },
+          {
+            "title": "Diagnosis",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "11450-4",
+                  "display": "Problem list"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Condition/CON0013"
+              }
+            ]
+          },
+          {
+            "title": "Medications",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "10160-0",
+                  "display": "History of medication use"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "MedicationRequest/MRQ0017"
+              }
+            ]
+          },
+          {
+            "title": "Vitals",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8716-3",
+                  "display": "Vital signs"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Observation/OBS0015"
+              },
+              {
+                "reference": "Observation/OBS0016"
+              }
+            ]
+          },
+          {
+            "title": "Investigations",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "30954-2",
+                  "display": "Relevant diagnostic tests/laboratory data"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "DiagnosticReport/DRP0010"
+              },
+              {
+                "reference": "DiagnosticReport/DRP0011"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Patient/PAT0001",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "PAT0001",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code",
+                  "code": "ABHA",
+                  "display": "Ayushman Bharat Health Account (ABHA) ID"
+                }
+              ],
+              "text": "ABHA Number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "18-1514-6413-2160"
+          },
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code",
+                  "code": "ABHA",
+                  "display": "Ayushman Bharat Health Account (ABHA) ID"
+                }
+              ],
+              "text": "ABHA Address"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "vivaanjoshi1@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Vivaan Joshi"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9219547810"
+          },
+          {
+            "system": "email",
+            "value": "vivaan.joshi@gmail.com"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "1977-11-16"
+      }
+    },
+    {
+      "fullUrl": "Practitioner/DOC0010",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "DOC0010",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "text": "Gujarat Medical Council"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": "GMC100010"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Nisha Shah",
+            "family": "Shah",
+            "given": [
+              "Nisha"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9175750309"
+          },
+          {
+            "system": "email",
+            "value": "dr.nisha.shah@aeglecare.in"
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "text": "MBBS, MD"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Organization/IN2410002590",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "IN2410002590",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002590"
+          }
+        ],
+        "type": [
+          {
+            "text": "Urgent Care"
+          }
+        ],
+        "name": "Aegle Urgent Care",
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "07940001004"
+          },
+          {
+            "system": "email",
+            "value": "contact@aegleurgentcare.in"
+          }
+        ],
+        "address": [
+          {
+            "line": [
+              "Satellite Road"
+            ],
+            "city": "Ahmedabad",
+            "state": "Gujarat",
+            "postalCode": "380015",
+            "country": "IN"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Encounter/ENC0013",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "ENC0013",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://facility.ndhm.gov.in/encounter",
+            "value": "AUC-2024-000006"
+          },
+          {
+            "system": "https://facility.ndhm.gov.in/mrn",
+            "value": "MR-AUC-000006"
+          }
+        ],
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "ambulatory"
+        },
+        "subject": {
+          "reference": "Patient/PAT0001"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/DOC0010"
+            }
+          }
+        ],
+        "period": {
+          "start": "2024-11-29T05:59:05+05:30"
+        },
+        "reasonCode": [
+          {
+            "text": "Routine antenatal check-up"
+          }
+        ],
+        "serviceProvider": {
+          "reference": "Organization/IN2410002590"
+        }
+      }
+    },
+    {
+      "fullUrl": "Condition/CON0013",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "CON0013",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Condition"
+          ]
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed"
+            }
+          ]
+        },
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "255604002",
+              "display": "Mild"
+            }
+          ],
+          "text": "Mild"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "72892002",
+              "display": "Normal Pregnancy"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10",
+              "code": "Z34.9"
+            }
+          ],
+          "text": "Normal Pregnancy"
+        },
+        "subject": {
+          "reference": "Patient/PAT0001"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0013"
+        },
+        "onsetDateTime": "2024-11-29",
+        "recordedDate": "2024-11-29"
+      }
+    },
+    {
+      "fullUrl": "Observation/OBS0015",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "OBS0015",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "85354-9",
+              "display": "Blood Pressure"
+            }
+          ],
+          "text": "Blood Pressure"
+        },
+        "subject": {
+          "reference": "Patient/PAT0001"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0013"
+        },
+        "effectiveDateTime": "2024-11-29T05:59:05+05:30",
+        "component": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8480-6",
+                  "display": "Systolic blood pressure"
+                }
+              ]
+            },
+            "valueQuantity": {
+              "value": 112.0,
+              "unit": "mmHg",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8462-4",
+                  "display": "Diastolic blood pressure"
+                }
+              ]
+            },
+            "valueQuantity": {
+              "value": 71.0,
+              "unit": "mmHg",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Observation/OBS0016",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "OBS0016",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "29463-7",
+              "display": "Weight"
+            }
+          ],
+          "text": "Weight"
+        },
+        "subject": {
+          "reference": "Patient/PAT0001"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0013"
+        },
+        "effectiveDateTime": "2024-11-29T05:59:05+05:30",
+        "valueQuantity": {
+          "value": 86.1,
+          "unit": "kg",
+          "system": "http://unitsofmeasure.org",
+          "code": "kg"
+        }
+      }
+    },
+    {
+      "fullUrl": "MedicationRequest/MRQ0017",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "MRQ0017",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "text": "Iron + Folic Acid 100 mg"
+        },
+        "subject": {
+          "reference": "Patient/PAT0001"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0013"
+        },
+        "authoredOn": "2024-11-29T05:59:05+05:30",
+        "dosageInstruction": [
+          {
+            "text": "Twice daily for 14 days",
+            "route": {
+              "text": "Oral"
+            }
+          }
+        ],
+        "dispenseRequest": {
+          "quantity": {
+            "value": 28.0,
+            "unit": "Tablet"
+          }
+        }
+      }
+    },
+    {
+      "fullUrl": "DiagnosticReport/DRP0010",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "DRP0010",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DiagnosticReportLab"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "LAB",
+                "display": "Laboratory"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "57021-8",
+              "display": "Complete Blood Count"
+            }
+          ],
+          "text": "Complete Blood Count"
+        },
+        "subject": {
+          "reference": "Patient/PAT0001"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0013"
+        },
+        "issued": "2024-11-29T05:59:05+05:30",
+        "conclusion": "Complete Blood Count | Result: 6197 cells/cumm | Reference range: 4000-11000 | Interpretation: Normal"
+      }
+    },
+    {
+      "fullUrl": "DiagnosticReport/DRP0011",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "DRP0011",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DiagnosticReportLab"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "LAB",
+                "display": "Laboratory"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "5804-0",
+              "display": "Urine Routine"
+            }
+          ],
+          "text": "Urine Routine"
+        },
+        "subject": {
+          "reference": "Patient/PAT0001"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0013"
+        },
+        "issued": "2024-11-29T05:59:05+05:30",
+        "conclusion": "Urine Routine | Result: No abnormality detected | Reference range: No abnormality detected | Interpretation: Normal"
+      }
+    }
+  ]
+}

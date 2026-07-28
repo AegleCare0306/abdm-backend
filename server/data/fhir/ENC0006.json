@@ -1,0 +1,519 @@
+{
+  "resourceType": "Bundle",
+  "id": "BUNDLE-ENC0006",
+  "meta": {
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://ndhm.in",
+    "value": "BUNDLE-ENC0006"
+  },
+  "type": "document",
+  "timestamp": "2026-07-02T05:59:05+05:30",
+  "entry": [
+    {
+      "fullUrl": "Composition/COMP-ENC0006",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "COMP-ENC0006",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/OPConsultRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "371530004",
+              "display": "Clinical consultation report"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/PAT9002"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0006"
+        },
+        "date": "2026-07-02T05:59:05+05:30",
+        "author": [
+          {
+            "reference": "Practitioner/DOC0006"
+          }
+        ],
+        "title": "Follow-up - Loose stools and vomiting since yesterday",
+        "custodian": {
+          "reference": "Organization/IN3310002220"
+        },
+        "section": [
+          {
+            "title": "Chief Complaint",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "422843007",
+                  "display": "Chief complaint section"
+                }
+              ]
+            },
+            "text": {
+              "status": "generated",
+              "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Loose stools and vomiting since yesterday</div>"
+            }
+          },
+          {
+            "title": "Diagnosis",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "11450-4",
+                  "display": "Problem list"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Condition/CON0006"
+              }
+            ]
+          },
+          {
+            "title": "Medications",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "10160-0",
+                  "display": "History of medication use"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "MedicationRequest/MRQ0008"
+              },
+              {
+                "reference": "MedicationRequest/MRQ0009"
+              }
+            ]
+          },
+          {
+            "title": "Vitals",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8716-3",
+                  "display": "Vital signs"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Observation/OBS0007"
+              }
+            ]
+          },
+          {
+            "title": "Investigations",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "30954-2",
+                  "display": "Relevant diagnostic tests/laboratory data"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "DiagnosticReport/DRP0004"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Patient/PAT9002",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "PAT9002",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "name": [
+          {
+            "text": "Manya Shah"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9898034665"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Practitioner/DOC0006",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "DOC0006",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "text": "Gujarat Medical Council"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": "GMC100006"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Kavya Joshi",
+            "family": "Joshi",
+            "given": [
+              "Kavya"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9203229836"
+          },
+          {
+            "system": "email",
+            "value": "dr.kavya.joshi@aeglecare.in"
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "text": "MBBS"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Organization/IN3310002220",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "IN3310002220",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN3310002220"
+          }
+        ],
+        "type": [
+          {
+            "text": "Clinic"
+          }
+        ],
+        "name": "Prithvi Health Solutions",
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "07940001002"
+          },
+          {
+            "system": "email",
+            "value": "contact@prithvihealth.in"
+          }
+        ],
+        "address": [
+          {
+            "line": [
+              "Prahlad Nagar"
+            ],
+            "city": "Ahmedabad",
+            "state": "Gujarat",
+            "postalCode": "380015",
+            "country": "IN"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Encounter/ENC0006",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "ENC0006",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://facility.ndhm.gov.in/encounter",
+            "value": "PHS-2026-000002"
+          },
+          {
+            "system": "https://facility.ndhm.gov.in/mrn",
+            "value": "MR-PHS-000002"
+          }
+        ],
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "ambulatory"
+        },
+        "subject": {
+          "reference": "Patient/PAT9002"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/DOC0006"
+            }
+          }
+        ],
+        "period": {
+          "start": "2026-07-02T05:59:05+05:30"
+        },
+        "reasonCode": [
+          {
+            "text": "Loose stools and vomiting since yesterday"
+          }
+        ],
+        "serviceProvider": {
+          "reference": "Organization/IN3310002220"
+        }
+      }
+    },
+    {
+      "fullUrl": "Condition/CON0006",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "CON0006",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Condition"
+          ]
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed"
+            }
+          ]
+        },
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "255604002",
+              "display": "Mild"
+            }
+          ],
+          "text": "Mild"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "69776003",
+              "display": "Acute Gastroenteritis"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10",
+              "code": "A09"
+            }
+          ],
+          "text": "Acute Gastroenteritis"
+        },
+        "subject": {
+          "reference": "Patient/PAT9002"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0006"
+        },
+        "onsetDateTime": "2026-07-02",
+        "recordedDate": "2026-07-02"
+      }
+    },
+    {
+      "fullUrl": "Observation/OBS0007",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "OBS0007",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8310-5",
+              "display": "Body Temperature"
+            }
+          ],
+          "text": "Body Temperature"
+        },
+        "subject": {
+          "reference": "Patient/PAT9002"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0006"
+        },
+        "effectiveDateTime": "2026-07-02T05:59:05+05:30",
+        "valueQuantity": {
+          "value": 36.5,
+          "unit": "\u00b0C",
+          "system": "http://unitsofmeasure.org",
+          "code": "Cel"
+        }
+      }
+    },
+    {
+      "fullUrl": "MedicationRequest/MRQ0008",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "MRQ0008",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "text": "ORS Standard"
+        },
+        "subject": {
+          "reference": "Patient/PAT9002"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0006"
+        },
+        "authoredOn": "2026-07-02T05:59:05+05:30",
+        "dosageInstruction": [
+          {
+            "text": "As directed after each loose stool for 5 days",
+            "route": {
+              "text": "Oral"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "MedicationRequest/MRQ0009",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "MRQ0009",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "text": "Pantoprazole 40 mg"
+        },
+        "subject": {
+          "reference": "Patient/PAT9002"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0006"
+        },
+        "authoredOn": "2026-07-02T05:59:05+05:30",
+        "dosageInstruction": [
+          {
+            "text": "Twice daily for 5 days",
+            "route": {
+              "text": "Oral"
+            }
+          }
+        ],
+        "dispenseRequest": {
+          "quantity": {
+            "value": 10.0,
+            "unit": "Tablet"
+          }
+        }
+      }
+    },
+    {
+      "fullUrl": "DiagnosticReport/DRP0004",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "DRP0004",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DiagnosticReportLab"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "LAB",
+                "display": "Laboratory"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "5804-0",
+              "display": "Urine Routine"
+            }
+          ],
+          "text": "Urine Routine"
+        },
+        "subject": {
+          "reference": "Patient/PAT9002"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0006"
+        },
+        "issued": "2026-07-02T05:59:05+05:30",
+        "conclusion": "Urine Routine | Result: No abnormality detected | Reference range: No abnormality detected | Interpretation: Normal"
+      }
+    }
+  ]
+}

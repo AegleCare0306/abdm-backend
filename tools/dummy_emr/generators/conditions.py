@@ -3,6 +3,7 @@ Condition Generator.
 """
 
 from dummy_emr.case_library import CLINICAL_CASES
+from dummy_emr.master_data.diagnoses import DIAGNOSES
 from dummy_emr.utils import condition_reference
 
 
@@ -17,10 +18,19 @@ def generate_conditions(
         for case in CLINICAL_CASES
     }
 
+    diagnosis_lookup = {
+        diagnosis["diagnosis_reference"]: diagnosis
+        for diagnosis in DIAGNOSES
+    }
+
     for index, encounter in enumerate(encounters, start=1):
 
         case = case_lookup[
             encounter["clinical_case"]
+        ]
+
+        diagnosis = diagnosis_lookup[
+            case["diagnosis_reference"]
         ]
 
         conditions.append(
@@ -38,11 +48,23 @@ def generate_conditions(
                 "clinical_case":
                     encounter["clinical_case"],
 
+                "diagnosis_reference":
+                    diagnosis["diagnosis_reference"],
+
                 "condition_name":
-                    case["condition"]["name"],
+                    diagnosis["condition_name"],
 
                 "icd10_code":
-                    case["condition"]["icd10"],
+                    diagnosis["icd10"],
+
+                "snomed_code":
+                    diagnosis["snomed"],
+
+                "chronic":
+                    diagnosis["chronic"],
+
+                "severity":
+                    diagnosis["severity"],
 
                 "clinical_status":
                     "active",

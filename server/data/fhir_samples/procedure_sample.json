@@ -1,0 +1,23 @@
+{
+  "resourceType": "Procedure",
+  "id": "PRO0001",
+  "meta": {
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Procedure"
+    ]
+  },
+  "status": "completed",
+  "code": {
+    "text": "ECG"
+  },
+  "subject": {
+    "reference": "Patient/PAT9001"
+  },
+  "encounter": {
+    "reference": "Encounter/ENC0005"
+  },
+  "performedDateTime": "2024-11-13T22:59:05+05:30",
+  "outcome": {
+    "text": "Successful"
+  }
+}

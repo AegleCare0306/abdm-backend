@@ -1,0 +1,50 @@
+{
+  "resourceType": "Patient",
+  "id": "PAT9001",
+  "meta": {
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+    ]
+  },
+  "identifier": [
+    {
+      "type": {
+        "coding": [
+          {
+            "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code",
+            "code": "ABHA",
+            "display": "Ayushman Bharat Health Account (ABHA) ID"
+          }
+        ],
+        "text": "ABHA Number"
+      },
+      "system": "https://healthid.ndhm.gov.in",
+      "value": "91-6182-1610-5253"
+    },
+    {
+      "type": {
+        "coding": [
+          {
+            "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code",
+            "code": "ABHA",
+            "display": "Ayushman Bharat Health Account (ABHA) ID"
+          }
+        ],
+        "text": "ABHA Address"
+      },
+      "system": "https://healthid.ndhm.gov.in",
+      "value": "aayushchordia1997@sbx"
+    }
+  ],
+  "name": [
+    {
+      "text": "Aayush Chordia"
+    }
+  ],
+  "telecom": [
+    {
+      "system": "phone",
+      "value": "7904191949"
+    }
+  ]
+}

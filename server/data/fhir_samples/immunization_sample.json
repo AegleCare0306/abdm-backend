@@ -1,0 +1,20 @@
+{
+  "resourceType": "Immunization",
+  "id": "IMM0001",
+  "meta": {
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Immunization"
+    ]
+  },
+  "status": "completed",
+  "vaccineCode": {
+    "text": "COVID-19"
+  },
+  "patient": {
+    "reference": "Patient/PAT0015"
+  },
+  "encounter": {
+    "reference": "Encounter/ENC0069"
+  },
+  "occurrenceDateTime": "2025-11-30T21:59:05+05:30"
+}

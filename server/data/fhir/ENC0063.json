@@ -1,0 +1,520 @@
+{
+  "resourceType": "Bundle",
+  "id": "BUNDLE-ENC0063",
+  "meta": {
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://ndhm.in",
+    "value": "BUNDLE-ENC0063"
+  },
+  "type": "document",
+  "timestamp": "2025-04-01T06:59:05+05:30",
+  "entry": [
+    {
+      "fullUrl": "Composition/COMP-ENC0063",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "COMP-ENC0063",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/OPConsultRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "371530004",
+              "display": "Clinical consultation report"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/PAT0013"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0063"
+        },
+        "date": "2025-04-01T06:59:05+05:30",
+        "author": [
+          {
+            "reference": "Practitioner/DOC0005"
+          }
+        ],
+        "title": "Follow-up - Burning micturition and urgency",
+        "custodian": {
+          "reference": "Organization/IN2410002587"
+        },
+        "section": [
+          {
+            "title": "Chief Complaint",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "422843007",
+                  "display": "Chief complaint section"
+                }
+              ]
+            },
+            "text": {
+              "status": "generated",
+              "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Burning micturition and urgency</div>"
+            }
+          },
+          {
+            "title": "Diagnosis",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "11450-4",
+                  "display": "Problem list"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Condition/CON0063"
+              }
+            ]
+          },
+          {
+            "title": "Medications",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "10160-0",
+                  "display": "History of medication use"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "MedicationRequest/MRQ0062"
+              }
+            ]
+          },
+          {
+            "title": "Vitals",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8716-3",
+                  "display": "Vital signs"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Observation/OBS0072"
+              }
+            ]
+          },
+          {
+            "title": "Investigations",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "30954-2",
+                  "display": "Relevant diagnostic tests/laboratory data"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "DiagnosticReport/DRP0038"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Patient/PAT0013",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "PAT0013",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code",
+                  "code": "ABHA",
+                  "display": "Ayushman Bharat Health Account (ABHA) ID"
+                }
+              ],
+              "text": "ABHA Number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "94-3041-5920-9308"
+          },
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code",
+                  "code": "ABHA",
+                  "display": "Ayushman Bharat Health Account (ABHA) ID"
+                }
+              ],
+              "text": "ABHA Address"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "riyatrivedi13@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Riya Trivedi"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9421496963"
+          },
+          {
+            "system": "email",
+            "value": "riya.trivedi@gmail.com"
+          }
+        ],
+        "gender": "female",
+        "birthDate": "2002-07-11"
+      }
+    },
+    {
+      "fullUrl": "Practitioner/DOC0005",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "DOC0005",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "text": "Gujarat Medical Council"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": "GMC100005"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Priya Mehta",
+            "family": "Mehta",
+            "given": [
+              "Priya"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9229661713"
+          },
+          {
+            "system": "email",
+            "value": "dr.priya.mehta@aeglecare.in"
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "text": "MBBS, MS"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Organization/IN2410002587",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "IN2410002587",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002587"
+          }
+        ],
+        "type": [
+          {
+            "text": "Hospital"
+          }
+        ],
+        "name": "MS Hospitals",
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "07940001003"
+          },
+          {
+            "system": "email",
+            "value": "contact@mshospitals.in"
+          }
+        ],
+        "address": [
+          {
+            "line": [
+              "SG Highway"
+            ],
+            "city": "Ahmedabad",
+            "state": "Gujarat",
+            "postalCode": "380060",
+            "country": "IN"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Encounter/ENC0063",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "ENC0063",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://facility.ndhm.gov.in/encounter",
+            "value": "MSH-2025-000012"
+          },
+          {
+            "system": "https://facility.ndhm.gov.in/mrn",
+            "value": "MR-MSH-000012"
+          }
+        ],
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "ambulatory"
+        },
+        "subject": {
+          "reference": "Patient/PAT0013"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/DOC0005"
+            }
+          }
+        ],
+        "period": {
+          "start": "2025-04-01T06:59:05+05:30"
+        },
+        "reasonCode": [
+          {
+            "text": "Burning micturition and urgency"
+          }
+        ],
+        "serviceProvider": {
+          "reference": "Organization/IN2410002587"
+        }
+      }
+    },
+    {
+      "fullUrl": "Condition/CON0063",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "CON0063",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Condition"
+          ]
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed"
+            }
+          ]
+        },
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "6736007",
+              "display": "Moderate"
+            }
+          ],
+          "text": "Moderate"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "68566005",
+              "display": "Urinary Tract Infection"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10",
+              "code": "N39.0"
+            }
+          ],
+          "text": "Urinary Tract Infection"
+        },
+        "subject": {
+          "reference": "Patient/PAT0013"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0063"
+        },
+        "onsetDateTime": "2025-04-01",
+        "recordedDate": "2025-04-01"
+      }
+    },
+    {
+      "fullUrl": "Observation/OBS0072",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "OBS0072",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8310-5",
+              "display": "Body Temperature"
+            }
+          ],
+          "text": "Body Temperature"
+        },
+        "subject": {
+          "reference": "Patient/PAT0013"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0063"
+        },
+        "effectiveDateTime": "2025-04-01T06:59:05+05:30",
+        "valueQuantity": {
+          "value": 36.8,
+          "unit": "\u00b0C",
+          "system": "http://unitsofmeasure.org",
+          "code": "Cel"
+        }
+      }
+    },
+    {
+      "fullUrl": "MedicationRequest/MRQ0062",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "MRQ0062",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "text": "Amoxicillin 500 mg"
+        },
+        "subject": {
+          "reference": "Patient/PAT0013"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0063"
+        },
+        "authoredOn": "2025-04-01T06:59:05+05:30",
+        "dosageInstruction": [
+          {
+            "text": "Thrice daily for 5 days",
+            "route": {
+              "text": "Oral"
+            }
+          }
+        ],
+        "dispenseRequest": {
+          "quantity": {
+            "value": 15.0,
+            "unit": "Capsule"
+          }
+        }
+      }
+    },
+    {
+      "fullUrl": "DiagnosticReport/DRP0038",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "DRP0038",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DiagnosticReportLab"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/v2-0074",
+                "code": "LAB",
+                "display": "Laboratory"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "5804-0",
+              "display": "Urine Routine"
+            }
+          ],
+          "text": "Urine Routine"
+        },
+        "subject": {
+          "reference": "Patient/PAT0013"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0063"
+        },
+        "issued": "2025-04-01T06:59:05+05:30",
+        "conclusion": "Urine Routine | Result: Pus cells 15-20/hpf, leukocyte esterase positive | Reference range: No pus cells seen | Interpretation: Abnormal"
+      }
+    }
+  ]
+}

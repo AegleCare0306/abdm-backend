@@ -1,0 +1,518 @@
+{
+  "resourceType": "Bundle",
+  "id": "BUNDLE-ENC0071",
+  "meta": {
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://ndhm.in",
+    "value": "BUNDLE-ENC0071"
+  },
+  "type": "document",
+  "timestamp": "2024-09-29T07:59:05+05:30",
+  "entry": [
+    {
+      "fullUrl": "Composition/COMP-ENC0071",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "COMP-ENC0071",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DischargeSummaryRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "373942005",
+              "display": "Discharge summary"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/PAT0015"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0071"
+        },
+        "date": "2024-09-29T07:59:05+05:30",
+        "author": [
+          {
+            "reference": "Practitioner/DOC0010"
+          }
+        ],
+        "title": "Emergency Visit - Sudden loss of consciousness",
+        "custodian": {
+          "reference": "Organization/IN2410002590"
+        },
+        "section": [
+          {
+            "title": "Chief Complaint",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "422843007",
+                  "display": "Chief complaint section"
+                }
+              ]
+            },
+            "text": {
+              "status": "generated",
+              "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Sudden loss of consciousness</div>"
+            }
+          },
+          {
+            "title": "Diagnosis",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "11450-4",
+                  "display": "Problem list"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Condition/CON0071"
+              }
+            ]
+          },
+          {
+            "title": "Vitals",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8716-3",
+                  "display": "Vital signs"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Observation/OBS0087"
+              },
+              {
+                "reference": "Observation/OBS0088"
+              }
+            ]
+          },
+          {
+            "title": "Procedures",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "47519-4",
+                  "display": "History of procedures"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Procedure/PRO0016"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Patient/PAT0015",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "PAT0015",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code",
+                  "code": "ABHA",
+                  "display": "Ayushman Bharat Health Account (ABHA) ID"
+                }
+              ],
+              "text": "ABHA Number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "35-3414-1400-1757"
+          },
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code",
+                  "code": "ABHA",
+                  "display": "Ayushman Bharat Health Account (ABHA) ID"
+                }
+              ],
+              "text": "ABHA Address"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "ishaanjoshi15@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Ishaan Joshi"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9748573316"
+          },
+          {
+            "system": "email",
+            "value": "ishaan.joshi@gmail.com"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "1990-10-28"
+      }
+    },
+    {
+      "fullUrl": "Practitioner/DOC0010",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "DOC0010",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "text": "Gujarat Medical Council"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": "GMC100010"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Nisha Shah",
+            "family": "Shah",
+            "given": [
+              "Nisha"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9175750309"
+          },
+          {
+            "system": "email",
+            "value": "dr.nisha.shah@aeglecare.in"
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "text": "MBBS, MD"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Organization/IN2410002590",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "IN2410002590",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002590"
+          }
+        ],
+        "type": [
+          {
+            "text": "Urgent Care"
+          }
+        ],
+        "name": "Aegle Urgent Care",
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "07940001004"
+          },
+          {
+            "system": "email",
+            "value": "contact@aegleurgentcare.in"
+          }
+        ],
+        "address": [
+          {
+            "line": [
+              "Satellite Road"
+            ],
+            "city": "Ahmedabad",
+            "state": "Gujarat",
+            "postalCode": "380015",
+            "country": "IN"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Encounter/ENC0071",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "ENC0071",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://facility.ndhm.gov.in/encounter",
+            "value": "AUC-2024-000025"
+          },
+          {
+            "system": "https://facility.ndhm.gov.in/mrn",
+            "value": "MR-AUC-000025"
+          }
+        ],
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "EMER",
+          "display": "emergency"
+        },
+        "subject": {
+          "reference": "Patient/PAT0015"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/DOC0010"
+            }
+          }
+        ],
+        "period": {
+          "start": "2024-09-29T07:59:05+05:30"
+        },
+        "reasonCode": [
+          {
+            "text": "Sudden loss of consciousness"
+          }
+        ],
+        "serviceProvider": {
+          "reference": "Organization/IN2410002590"
+        }
+      }
+    },
+    {
+      "fullUrl": "Condition/CON0071",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "CON0071",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Condition"
+          ]
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed"
+            }
+          ]
+        },
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "6736007",
+              "display": "Moderate"
+            }
+          ],
+          "text": "Moderate"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "271594007",
+              "display": "Syncope"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10",
+              "code": "R55"
+            }
+          ],
+          "text": "Syncope"
+        },
+        "subject": {
+          "reference": "Patient/PAT0015"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0071"
+        },
+        "onsetDateTime": "2024-09-29",
+        "recordedDate": "2024-09-29"
+      }
+    },
+    {
+      "fullUrl": "Observation/OBS0087",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "OBS0087",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "85354-9",
+              "display": "Blood Pressure"
+            }
+          ],
+          "text": "Blood Pressure"
+        },
+        "subject": {
+          "reference": "Patient/PAT0015"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0071"
+        },
+        "effectiveDateTime": "2024-09-29T07:59:05+05:30",
+        "component": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8480-6",
+                  "display": "Systolic blood pressure"
+                }
+              ]
+            },
+            "valueQuantity": {
+              "value": 119.0,
+              "unit": "mmHg",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            }
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8462-4",
+                  "display": "Diastolic blood pressure"
+                }
+              ]
+            },
+            "valueQuantity": {
+              "value": 71.0,
+              "unit": "mmHg",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Observation/OBS0088",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "OBS0088",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8867-4",
+              "display": "Heart Rate"
+            }
+          ],
+          "text": "Heart Rate"
+        },
+        "subject": {
+          "reference": "Patient/PAT0015"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0071"
+        },
+        "effectiveDateTime": "2024-09-29T07:59:05+05:30",
+        "valueQuantity": {
+          "value": 86.0,
+          "unit": "bpm",
+          "system": "http://unitsofmeasure.org",
+          "code": "/min"
+        }
+      }
+    },
+    {
+      "fullUrl": "Procedure/PRO0016",
+      "resource": {
+        "resourceType": "Procedure",
+        "id": "PRO0016",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Procedure"
+          ]
+        },
+        "status": "completed",
+        "code": {
+          "text": "ECG"
+        },
+        "subject": {
+          "reference": "Patient/PAT0015"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0071"
+        },
+        "performedDateTime": "2024-09-29T07:59:05+05:30",
+        "outcome": {
+          "text": "Successful"
+        }
+      }
+    }
+  ]
+}

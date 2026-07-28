@@ -1,0 +1,42 @@
+{
+  "resourceType": "Organization",
+  "id": "IN3310002215",
+  "meta": {
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+    ]
+  },
+  "identifier": [
+    {
+      "system": "https://facility.ndhm.gov.in",
+      "value": "IN3310002215"
+    }
+  ],
+  "type": [
+    {
+      "text": "Clinic"
+    }
+  ],
+  "name": "Aayush Health Care",
+  "telecom": [
+    {
+      "system": "phone",
+      "value": "07940001001"
+    },
+    {
+      "system": "email",
+      "value": "contact@aayushhealthcare.in"
+    }
+  ],
+  "address": [
+    {
+      "line": [
+        "Satellite Road"
+      ],
+      "city": "Ahmedabad",
+      "state": "Gujarat",
+      "postalCode": "380015",
+      "country": "IN"
+    }
+  ]
+}

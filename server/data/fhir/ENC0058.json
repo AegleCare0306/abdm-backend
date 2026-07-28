@@ -1,0 +1,408 @@
+{
+  "resourceType": "Bundle",
+  "id": "BUNDLE-ENC0058",
+  "meta": {
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://ndhm.in",
+    "value": "BUNDLE-ENC0058"
+  },
+  "type": "document",
+  "timestamp": "2025-03-19T08:59:05+05:30",
+  "entry": [
+    {
+      "fullUrl": "Composition/COMP-ENC0058",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "COMP-ENC0058",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/OPConsultRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "371530004",
+              "display": "Clinical consultation report"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/PAT0012"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0058"
+        },
+        "date": "2025-03-19T08:59:05+05:30",
+        "author": [
+          {
+            "reference": "Practitioner/DOC0005"
+          }
+        ],
+        "title": "Follow-up - Excessive worry and restlessness",
+        "custodian": {
+          "reference": "Organization/IN2410002587"
+        },
+        "section": [
+          {
+            "title": "Chief Complaint",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "422843007",
+                  "display": "Chief complaint section"
+                }
+              ]
+            },
+            "text": {
+              "status": "generated",
+              "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Excessive worry and restlessness</div>"
+            }
+          },
+          {
+            "title": "Diagnosis",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "11450-4",
+                  "display": "Problem list"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "Condition/CON0058"
+              }
+            ]
+          },
+          {
+            "title": "Medications",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "10160-0",
+                  "display": "History of medication use"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "MedicationRequest/MRQ0059"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Patient/PAT0012",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "PAT0012",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code",
+                  "code": "ABHA",
+                  "display": "Ayushman Bharat Health Account (ABHA) ID"
+                }
+              ],
+              "text": "ABHA Number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "75-2894-7311-4114"
+          },
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-identifier-type-code",
+                  "code": "ABHA",
+                  "display": "Ayushman Bharat Health Account (ABHA) ID"
+                }
+              ],
+              "text": "ABHA Address"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "diyasingh12@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Diya Singh"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9095776306"
+          },
+          {
+            "system": "email",
+            "value": "diya.singh@gmail.com"
+          }
+        ],
+        "gender": "female",
+        "birthDate": "1962-12-14"
+      }
+    },
+    {
+      "fullUrl": "Practitioner/DOC0005",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "DOC0005",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "text": "Gujarat Medical Council"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": "GMC100005"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Priya Mehta",
+            "family": "Mehta",
+            "given": [
+              "Priya"
+            ],
+            "prefix": [
+              "Dr."
+            ]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9229661713"
+          },
+          {
+            "system": "email",
+            "value": "dr.priya.mehta@aeglecare.in"
+          }
+        ],
+        "qualification": [
+          {
+            "code": {
+              "text": "MBBS, MS"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Organization/IN2410002587",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "IN2410002587",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002587"
+          }
+        ],
+        "type": [
+          {
+            "text": "Hospital"
+          }
+        ],
+        "name": "MS Hospitals",
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "07940001003"
+          },
+          {
+            "system": "email",
+            "value": "contact@mshospitals.in"
+          }
+        ],
+        "address": [
+          {
+            "line": [
+              "SG Highway"
+            ],
+            "city": "Ahmedabad",
+            "state": "Gujarat",
+            "postalCode": "380060",
+            "country": "IN"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "Encounter/ENC0058",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "ENC0058",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://facility.ndhm.gov.in/encounter",
+            "value": "MSH-2025-000011"
+          },
+          {
+            "system": "https://facility.ndhm.gov.in/mrn",
+            "value": "MR-MSH-000011"
+          }
+        ],
+        "status": "finished",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "ambulatory"
+        },
+        "subject": {
+          "reference": "Patient/PAT0012"
+        },
+        "participant": [
+          {
+            "individual": {
+              "reference": "Practitioner/DOC0005"
+            }
+          }
+        ],
+        "period": {
+          "start": "2025-03-19T08:59:05+05:30"
+        },
+        "reasonCode": [
+          {
+            "text": "Excessive worry and restlessness"
+          }
+        ],
+        "serviceProvider": {
+          "reference": "Organization/IN2410002587"
+        }
+      }
+    },
+    {
+      "fullUrl": "Condition/CON0058",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "CON0058",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Condition"
+          ]
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed"
+            }
+          ]
+        },
+        "severity": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "6736007",
+              "display": "Moderate"
+            }
+          ],
+          "text": "Moderate"
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "21897009",
+              "display": "Generalized Anxiety Disorder"
+            },
+            {
+              "system": "http://hl7.org/fhir/sid/icd-10",
+              "code": "F41.1"
+            }
+          ],
+          "text": "Generalized Anxiety Disorder"
+        },
+        "subject": {
+          "reference": "Patient/PAT0012"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0058"
+        },
+        "onsetDateTime": "2025-03-19",
+        "recordedDate": "2025-03-19"
+      }
+    },
+    {
+      "fullUrl": "MedicationRequest/MRQ0059",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "MRQ0059",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "text": "Escitalopram 10 mg"
+        },
+        "subject": {
+          "reference": "Patient/PAT0012"
+        },
+        "encounter": {
+          "reference": "Encounter/ENC0058"
+        },
+        "authoredOn": "2025-03-19T08:59:05+05:30",
+        "dosageInstruction": [
+          {
+            "text": "Once daily for 30 days",
+            "route": {
+              "text": "Oral"
+            }
+          }
+        ],
+        "dispenseRequest": {
+          "quantity": {
+            "value": 30.0,
+            "unit": "Tablet"
+          }
+        }
+      }
+    }
+  ]
+}
