@@ -1,19 +1,51 @@
 # Python
 __pycache__/
 *.pyc
+*.pyo
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Generated dummy EMR data (regenerate with tools/generate_dummy_emr.py,
+# tools/generate_patient_records.py, tools/generate_fhir_bundles.py --
+# not source, just noisy diffs if committed)
+server/data/master/*.csv
+server/data/transaction/*.csv
+server/data/patient_records.csv
+server/data/fhir/*.json
+server/data/fhir_samples/*.json
 
 # Jupyter
 .ipynb_checkpoints/
 
-# Callback logs
-server/storage/
+# Callback logs (actual path per server/callbacks/utils/storage.py)
+storage/callbacks/*
+
+# Logs
+*.log
+
+# PyCharm/JVM crash dumps (e.g. from the Claude Code plugin OOM crash)
+java_error_in_pycharm_*.log
+*.hprof
 
 # Environment
 .env
 
-# VS Code
+# Editors / IDEs
 .vscode/
-
 .idea/
 
-storage/callbacks/*
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Test/coverage caches
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
