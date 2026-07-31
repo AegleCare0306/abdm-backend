@@ -1,61 +1,76 @@
+import json
 import requests
 
 from server.config import HIECM_BASE_URL, X_CM_ID
 from server.utils import generate_request_id, generate_timestamp, get_gateway_token
+from server.callbacks.utils.flow_logger import log_error
 
-def discover_patient(
-    x_auth_token,
-    hiu_id,
-    hip_id,
-    identifier_type,
-    identifier_value,
-):
-    """
-    Discover a patient for User Initiated Linking.
-    Args:
-        token (str): Gateway bearer token.
-        x_auth_token (str): X-AUTH-TOKEN issued by ABDM.
-        hiu_id (str): HIU identifier.
-        hip_id (str): HIP identifier.
-        identifier_type (str): Identifier type.
-                               Example: "ABHA_ADDRESS"
-        identifier_value (str): Identifier value.
-    Returns:
-        requests.Response
-    """
-
-    url = (
-        f"{HIECM_BASE_URL}"
-        "/user-initiated-linking/v3/patient/care-context/discover"
-    )
-
-    headers = {
-        "Authorization": f"Bearer {get_gateway_token()}",
-        "X-AUTH-TOKEN": f"Bearer {x_auth_token}",
-        "X-CM-ID": X_CM_ID,
-        "X-HIU-ID": hiu_id,
-        "REQUEST-ID": generate_request_id(),
-        "TIMESTAMP": generate_timestamp(),
-        "Content-Type": "application/json",
-    }
-
-    payload = {
-        "hipId": hip_id,
-        "unverifiedIdentifiers": [
-            {
-                "type": identifier_type,
-                "value": identifier_value,
-            }
-        ],
-    }
-
-    response = requests.post(
-        url=url,
-        headers=headers,
-        json=payload,
-    )
-
-    return response
+# NOTE (2026-07-31): disabled during M2 documentation review. This function
+# sends a discover *request* as if we were the HIU side of the exchange --
+# it doesn't fit our HIP-only flow (we only ever receive/react to discover
+# callbacks, never initiate them -- see server/callbacks/services/discover_service.py).
+# Left over from early testing when the same app simulated both HIP and HIU
+# roles. Not called anywhere in the current codebase (confirmed via repo-wide
+# search). Commented out rather than deleted in case it's needed again for
+# that kind of local testing.
+#
+# def discover_patient(
+#     x_auth_token,
+#     hiu_id,
+#     hip_id,
+#     identifier_type,
+#     identifier_value,
+# ):
+#     """
+#     Discover a patient for User Initiated Linking.
+#     Args:
+#         token (str): Gateway bearer token.
+#         x_auth_token (str): X-AUTH-TOKEN issued by ABDM.
+#         hiu_id (str): HIU identifier.
+#         hip_id (str): HIP identifier.
+#         identifier_type (str): Identifier type.
+#                                Example: "ABHA_ADDRESS"
+#         identifier_value (str): Identifier value.
+#     Returns:
+#         requests.Response
+#     """
+#
+#     url = (
+#         f"{HIECM_BASE_URL}"
+#         "/user-initiated-linking/v3/patient/care-context/discover"
+#     )
+#
+#     headers = {
+#         "Authorization": f"Bearer {get_gateway_token()}",
+#         "X-AUTH-TOKEN": f"Bearer {x_auth_token}",
+#         "X-CM-ID": X_CM_ID,
+#         "X-HIU-ID": hiu_id,
+#         "REQUEST-ID": generate_request_id(),
+#         "TIMESTAMP": generate_timestamp(),
+#         "Content-Type": "application/json",
+#     }
+#
+#     payload = {
+#         "hipId": hip_id,
+#         "unverifiedIdentifiers": [
+#             {
+#                 "type": identifier_type,
+#                 "value": identifier_value,
+#             }
+#         ],
+#     }
+#
+#     try:
+#         response = requests.post(
+#             url=url,
+#             headers=headers,
+#             json=payload,
+#         )
+#     except requests.exceptions.RequestException as exc:
+#         log_error(f"Discover patient request failed: {exc}")
+#         raise
+#
+#     return response
 
 def send_on_discover(
     transaction_id,
@@ -74,6 +89,12 @@ def send_on_discover(
     payload = {
         "transactionId": transaction_id,
         "patient": patient_data,
+        # TODO(flagged 2026-07): hardcoded to "MR" regardless of which
+        # identifier actually matched the patient. Per the demo video,
+        # this can legitimately be "MR" or "MOBILE" -- current code always
+        # searches by ABHA address though, so this may not reflect reality.
+        # Left as-is intentionally until confirmed; revisit if ABDM's
+        # gateway ever rejects/complains about this value.
         "matchedBy": ["MR"],
         "response": {
             "requestId": request_id
@@ -88,19 +109,15 @@ def send_on_discover(
         "Authorization": f"Bearer {get_gateway_token()}",
     }
 
-    response = requests.post(
-        url,
-        headers=headers,
-        json=payload,
-    )
-
-    print("\n===== ON DISCOVER RESPONSE =====")
-    print("Status :", response.status_code)
-
     try:
-        print(json.dumps(response.json(), indent=4))
-    except Exception:
-        print(response.text)
+        response = requests.post(
+            url,
+            headers=headers,
+            json=payload,
+        )
+    except requests.exceptions.RequestException as exc:
+        log_error(f"on-discover call failed: {exc}")
+        raise
 
     return response
 
@@ -146,11 +163,15 @@ def send_on_init(
         "Authorization": f"Bearer {get_gateway_token()}",
     }
 
-    response = requests.post(
-        url,
-        headers=headers,
-        json=payload,
-    )
+    try:
+        response = requests.post(
+            url,
+            headers=headers,
+            json=payload,
+        )
+    except requests.exceptions.RequestException as exc:
+        log_error(f"on-init call failed: {exc}")
+        raise
 
     return response
 
@@ -189,11 +210,15 @@ def send_on_confirm(
         "Authorization": f"Bearer {get_gateway_token()}",
     }
 
-    response = requests.post(
-        url,
-        headers=headers,
-        json=payload,
-        timeout=30,
-    )
+    try:
+        response = requests.post(
+            url,
+            headers=headers,
+            json=payload,
+            timeout=30,
+        )
+    except requests.exceptions.RequestException as exc:
+        log_error(f"on-confirm call failed: {exc}")
+        raise
 
     return response

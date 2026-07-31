@@ -1,17 +1,15 @@
 """
 verify_fidelius.py
 
-Verifies that pyfidelius produces results matching ABDM's official
-reference implementation (fidelius-cli, the Java project pyfidelius is
-ported from), using a test vector published in that project's own README
--- NOT something I generated myself, since I have no way to independently
-verify correct output for a curve this unusual.
+Verifies server/fidelius_crypto.py -- the pure-Python Fidelius encryption
+implementation -- against a known test vector published in ABDM's own
+reference implementation's documentation (mgrmtech/fidelius-cli README),
+plus a self-consistent encrypt->decrypt round trip.
 
-Source of the test vector: mgrmtech/fidelius-cli README, the documented
-encrypt/decrypt example pair. If this script prints PASS, the underlying
-curve arithmetic + HKDF + AES-GCM chain in pyfidelius matches the real
-ABDM spec -- since decrypt necessarily exercises the identical shared-
-secret computation and key derivation that encrypt also depends on.
+Unlike the earlier version of this script, this does NOT depend on any
+external package beyond what's already in requirements.txt (no fastecdsa,
+no GMP, no C compiler needed) -- server/fidelius_crypto.py implements the
+BC25519 curve arithmetic directly in pure Python.
 
 HOW TO RUN
 ----------
@@ -20,22 +18,13 @@ HOW TO RUN
 """
 
 import sys
+from pathlib import Path
 
-try:
-    from fidelius import CryptoController, DecryptionRequest
-except ImportError as exc:
-    print(f"[FAIL] Could not import pyfidelius: {exc}")
-    print("       Check `pip show fidelius` -- the class names below")
-    print("       (DecryptionRequest, CryptoController.decrypt) are my")
-    print("       best guess at the API surface; if the import itself")
-    print("       fails, paste the actual error and I'll adjust.")
-    sys.exit(1)
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from server.fidelius_crypto import decrypt_health_data, encrypt_health_data, generate_key_material
 
 
-# Published test vector from mgrmtech/fidelius-cli's README.
-# This is A (the "sender" in the original encrypt direction) having
-# encrypted a message for B; here B ("sender" from B's own decrypt
-# call's point of view) decrypts it back.
 KNOWN_CIPHERTEXT = (
     "pzMvVZNNVtJzqPkkxcCbBUWgDEBy/mBXIeT2dJWI16ZAQnnXUb9lI+S4k8XK6mgZ"
     "SKKSRIHkcNvJpllnBg548wUgavBa0vCRRwdL6kY6Yw=="
@@ -50,37 +39,73 @@ KNOWN_REQUESTER_PUBLIC_KEY = (
 EXPECTED_PLAINTEXT = "Wormtail should never have been Potter cottage's secret keeper."
 
 
-def main():
-
-    print("\nVerifying pyfidelius against the official reference test vector...\n")
-
+def check_known_vector():
+    print("[1/2] Known reference test vector (mgrmtech/fidelius-cli README)")
     try:
-        decryption_request = DecryptionRequest(
-            encrypted_data=KNOWN_CIPHERTEXT,
-            sender_nonce=KNOWN_SENDER_NONCE,
-            requester_nonce=KNOWN_REQUESTER_NONCE,
+        result = decrypt_health_data(
+            ciphertext=KNOWN_CIPHERTEXT,
             sender_private_key=KNOWN_SENDER_PRIVATE_KEY,
+            sender_nonce=KNOWN_SENDER_NONCE,
             requester_public_key=KNOWN_REQUESTER_PUBLIC_KEY,
+            requester_nonce=KNOWN_REQUESTER_NONCE,
         )
-        controller = CryptoController()
-        result = controller.decrypt(decryption_request)
     except Exception as exc:
-        print(f"[FAIL] Decryption raised an exception: {type(exc).__name__}: {exc}")
-        print("       This likely means the DecryptionRequest/decrypt() API")
-        print("       surface doesn't match what I guessed -- paste this error")
-        print("       and I'll fix the call to match the real signature.")
-        sys.exit(1)
+        print(f"  [FAIL] Raised {type(exc).__name__}: {exc}")
+        return False
 
     if result == EXPECTED_PLAINTEXT:
-        print("[PASS] Decrypted output matches the known reference plaintext exactly.")
-        print(f"       -> \"{result}\"")
-        print("\npyfidelius's curve/HKDF/AES-GCM implementation matches the official spec.\n")
-    else:
-        print("[FAIL] Decrypted output does NOT match the expected plaintext.")
-        print(f"       Expected: {EXPECTED_PLAINTEXT!r}")
-        print(f"       Got:      {result!r}")
-        print("\nThis would mean pyfidelius's output diverges from the official reference --")
-        print("do not wire this into the live flow until this is resolved.\n")
+        print(f'  [PASS] Decrypted exactly: "{result}"')
+        return True
+
+    print(f"  [FAIL] Expected: {EXPECTED_PLAINTEXT!r}")
+    print(f"         Got:      {result!r}")
+    return False
+
+
+def check_round_trip():
+    print("\n[2/2] Self-consistent encrypt -> decrypt round trip (fresh keys)")
+    try:
+        hip = generate_key_material()
+        hiu = generate_key_material()
+        message = '{"resourceType": "Bundle", "id": "verify-round-trip"}'
+
+        ciphertext = encrypt_health_data(
+            plaintext=message,
+            sender_private_key=hip["private_key"],
+            sender_nonce=hip["nonce"],
+            requester_public_key=hiu["public_key"],
+            requester_nonce=hiu["nonce"],
+        )
+
+        recovered = decrypt_health_data(
+            ciphertext=ciphertext,
+            sender_private_key=hiu["private_key"],
+            sender_nonce=hiu["nonce"],
+            requester_public_key=hip["public_key"],
+            requester_nonce=hip["nonce"],
+        )
+    except Exception as exc:
+        print(f"  [FAIL] Raised {type(exc).__name__}: {exc}")
+        return False
+
+    if recovered == message:
+        print(f"  [PASS] Round trip recovered the original message exactly.")
+        return True
+
+    print(f"  [FAIL] Expected: {message!r}")
+    print(f"         Got:      {recovered!r}")
+    return False
+
+
+def main():
+    print("\nVerifying server/fidelius_crypto.py...\n")
+
+    results = [check_known_vector(), check_round_trip()]
+
+    passed = sum(results)
+    print(f"\n{passed}/{len(results)} checks passed.\n")
+
+    if not all(results):
         sys.exit(1)
 
 

@@ -62,10 +62,12 @@ async def care_context_init(request: Request):
 @router.post("/api/v3/hip/link/care-context/confirm")
 async def care_context_confirm(request: Request):
 
-    return await dispatch_callback(
+    await dispatch_callback(
         callback_type="care_context_confirm",
         request=request,
     )
+
+    return success()
 
 @router.post("/api/v3/hip/health-information/request")
 async def health_information_request(

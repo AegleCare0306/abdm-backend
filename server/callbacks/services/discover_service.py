@@ -3,79 +3,90 @@ from server.callbacks.transformers.patient_transformer import build_patient_payl
 from server.linking import send_on_discover
 from server.utils import print_api_response
 from server.callbacks.repository.patient_identity_repository import save_patient_identity
-
-import json
+from server.callbacks.utils.flow_logger import log_phase, log_api_call, log_waiting, log_error
 
 async def process_discover(callback_data):
 
-    headers = callback_data["headers"]
-    body = callback_data["body"]
-    patient = body["patient"]
+    try:
+        log_phase("Patient search request received from ABDM (POST /api/v3/hip/patient/care-context/discover)")
 
-    verified = patient.get("verifiedIdentifiers", [])
-    unverified = patient.get("unverifiedIdentifiers", [])
+        headers = callback_data["headers"]
+        body = callback_data["body"]
+        patient = body["patient"]
 
-    hip_id = headers.get("x-hip-id")
-    abha_address = None
-    abha_number = None
-    mobile = None
-    mr_number = None
+        verified = patient.get("verifiedIdentifiers") or []
+        unverified = patient.get("unverifiedIdentifiers") or []
 
-    for identifier in verified:
+        hip_id = headers.get("x-hip-id")
+        abha_address = None
+        abha_number = None
+        mobile = None
+        mr_number = None
 
-        if identifier["type"] == "MOBILE":
-            mobile = identifier["value"]
+        for identifier in verified:
 
-        if identifier["type"] == "ABHA_NUMBER":
-            abha_number = identifier["value"]
+            if identifier.get("type") == "MOBILE":
+                mobile = identifier.get("value")
 
-        if identifier["type"] == "abhaAddress":
-            abha_address = identifier["value"]
+            if identifier.get("type") == "ABHA_NUMBER":
+                abha_number = identifier.get("value")
 
-    for identifier in unverified:
+            if identifier.get("type") == "abhaAddress":
+                abha_address = identifier.get("value")
 
-        if identifier["type"] == "MR":
-            mr_number = identifier["value"]
+        for identifier in unverified:
 
-    name = patient.get("name")
-    gender = patient.get("gender")
-    year_of_birth = patient.get("yearOfBirth")
+            if identifier.get("type") == "MR":
+                mr_number = identifier.get("value")
 
-    patient_profile= {
-        "abha_address": abha_address,
-        "abha_number": abha_number,
-        "mobile": mobile,
-        "name": name,
-        "year_of_birth": year_of_birth,
-        "hip_id": hip_id,
-    }
+        log_phase("Extracted patient identifiers (ABHA address, mobile, MR if provided)")
 
-    save_patient_identity(
-        abha_address,
-        patient_profile,
-    )
+        name = patient.get("name")
+        gender = patient.get("gender")
+        year_of_birth = patient.get("yearOfBirth")
 
-    transaction_id = body.get("transactionId")
-    request_id = headers.get("request-id")
+        patient_profile= {
+            "abha_address": abha_address,
+            "abha_number": abha_number,
+            "mobile": mobile,
+            "name": name,
+            "year_of_birth": year_of_birth,
+            "hip_id": hip_id,
+        }
 
-    print("\n===== DISCOVER CALLBACK =====")
+        save_patient_identity(
+            abha_address,
+            patient_profile,
+        )
 
-    patient_data = search_patient(
-    abha_address=abha_address,
-    hip_id=hip_id,
-    )
-    patient_payload = build_patient_payload(patient_data)
+        transaction_id = body.get("transactionId")
+        request_id = headers.get("request-id")
 
-    print("Patient Found  :", patient_data)
+        patient_data = search_patient(
+        abha_address=abha_address,
+        hip_id=hip_id,
+        )
+        patient_payload = build_patient_payload(patient_data)
 
-    response = send_on_discover(
-        transaction_id,
-        request_id,
-        patient_payload,
-    )
+        if patient_data:
+            log_phase(f"Found {len(patient_data)} matching record(s)")
+        else:
+            log_phase("No matching records found")
 
-    print("\n===== ON DISCOVER RESPONSE =====")
-    print(f"Status Code : {response.status_code}")
+        response = send_on_discover(
+            transaction_id,
+            request_id,
+            patient_payload,
+        )
 
-    if response.status_code != 202:
-        print_api_response(response)
+        log_api_call("Reporting Patient Match to ABDM", "POST .../on-discover", response.status_code)
+
+        if response.status_code != 202:
+            print_api_response(response)
+            return
+
+        log_waiting("Waiting for the patient to choose to link these records in the PHR app")
+
+    except Exception as exc:
+        log_error(f"Discover callback processing failed unexpectedly: {exc}")
+        return

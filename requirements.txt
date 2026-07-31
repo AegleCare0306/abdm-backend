@@ -7,7 +7,6 @@ click==8.4.2
 colorama==0.4.6
 cryptography>=41.0.0
 fastapi==0.139.2
-fidelius @ git+https://github.com/dimagi/pyfidelius.git@master
 fhir.resources>=7.1.0
 h11==0.16.0
 idna==3.18
