@@ -26,6 +26,20 @@ server/data/fhir_samples/*.json
 # Callback logs (actual path per server/callbacks/utils/storage.py)
 storage/callbacks/*
 
+# API capture diagnostic (actual path per server/callbacks/utils/api_capture.py)
+# -- contains real bearer tokens and patient PII once a real flow is run
+storage/api_capture.jsonl
+
+# M1 test CLI response logs (tools/m1_test_suite/common.py's log_response())
+# -- contain full session tokens (JWTs), OTPs, ABHA numbers, and mobile
+# numbers in plaintext once a real flow is run against the sandbox
+tools/m1_test_suite/logs/
+
+# M1 test CLI downloads (tools/m1_test_suite/flows/profile_utilities.py)
+# -- contains a real ABHA Card and QR Code once Flow 12 is run for real,
+# personal identity-adjacent documents
+tools/m1_test_suite/downloads/
+
 # Logs
 *.log
 

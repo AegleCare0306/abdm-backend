@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from server.callbacks.repository.link_repository import get_link_session
 from server.callbacks.repository.patient_repository import search_patient
 from server.callbacks.transformers.patient_transformer import build_patient_payload
@@ -26,6 +28,13 @@ async def process_link_confirm(callback_data):
         if session is None:
             log_error("Link session not found -- cannot confirm.")
             return
+
+        expiry_str = session.get("otp_expiry")
+        if expiry_str:
+            expiry_dt = datetime.fromisoformat(expiry_str.replace("Z", "+00:00"))
+            if datetime.now(timezone.utc) > expiry_dt:
+                log_error("OTP window has expired -- cannot confirm link.")
+                return
 
         if not verify_otp(
                 otp=otp,

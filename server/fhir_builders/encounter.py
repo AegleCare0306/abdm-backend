@@ -10,6 +10,8 @@ from fhir.resources.R4B.reference import Reference
 from fhir.resources.R4B.period import Period
 from fhir.resources.R4B.meta import Meta
 
+from server.fhir_builders.datetime_utils import to_fhir_datetime
+
 
 ABDM_ENCOUNTER_PROFILE = "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
 FACILITY_ENCOUNTER_ID_SYSTEM = "https://facility.ndhm.gov.in/encounter"
@@ -27,21 +29,6 @@ VALID_STATUSES = {
     "planned", "arrived", "triaged", "in-progress", "onleave",
     "finished", "cancelled", "entered-in-error", "unknown",
 }
-
-
-def _to_fhir_datetime(value):
-    """
-    '2025-05-16 06:53:08' -> '2025-05-16T06:53:08+05:30'
-
-    FHIR's dateTime type requires a timezone offset whenever a time
-    component is present (its regex rejects a bare local time). The
-    dummy data has no timezone info, so IST (+05:30) is appended since
-    this is Indian hospital data -- if encounter_datetime ever starts
-    carrying its own timezone, this should read that instead of assuming.
-    """
-    if not value:
-        return None
-    return value.replace(" ", "T") + "+05:30"
 
 
 def build_encounter(encounter_row):
@@ -89,7 +76,7 @@ def build_encounter(encounter_row):
             )
         ],
         "serviceProvider": Reference(reference=f"Organization/{encounter_row['hip_id']}"),
-        "period": Period(start=_to_fhir_datetime(encounter_row["encounter_datetime"])),
+        "period": Period(start=to_fhir_datetime(encounter_row["encounter_datetime"])),
     }
 
     if encounter_row.get("chief_complaint"):

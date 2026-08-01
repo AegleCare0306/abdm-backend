@@ -3,6 +3,7 @@ import requests
 from server.config import HIECM_BASE_URL, X_CM_ID
 from server.utils import generate_request_id, generate_timestamp, get_gateway_token
 from server.callbacks.utils.flow_logger import log_error
+from server.callbacks.utils.api_capture import record_call
 
 
 def send_on_consent_notify(
@@ -52,8 +53,35 @@ def send_on_consent_notify(
             json=payload,
         )
     except requests.exceptions.RequestException as exc:
+        record_call(
+            label="on-notify-consent",
+            direction="outgoing",
+            method="POST",
+            url=url,
+            request_headers=headers,
+            request_body=payload,
+            response_status=None,
+            response_body=f"RequestException: {exc}",
+        )
         log_error(f"on-notify (consent) call failed: {exc}")
         raise
+
+    try:
+        response_body = response.json()
+    except ValueError:
+        response_body = response.text
+
+    record_call(
+        label="on-notify-consent",
+        direction="outgoing",
+        method="POST",
+        url=url,
+        request_headers=headers,
+        request_body=payload,
+        response_status=response.status_code,
+        response_headers=dict(response.headers),
+        response_body=response_body,
+    )
 
     return response
 
@@ -104,8 +132,35 @@ def send_on_health_information_request(
             json=payload,
         )
     except requests.exceptions.RequestException as exc:
+        record_call(
+            label="on-request-health-information",
+            direction="outgoing",
+            method="POST",
+            url=url,
+            request_headers=headers,
+            request_body=payload,
+            response_status=None,
+            response_body=f"RequestException: {exc}",
+        )
         log_error(f"on-request (health information) call failed: {exc}")
         raise
+
+    try:
+        response_body = response.json()
+    except ValueError:
+        response_body = response.text
+
+    record_call(
+        label="on-request-health-information",
+        direction="outgoing",
+        method="POST",
+        url=url,
+        request_headers=headers,
+        request_body=payload,
+        response_status=response.status_code,
+        response_headers=dict(response.headers),
+        response_body=response_body,
+    )
 
     return response
 
@@ -161,8 +216,35 @@ def send_health_information_data(
             json=payload,
         )
     except requests.exceptions.RequestException as exc:
+        record_call(
+            label="data-push-to-hiu",
+            direction="outgoing",
+            method="POST",
+            url=data_push_url,
+            request_headers=headers,
+            request_body=payload,
+            response_status=None,
+            response_body=f"RequestException: {exc}",
+        )
         log_error(f"Data push to HIU ({data_push_url}) failed: {exc}")
         raise
+
+    try:
+        response_body = response.json()
+    except ValueError:
+        response_body = response.text
+
+    record_call(
+        label="data-push-to-hiu",
+        direction="outgoing",
+        method="POST",
+        url=data_push_url,
+        request_headers=headers,
+        request_body=payload,
+        response_status=response.status_code,
+        response_headers=dict(response.headers),
+        response_body=response_body,
+    )
 
     return response
 
@@ -231,7 +313,34 @@ def send_health_information_notify(
             json=payload,
         )
     except requests.exceptions.RequestException as exc:
+        record_call(
+            label="health-information-notify",
+            direction="outgoing",
+            method="POST",
+            url=url,
+            request_headers=headers,
+            request_body=payload,
+            response_status=None,
+            response_body=f"RequestException: {exc}",
+        )
         log_error(f"Health Information notify call failed: {exc}")
         raise
+
+    try:
+        response_body = response.json()
+    except ValueError:
+        response_body = response.text
+
+    record_call(
+        label="health-information-notify",
+        direction="outgoing",
+        method="POST",
+        url=url,
+        request_headers=headers,
+        request_body=payload,
+        response_status=response.status_code,
+        response_headers=dict(response.headers),
+        response_body=response_body,
+    )
 
     return response

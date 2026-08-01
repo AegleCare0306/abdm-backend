@@ -4,6 +4,7 @@ import requests
 from server.config import HIECM_BASE_URL, X_CM_ID
 from server.utils import generate_request_id, generate_timestamp, get_gateway_token
 from server.callbacks.utils.flow_logger import log_error
+from server.callbacks.utils.api_capture import record_call
 
 # NOTE (2026-07-31): disabled during M2 documentation review. This function
 # sends a discover *request* as if we were the HIU side of the exchange --
@@ -116,8 +117,35 @@ def send_on_discover(
             json=payload,
         )
     except requests.exceptions.RequestException as exc:
+        record_call(
+            label="on-discover",
+            direction="outgoing",
+            method="POST",
+            url=url,
+            request_headers=headers,
+            request_body=payload,
+            response_status=None,
+            response_body=f"RequestException: {exc}",
+        )
         log_error(f"on-discover call failed: {exc}")
         raise
+
+    try:
+        response_body = response.json()
+    except ValueError:
+        response_body = response.text
+
+    record_call(
+        label="on-discover",
+        direction="outgoing",
+        method="POST",
+        url=url,
+        request_headers=headers,
+        request_body=payload,
+        response_status=response.status_code,
+        response_headers=dict(response.headers),
+        response_body=response_body,
+    )
 
     return response
 
@@ -170,8 +198,35 @@ def send_on_init(
             json=payload,
         )
     except requests.exceptions.RequestException as exc:
+        record_call(
+            label="on-init",
+            direction="outgoing",
+            method="POST",
+            url=url,
+            request_headers=headers,
+            request_body=payload,
+            response_status=None,
+            response_body=f"RequestException: {exc}",
+        )
         log_error(f"on-init call failed: {exc}")
         raise
+
+    try:
+        response_body = response.json()
+    except ValueError:
+        response_body = response.text
+
+    record_call(
+        label="on-init",
+        direction="outgoing",
+        method="POST",
+        url=url,
+        request_headers=headers,
+        request_body=payload,
+        response_status=response.status_code,
+        response_headers=dict(response.headers),
+        response_body=response_body,
+    )
 
     return response
 
@@ -218,7 +273,34 @@ def send_on_confirm(
             timeout=30,
         )
     except requests.exceptions.RequestException as exc:
+        record_call(
+            label="on-confirm",
+            direction="outgoing",
+            method="POST",
+            url=url,
+            request_headers=headers,
+            request_body=payload,
+            response_status=None,
+            response_body=f"RequestException: {exc}",
+        )
         log_error(f"on-confirm call failed: {exc}")
         raise
+
+    try:
+        response_body = response.json()
+    except ValueError:
+        response_body = response.text
+
+    record_call(
+        label="on-confirm",
+        direction="outgoing",
+        method="POST",
+        url=url,
+        request_headers=headers,
+        request_body=payload,
+        response_status=response.status_code,
+        response_headers=dict(response.headers),
+        response_body=response_body,
+    )
 
     return response

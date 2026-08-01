@@ -9,34 +9,33 @@ from fhir.resources.R4B.coding import Coding
 from fhir.resources.R4B.reference import Reference
 from fhir.resources.R4B.meta import Meta
 
+from server.fhir_builders.datetime_utils import to_fhir_datetime
+
 
 ABDM_OBSERVATION_PROFILE = "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
 LOINC_SYSTEM = "http://loinc.org"
 UCUM_SYSTEM = "http://unitsofmeasure.org"
 
-BP_OBSERVATION_REF = "OBS000001"
+BP_PANEL_LOINC = "85354-9"
 SYSTOLIC_LOINC = "8480-6"
 DIASTOLIC_LOINC = "8462-4"
 
-# observation_master_reference -> UCUM unit code (the CSV's "unit" field is a
-# display string like "mmHg", not a UCUM code, so this maps explicitly rather
-# than trying to string-match display units to UCUM)
+# loinc -> UCUM unit code (the CSV's "unit" field is a display string like
+# "mmHg", not a UCUM code, so this maps explicitly rather than trying to
+# string-match display units to UCUM). Keyed by LOINC rather than the
+# internal observation_master_reference (OBS0000xx) since LOINC is the
+# stable, standards-based identifier -- the master reference is just a
+# dummy-data ID that could change if observation_catalog.py is regenerated.
 UCUM_UNIT_MAP = {
-    "OBS000001": "mm[Hg]",
-    "OBS000002": "/min",
-    "OBS000003": "/min",
-    "OBS000004": "Cel",
-    "OBS000005": "kg",
-    "OBS000006": "cm",
-    "OBS000007": "mg/dL",
-    "OBS000008": "%",
+    "85354-9": "mm[Hg]",  # Blood Pressure
+    "8867-4": "/min",     # Heart Rate
+    "9279-1": "/min",     # Respiratory Rate
+    "8310-5": "Cel",      # Body Temperature
+    "29463-7": "kg",      # Weight
+    "8302-2": "cm",       # Height
+    "2339-0": "mg/dL",    # Blood Glucose
+    "59408-5": "%",       # Oxygen Saturation
 }
-
-
-def _to_fhir_datetime(value):
-    if not value:
-        return None
-    return value.replace(" ", "T") + "+05:30"
 
 
 def build_observation(observation_row):
@@ -47,8 +46,7 @@ def build_observation(observation_row):
         effective_datetime, status
     """
 
-    master_ref = observation_row["observation_master_reference"]
-    ucum_unit = UCUM_UNIT_MAP.get(master_ref)
+    ucum_unit = UCUM_UNIT_MAP.get(observation_row["loinc"])
 
     kwargs = {
         "id": observation_row["observation_reference"],
@@ -60,10 +58,10 @@ def build_observation(observation_row):
         ),
         "subject": Reference(reference=f"Patient/{observation_row['patient_reference']}"),
         "encounter": Reference(reference=f"Encounter/{observation_row['encounter_reference']}"),
-        "effectiveDateTime": _to_fhir_datetime(observation_row["effective_datetime"]),
+        "effectiveDateTime": to_fhir_datetime(observation_row["effective_datetime"]),
     }
 
-    if master_ref == BP_OBSERVATION_REF:
+    if observation_row["loinc"] == BP_PANEL_LOINC:
         # Blood Pressure is a panel: systolic/diastolic as separate
         # components with their own LOINC codes, not a single value.
         systolic, diastolic = observation_row["value"].split("/")

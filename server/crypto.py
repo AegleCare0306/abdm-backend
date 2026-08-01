@@ -15,6 +15,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from server.config import ABHA_BASE_URL
 from server.utils import generate_request_id, generate_timestamp, get_gateway_token
 from server.callbacks.utils.flow_logger import log_phase, log_error
+from server.callbacks.utils.api_capture import record_call
 
 # -----------------------------------------------------------------------------
 # Certificate Cache
@@ -42,15 +43,44 @@ def download_public_certificate():
         "TIMESTAMP": generate_timestamp(),
     }
 
+    url = f"{ABHA_BASE_URL}/profile/public/certificate"
+
     try:
         response = requests.get(
-            url=f"{ABHA_BASE_URL}/profile/public/certificate",
+            url=url,
             headers=headers,
         )
         response.raise_for_status()
     except requests.exceptions.RequestException as exc:
+        record_call(
+            label="get-public-certificate",
+            direction="outgoing",
+            method="GET",
+            url=url,
+            request_headers=headers,
+            request_body=None,
+            response_status=None,
+            response_body=f"RequestException: {exc}",
+        )
         log_error(f"ABDM public certificate download failed: {exc}")
         raise
+
+    try:
+        response_body = response.json()
+    except ValueError:
+        response_body = response.text
+
+    record_call(
+        label="get-public-certificate",
+        direction="outgoing",
+        method="GET",
+        url=url,
+        request_headers=headers,
+        request_body=None,
+        response_status=response.status_code,
+        response_headers=dict(response.headers),
+        response_body=response_body,
+    )
 
     public_key_str = response.json().get("publicKey")
 

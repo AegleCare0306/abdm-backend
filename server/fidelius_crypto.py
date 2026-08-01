@@ -150,10 +150,20 @@ def _decode_public_key(raw_bytes):
         raise ValueError(f"Expected uncompressed EC point (0x04 prefix), got {raw_bytes[0]:#x}")
     x = int.from_bytes(raw_bytes[1:33], "big")
     y = int.from_bytes(raw_bytes[33:65], "big")
+
+    if (y * y - (x**3 + _CURVE_A * x + _CURVE_B)) % _P != 0:
+        raise ValueError(f"Public key point is not on the curve (x={x}, y={y})")
+
     return (x, y)
 
 
 def _derive_key_and_iv(sender_nonce_bytes, requester_nonce_bytes, shared_secret_x_bytes):
+    if len(sender_nonce_bytes) != 32 or len(requester_nonce_bytes) != 32:
+        raise ValueError(
+            f"Expected 32-byte nonce, got sender={len(sender_nonce_bytes)} bytes, "
+            f"requester={len(requester_nonce_bytes)} bytes"
+        )
+
     xor_nonces = bytes(s ^ r for s, r in zip(sender_nonce_bytes, requester_nonce_bytes))
     salt = xor_nonces[:20]
     iv = xor_nonces[20:32]

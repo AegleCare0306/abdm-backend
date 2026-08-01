@@ -8,6 +8,8 @@ from fhir.resources.R4B.coding import Coding
 from fhir.resources.R4B.reference import Reference
 from fhir.resources.R4B.meta import Meta
 
+from server.fhir_builders.datetime_utils import to_fhir_datetime
+
 
 LOINC_SYSTEM = "http://loinc.org"
 SNOMED_SYSTEM = "http://snomed.info/sct"
@@ -52,12 +54,6 @@ def _pick_composition_type(document_types):
         if doc_type in COMPOSITION_TYPE_BY_DOCUMENT_TYPE:
             return COMPOSITION_TYPE_BY_DOCUMENT_TYPE[doc_type]
     return DEFAULT_COMPOSITION_TYPE
-
-
-def _to_fhir_datetime(value):
-    if not value:
-        return None
-    return value.replace(" ", "T") + "+05:30"
 
 
 def build_composition(
@@ -122,7 +118,7 @@ def build_composition(
         type=CodeableConcept(coding=[Coding(system=SNOMED_SYSTEM, code=type_code, display=type_display)]),
         subject=Reference(reference=f"Patient/{patient_id}"),
         encounter=Reference(reference=f"Encounter/{encounter_id}"),
-        date=_to_fhir_datetime(composition_date),
+        date=to_fhir_datetime(composition_date),
         author=[Reference(reference=f"Practitioner/{practitioner_id}")],
         title=title,
         custodian=Reference(reference=f"Organization/{organization_id}"),

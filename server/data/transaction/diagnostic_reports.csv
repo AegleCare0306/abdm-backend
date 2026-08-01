@@ -1,48 +1,48 @@
 diagnostic_report_reference,encounter_reference,patient_reference,lab_reference,test_name,loinc,category,result_value,reference_range,unit,interpretation,status,issued_datetime
-DRP0001,ENC0002,PAT9001,LAB000002,HbA1c,4548-4,Diabetes,7.6,4.0-5.6,%,High,final,2026-06-27 08:44:34
-DRP0002,ENC0002,PAT9001,LAB000006,Blood Glucose,2339-0,Diabetes,156,70-110,mg/dL,High,final,2026-06-27 08:44:34
-DRP0003,ENC0005,PAT9001,LAB000005,Lipid Profile,24331-1,Cardiology,246,<200,mg/dL,High,final,2024-11-14 00:44:34
-DRP0004,ENC0006,PAT9002,LAB000008,Urine Routine,5804-0,Urine,No abnormality detected,No abnormality detected,,Normal,final,2026-07-02 07:44:34
-DRP0005,ENC0007,PAT9002,LAB000004,Liver Function Test,24325-3,Biochemistry,53,7-40,U/L,High,final,2026-01-06 10:44:34
-DRP0006,ENC0010,PAT9003,LAB000001,Complete Blood Count,57021-8,Hematology,17797,4000-11000,cells/cumm,High,final,2024-10-03 06:44:34
-DRP0007,ENC0011,PAT9004,LAB000008,Urine Routine,5804-0,Urine,No abnormality detected,No abnormality detected,,Normal,final,2025-07-23 01:44:34
-DRP0008,ENC0012,PAT9004,LAB000001,Complete Blood Count,57021-8,Hematology,9040,4000-11000,cells/cumm,Normal,final,2025-02-09 01:44:34
-DRP0009,ENC0012,PAT9004,LAB000008,Urine Routine,5804-0,Urine,No abnormality detected,No abnormality detected,,Normal,final,2025-02-09 01:44:34
-DRP0010,ENC0013,PAT0001,LAB000001,Complete Blood Count,57021-8,Hematology,6197,4000-11000,cells/cumm,Normal,final,2024-11-29 07:44:34
-DRP0011,ENC0013,PAT0001,LAB000008,Urine Routine,5804-0,Urine,No abnormality detected,No abnormality detected,,Normal,final,2024-11-29 07:44:34
-DRP0012,ENC0014,PAT0001,LAB000008,Urine Routine,5804-0,Urine,"Pus cells 15-20/hpf, leukocyte esterase positive",No pus cells seen,,Abnormal,final,2026-05-01 07:44:34
-DRP0013,ENC0016,PAT0001,LAB000002,HbA1c,4548-4,Diabetes,8.5,4.0-5.6,%,High,final,2025-08-30 09:44:34
-DRP0014,ENC0016,PAT0001,LAB000006,Blood Glucose,2339-0,Diabetes,244,70-110,mg/dL,High,final,2025-08-30 09:44:34
-DRP0015,ENC0018,PAT0002,LAB000005,Lipid Profile,24331-1,Cardiology,164,<200,mg/dL,Normal,final,2026-01-14 10:44:34
-DRP0016,ENC0019,PAT0002,LAB000008,Urine Routine,5804-0,Urine,"Pus cells 15-20/hpf, leukocyte esterase positive",No pus cells seen,,Abnormal,final,2025-11-24 00:44:34
-DRP0017,ENC0020,PAT0002,LAB000006,Blood Glucose,2339-0,Diabetes,90,70-110,mg/dL,Normal,final,2026-07-11 10:44:34
-DRP0018,ENC0022,PAT0003,LAB000001,Complete Blood Count,57021-8,Hematology,5708,4000-11000,cells/cumm,Normal,final,2025-01-11 06:44:34
-DRP0019,ENC0022,PAT0003,LAB000008,Urine Routine,5804-0,Urine,No abnormality detected,No abnormality detected,,Normal,final,2025-01-11 06:44:34
-DRP0020,ENC0023,PAT0003,LAB000001,Complete Blood Count,57021-8,Hematology,17460,4000-11000,cells/cumm,High,final,2025-11-13 08:44:34
-DRP0021,ENC0024,PAT0003,LAB000005,Lipid Profile,24331-1,Cardiology,220,<200,mg/dL,High,final,2026-03-28 00:44:34
-DRP0022,ENC0025,PAT0003,LAB000005,Lipid Profile,24331-1,Cardiology,255,<200,mg/dL,High,final,2025-03-20 07:44:34
-DRP0023,ENC0030,PAT0005,LAB000005,Lipid Profile,24331-1,Cardiology,238,<200,mg/dL,High,final,2026-06-06 07:44:34
-DRP0024,ENC0030,PAT0005,LAB000006,Blood Glucose,2339-0,Diabetes,156,70-110,mg/dL,High,final,2026-06-06 07:44:34
-DRP0025,ENC0033,PAT0005,LAB000007,Dengue NS1,34487-9,Microbiology,Positive,Negative,,Positive,final,2025-11-16 10:44:34
-DRP0026,ENC0033,PAT0005,LAB000001,Complete Blood Count,57021-8,Hematology,15425,4000-11000,cells/cumm,High,final,2025-11-16 10:44:34
-DRP0027,ENC0043,PAT0008,LAB000001,Complete Blood Count,57021-8,Hematology,13053,4000-11000,cells/cumm,High,final,2026-02-08 23:44:34
-DRP0028,ENC0048,PAT0009,LAB000005,Lipid Profile,24331-1,Cardiology,242,<200,mg/dL,High,final,2024-09-06 02:44:34
-DRP0029,ENC0051,PAT0010,LAB000001,Complete Blood Count,57021-8,Hematology,5400,4000-11000,cells/cumm,Normal,final,2025-04-03 06:44:34
-DRP0030,ENC0052,PAT0010,LAB000005,Lipid Profile,24331-1,Cardiology,223,<200,mg/dL,High,final,2026-04-12 09:44:34
-DRP0031,ENC0052,PAT0010,LAB000006,Blood Glucose,2339-0,Diabetes,84,70-110,mg/dL,Normal,final,2026-04-12 09:44:34
-DRP0032,ENC0054,PAT0011,LAB000007,Dengue NS1,34487-9,Microbiology,Positive,Negative,,Positive,final,2025-11-12 06:44:34
-DRP0033,ENC0054,PAT0011,LAB000001,Complete Blood Count,57021-8,Hematology,11121,4000-11000,cells/cumm,High,final,2025-11-12 06:44:34
-DRP0034,ENC0055,PAT0011,LAB000008,Urine Routine,5804-0,Urine,"Pus cells 15-20/hpf, leukocyte esterase positive",No pus cells seen,,Abnormal,final,2026-07-27 01:44:34
-DRP0035,ENC0055,PAT0011,LAB000003,Kidney Function Test,24323-8,Biochemistry,1.8,0.6-1.2,mg/dL,High,final,2026-07-27 01:44:34
-DRP0036,ENC0056,PAT0011,LAB000002,HbA1c,4548-4,Diabetes,9.0,4.0-5.6,%,High,final,2025-02-13 06:44:34
-DRP0037,ENC0056,PAT0011,LAB000006,Blood Glucose,2339-0,Diabetes,215,70-110,mg/dL,High,final,2025-02-13 06:44:34
-DRP0038,ENC0063,PAT0013,LAB000008,Urine Routine,5804-0,Urine,"Pus cells 15-20/hpf, leukocyte esterase positive",No pus cells seen,,Abnormal,final,2025-04-01 08:44:34
-DRP0039,ENC0064,PAT0014,LAB000005,Lipid Profile,24331-1,Cardiology,261,<200,mg/dL,High,final,2024-11-22 03:44:34
-DRP0040,ENC0065,PAT0014,LAB000001,Complete Blood Count,57021-8,Hematology,11129,4000-11000,cells/cumm,High,final,2025-05-30 06:44:34
-DRP0041,ENC0067,PAT0014,LAB000006,Blood Glucose,2339-0,Diabetes,85,70-110,mg/dL,Normal,final,2025-03-20 06:44:34
-DRP0042,ENC0070,PAT0015,LAB000005,Lipid Profile,24331-1,Cardiology,253,<200,mg/dL,High,final,2025-03-31 00:44:34
-DRP0043,ENC0070,PAT0015,LAB000006,Blood Glucose,2339-0,Diabetes,81,70-110,mg/dL,Normal,final,2025-03-31 00:44:34
-DRP0044,ENC0072,PAT0015,LAB000001,Complete Blood Count,57021-8,Hematology,5538,4000-11000,cells/cumm,Normal,final,2024-12-01 06:44:34
-DRP0045,ENC0076,PAT0017,LAB000003,Kidney Function Test,24323-8,Biochemistry,2.3,0.6-1.2,mg/dL,High,final,2025-01-28 05:44:34
-DRP0046,ENC0079,PAT0017,LAB000005,Lipid Profile,24331-1,Cardiology,183,<200,mg/dL,Normal,final,2024-10-18 00:44:34
-DRP0047,ENC0089,PAT0020,LAB000008,Urine Routine,5804-0,Urine,No abnormality detected,No abnormality detected,,Normal,final,2025-07-03 02:44:34
+DRP0001,ENC0002,PAT9001,LAB000002,HbA1c,4548-4,Diabetes,7.6,4.0-5.6,%,High,final,2026-07-01 08:54:17
+DRP0002,ENC0002,PAT9001,LAB000006,Blood Glucose,2339-0,Diabetes,156,70-110,mg/dL,High,final,2026-07-01 08:54:17
+DRP0003,ENC0005,PAT9001,LAB000005,Lipid Profile,24331-1,Cardiology,246,<200,mg/dL,High,final,2024-11-18 00:54:17
+DRP0004,ENC0006,PAT9002,LAB000008,Urine Routine,5804-0,Urine,No abnormality detected,No abnormality detected,,Normal,final,2026-07-06 07:54:17
+DRP0005,ENC0007,PAT9002,LAB000004,Liver Function Test,24325-3,Biochemistry,53,7-40,U/L,High,final,2026-01-10 10:54:17
+DRP0006,ENC0010,PAT9003,LAB000001,Complete Blood Count,57021-8,Hematology,17797,4000-11000,cells/cumm,High,final,2024-10-07 06:54:17
+DRP0007,ENC0011,PAT9004,LAB000008,Urine Routine,5804-0,Urine,No abnormality detected,No abnormality detected,,Normal,final,2025-07-27 01:54:17
+DRP0008,ENC0012,PAT9004,LAB000001,Complete Blood Count,57021-8,Hematology,9040,4000-11000,cells/cumm,Normal,final,2025-02-13 01:54:17
+DRP0009,ENC0012,PAT9004,LAB000008,Urine Routine,5804-0,Urine,No abnormality detected,No abnormality detected,,Normal,final,2025-02-13 01:54:17
+DRP0010,ENC0013,PAT0001,LAB000001,Complete Blood Count,57021-8,Hematology,6197,4000-11000,cells/cumm,Normal,final,2024-12-03 07:54:17
+DRP0011,ENC0013,PAT0001,LAB000008,Urine Routine,5804-0,Urine,No abnormality detected,No abnormality detected,,Normal,final,2024-12-03 07:54:17
+DRP0012,ENC0014,PAT0001,LAB000008,Urine Routine,5804-0,Urine,"Pus cells 15-20/hpf, leukocyte esterase positive",No pus cells seen,,Abnormal,final,2026-05-05 07:54:17
+DRP0013,ENC0016,PAT0001,LAB000002,HbA1c,4548-4,Diabetes,8.5,4.0-5.6,%,High,final,2025-09-03 09:54:17
+DRP0014,ENC0016,PAT0001,LAB000006,Blood Glucose,2339-0,Diabetes,244,70-110,mg/dL,High,final,2025-09-03 09:54:17
+DRP0015,ENC0018,PAT0002,LAB000005,Lipid Profile,24331-1,Cardiology,164,<200,mg/dL,Normal,final,2026-01-18 10:54:17
+DRP0016,ENC0019,PAT0002,LAB000008,Urine Routine,5804-0,Urine,"Pus cells 15-20/hpf, leukocyte esterase positive",No pus cells seen,,Abnormal,final,2025-11-28 00:54:17
+DRP0017,ENC0020,PAT0002,LAB000006,Blood Glucose,2339-0,Diabetes,90,70-110,mg/dL,Normal,final,2026-07-15 10:54:17
+DRP0018,ENC0022,PAT0003,LAB000001,Complete Blood Count,57021-8,Hematology,5708,4000-11000,cells/cumm,Normal,final,2025-01-15 06:54:17
+DRP0019,ENC0022,PAT0003,LAB000008,Urine Routine,5804-0,Urine,No abnormality detected,No abnormality detected,,Normal,final,2025-01-15 06:54:17
+DRP0020,ENC0023,PAT0003,LAB000001,Complete Blood Count,57021-8,Hematology,17460,4000-11000,cells/cumm,High,final,2025-11-17 08:54:17
+DRP0021,ENC0024,PAT0003,LAB000005,Lipid Profile,24331-1,Cardiology,220,<200,mg/dL,High,final,2026-04-01 00:54:17
+DRP0022,ENC0025,PAT0003,LAB000005,Lipid Profile,24331-1,Cardiology,255,<200,mg/dL,High,final,2025-03-24 07:54:17
+DRP0023,ENC0030,PAT0005,LAB000005,Lipid Profile,24331-1,Cardiology,238,<200,mg/dL,High,final,2026-06-10 07:54:17
+DRP0024,ENC0030,PAT0005,LAB000006,Blood Glucose,2339-0,Diabetes,156,70-110,mg/dL,High,final,2026-06-10 07:54:17
+DRP0025,ENC0033,PAT0005,LAB000007,Dengue NS1,34487-9,Microbiology,Positive,Negative,,Positive,final,2025-11-20 10:54:17
+DRP0026,ENC0033,PAT0005,LAB000001,Complete Blood Count,57021-8,Hematology,15425,4000-11000,cells/cumm,High,final,2025-11-20 10:54:17
+DRP0027,ENC0043,PAT0008,LAB000001,Complete Blood Count,57021-8,Hematology,13053,4000-11000,cells/cumm,High,final,2026-02-12 23:54:17
+DRP0028,ENC0048,PAT0009,LAB000005,Lipid Profile,24331-1,Cardiology,242,<200,mg/dL,High,final,2024-09-10 02:54:17
+DRP0029,ENC0051,PAT0010,LAB000001,Complete Blood Count,57021-8,Hematology,5400,4000-11000,cells/cumm,Normal,final,2025-04-07 06:54:17
+DRP0030,ENC0052,PAT0010,LAB000005,Lipid Profile,24331-1,Cardiology,223,<200,mg/dL,High,final,2026-04-16 09:54:17
+DRP0031,ENC0052,PAT0010,LAB000006,Blood Glucose,2339-0,Diabetes,84,70-110,mg/dL,Normal,final,2026-04-16 09:54:17
+DRP0032,ENC0054,PAT0011,LAB000007,Dengue NS1,34487-9,Microbiology,Positive,Negative,,Positive,final,2025-11-16 06:54:17
+DRP0033,ENC0054,PAT0011,LAB000001,Complete Blood Count,57021-8,Hematology,11121,4000-11000,cells/cumm,High,final,2025-11-16 06:54:17
+DRP0034,ENC0055,PAT0011,LAB000008,Urine Routine,5804-0,Urine,"Pus cells 15-20/hpf, leukocyte esterase positive",No pus cells seen,,Abnormal,final,2026-07-31 01:54:17
+DRP0035,ENC0055,PAT0011,LAB000003,Kidney Function Test,24323-8,Biochemistry,1.8,0.6-1.2,mg/dL,High,final,2026-07-31 01:54:17
+DRP0036,ENC0056,PAT0011,LAB000002,HbA1c,4548-4,Diabetes,9.0,4.0-5.6,%,High,final,2025-02-17 06:54:17
+DRP0037,ENC0056,PAT0011,LAB000006,Blood Glucose,2339-0,Diabetes,215,70-110,mg/dL,High,final,2025-02-17 06:54:17
+DRP0038,ENC0063,PAT0013,LAB000008,Urine Routine,5804-0,Urine,"Pus cells 15-20/hpf, leukocyte esterase positive",No pus cells seen,,Abnormal,final,2025-04-05 08:54:17
+DRP0039,ENC0064,PAT0014,LAB000005,Lipid Profile,24331-1,Cardiology,261,<200,mg/dL,High,final,2024-11-26 03:54:17
+DRP0040,ENC0065,PAT0014,LAB000001,Complete Blood Count,57021-8,Hematology,11129,4000-11000,cells/cumm,High,final,2025-06-03 06:54:17
+DRP0041,ENC0067,PAT0014,LAB000006,Blood Glucose,2339-0,Diabetes,85,70-110,mg/dL,Normal,final,2025-03-24 06:54:17
+DRP0042,ENC0070,PAT0015,LAB000005,Lipid Profile,24331-1,Cardiology,253,<200,mg/dL,High,final,2025-04-04 00:54:17
+DRP0043,ENC0070,PAT0015,LAB000006,Blood Glucose,2339-0,Diabetes,81,70-110,mg/dL,Normal,final,2025-04-04 00:54:17
+DRP0044,ENC0072,PAT0015,LAB000001,Complete Blood Count,57021-8,Hematology,5538,4000-11000,cells/cumm,Normal,final,2024-12-05 06:54:17
+DRP0045,ENC0076,PAT0017,LAB000003,Kidney Function Test,24323-8,Biochemistry,2.3,0.6-1.2,mg/dL,High,final,2025-02-01 05:54:17
+DRP0046,ENC0079,PAT0017,LAB000005,Lipid Profile,24331-1,Cardiology,183,<200,mg/dL,Normal,final,2024-10-22 00:54:17
+DRP0047,ENC0089,PAT0020,LAB000008,Urine Routine,5804-0,Urine,No abnormality detected,No abnormality detected,,Normal,final,2025-07-07 02:54:17

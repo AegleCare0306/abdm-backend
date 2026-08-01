@@ -107,6 +107,7 @@ def generate_medication_requests(
                     "generic_name": medication["generic_name"],
                     "brand_name": medication["brand_name"],
                     "strength": medication["strength"],
+                    "atc_code": medication["atc_code"],
                     "dosage_form": medication["dosage_form"],
                     "route": route,
                     "frequency": frequency,

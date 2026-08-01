@@ -7,14 +7,10 @@ from fhir.resources.R4B.codeableconcept import CodeableConcept
 from fhir.resources.R4B.reference import Reference
 from fhir.resources.R4B.meta import Meta
 
+from server.fhir_builders.datetime_utils import to_fhir_datetime
+
 
 ABDM_PROCEDURE_PROFILE = "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Procedure"
-
-
-def _to_fhir_datetime(value):
-    if not value:
-        return None
-    return value.replace(" ", "T") + "+05:30"
 
 
 def build_procedure(procedure_row):
@@ -31,7 +27,7 @@ def build_procedure(procedure_row):
         "code": CodeableConcept(text=procedure_row["name"]),
         "subject": Reference(reference=f"Patient/{procedure_row['patient_reference']}"),
         "encounter": Reference(reference=f"Encounter/{procedure_row['encounter_reference']}"),
-        "performedDateTime": _to_fhir_datetime(procedure_row["performed_datetime"]),
+        "performedDateTime": to_fhir_datetime(procedure_row["performed_datetime"]),
     }
 
     if procedure_row.get("outcome"):

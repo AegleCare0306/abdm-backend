@@ -1,12 +1,15 @@
+import uuid
+
 from fastapi import Request
 
 from server.callbacks.utils.storage import save_callback
+from server.callbacks.utils.api_capture import record_call
 from server.callbacks.handlers.discover import handle_discover
 from server.callbacks.handlers.link_init import handle_link_init
 from server.callbacks.handlers.link_confirm import handle_link_confirm
 from server.callbacks.handlers.consent_notify import handle_consent_notify
 from server.callbacks.handlers.health_information_request import handle_health_information_request
-from server.callbacks.utils.flow_logger import log_error
+from server.callbacks.utils.flow_logger import log_error, set_correlation_id
 
 
 async def dispatch_callback(
@@ -24,6 +27,9 @@ async def dispatch_callback(
     """
 
     try:
+        correlation_id = str(uuid.uuid4())[:8]
+        set_correlation_id(correlation_id)
+
         headers = dict(request.headers)
 
         try:
@@ -39,7 +45,19 @@ async def dispatch_callback(
         # Full raw callback payload is archived to storage/callbacks/*.json by
         # save_callback() -- nothing printed to console here, since each
         # service below tells its own story as it processes the callback.
-        save_callback(callback_data)
+        save_callback(callback_data, correlation_id=correlation_id)
+
+        record_call(
+            label=callback_type,
+            direction="incoming",
+            method="POST",
+            url=str(request.url.path),
+            request_headers=headers,
+            request_body=body,
+            response_status=200,
+            response_headers=None,
+            response_body={"status": "OK"},
+        )
 
         handlers = {
             "discover": handle_discover,

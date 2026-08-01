@@ -22,6 +22,9 @@ SEVERITY_SNOMED = {
     "Severe": "24484000",
 }
 
+VALID_CLINICAL_STATUSES = {"active", "recurrence", "relapse", "inactive", "remission", "resolved"}
+VALID_VERIFICATION_STATUSES = {"unconfirmed", "provisional", "differential", "confirmed", "refuted", "entered-in-error"}
+
 
 def build_condition(condition_row):
     """
@@ -53,14 +56,22 @@ def build_condition(condition_row):
     if coding:
         code_kwargs["coding"] = coding
 
+    clinical_status = condition_row["clinical_status"]
+    if clinical_status not in VALID_CLINICAL_STATUSES:
+        clinical_status = "active"
+
+    verification_status = condition_row["verification_status"]
+    if verification_status not in VALID_VERIFICATION_STATUSES:
+        verification_status = "unconfirmed"
+
     kwargs = {
         "id": condition_row["condition_reference"],
         "meta": Meta(profile=[ABDM_CONDITION_PROFILE]),
         "clinicalStatus": CodeableConcept(
-            coding=[Coding(system=CLINICAL_STATUS_SYSTEM, code=condition_row["clinical_status"])]
+            coding=[Coding(system=CLINICAL_STATUS_SYSTEM, code=clinical_status)]
         ),
         "verificationStatus": CodeableConcept(
-            coding=[Coding(system=VERIFICATION_STATUS_SYSTEM, code=condition_row["verification_status"])]
+            coding=[Coding(system=VERIFICATION_STATUS_SYSTEM, code=verification_status)]
         ),
         "code": CodeableConcept(**code_kwargs),
         "subject": Reference(reference=f"Patient/{condition_row['patient_reference']}"),

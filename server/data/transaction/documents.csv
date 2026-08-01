@@ -1,115 +1,115 @@
 document_reference,encounter_reference,patient_reference,document_type,title,status,authored_datetime
-DOCREF0001,ENC0001,PAT9001,Prescription,Prescription - Childhood Fever,final,2025-08-04 08:44:34
-DOCREF0002,ENC0002,PAT9001,Prescription,Prescription - Type 2 Diabetes Mellitus,final,2026-06-27 08:44:34
-DOCREF0003,ENC0002,PAT9001,Diagnostic Report,Diagnostic Report - Type 2 Diabetes Mellitus,final,2026-06-27 08:44:34
-DOCREF0004,ENC0003,PAT9001,Prescription,Prescription - Atopic Dermatitis,final,2025-11-26 09:44:34
-DOCREF0005,ENC0004,PAT9001,Prescription,Prescription - Otitis Media,final,2025-12-17 04:44:34
-DOCREF0006,ENC0005,PAT9001,Prescription,Prescription - Stable Angina,final,2024-11-14 00:44:34
-DOCREF0007,ENC0005,PAT9001,Diagnostic Report,Diagnostic Report - Stable Angina,final,2024-11-14 00:44:34
-DOCREF0008,ENC0006,PAT9002,Prescription,Prescription - Acute Gastroenteritis,final,2026-07-02 07:44:34
-DOCREF0009,ENC0007,PAT9002,Prescription,Prescription - Cholelithiasis,final,2026-01-06 10:44:34
-DOCREF0010,ENC0007,PAT9002,Diagnostic Report,Diagnostic Report - Cholelithiasis,final,2026-01-06 10:44:34
-DOCREF0011,ENC0008,PAT9003,Prescription,Prescription - Migraine,final,2024-08-27 02:44:34
-DOCREF0012,ENC0009,PAT9003,Prescription,Prescription - Tension Headache,final,2025-08-07 03:44:34
-DOCREF0013,ENC0010,PAT9003,Prescription,Prescription - Acute Viral Fever,final,2024-10-03 06:44:34
-DOCREF0014,ENC0011,PAT9004,Prescription,Prescription - Acute Gastroenteritis,final,2025-07-23 01:44:34
-DOCREF0015,ENC0012,PAT9004,Prescription,Prescription - Normal Pregnancy,final,2025-02-09 01:44:34
-DOCREF0016,ENC0012,PAT9004,Diagnostic Report,Diagnostic Report - Normal Pregnancy,final,2025-02-09 01:44:34
-DOCREF0017,ENC0013,PAT0001,Prescription,Prescription - Normal Pregnancy,final,2024-11-29 07:44:34
-DOCREF0018,ENC0013,PAT0001,Diagnostic Report,Diagnostic Report - Normal Pregnancy,final,2024-11-29 07:44:34
-DOCREF0019,ENC0014,PAT0001,Prescription,Prescription - Urinary Tract Infection,final,2026-05-01 07:44:34
-DOCREF0020,ENC0014,PAT0001,Diagnostic Report,Diagnostic Report - Urinary Tract Infection,final,2026-05-01 07:44:34
-DOCREF0021,ENC0015,PAT0001,Prescription,Prescription - Stye,final,2024-12-22 02:44:34
-DOCREF0022,ENC0016,PAT0001,Prescription,Prescription - Type 2 Diabetes Mellitus,final,2025-08-30 09:44:34
-DOCREF0023,ENC0016,PAT0001,Diagnostic Report,Diagnostic Report - Type 2 Diabetes Mellitus,final,2025-08-30 09:44:34
-DOCREF0024,ENC0017,PAT0002,Prescription,Prescription - Epilepsy,final,2025-08-14 07:44:34
-DOCREF0025,ENC0018,PAT0002,Prescription,Prescription - Essential Hypertension,final,2026-01-14 10:44:34
-DOCREF0026,ENC0019,PAT0002,Prescription,Prescription - Urinary Tract Infection,final,2025-11-24 00:44:34
-DOCREF0027,ENC0019,PAT0002,Diagnostic Report,Diagnostic Report - Urinary Tract Infection,final,2025-11-24 00:44:34
-DOCREF0028,ENC0020,PAT0002,Prescription,Prescription - PCOS,final,2026-07-11 10:44:34
-DOCREF0029,ENC0020,PAT0002,Diagnostic Report,Diagnostic Report - PCOS,final,2026-07-11 10:44:34
-DOCREF0030,ENC0021,PAT0002,Prescription,Prescription - Ankle Sprain,final,2025-11-21 07:44:34
-DOCREF0031,ENC0022,PAT0003,Prescription,Prescription - Normal Pregnancy,final,2025-01-11 06:44:34
-DOCREF0032,ENC0022,PAT0003,Diagnostic Report,Diagnostic Report - Normal Pregnancy,final,2025-01-11 06:44:34
-DOCREF0033,ENC0023,PAT0003,Prescription,Prescription - Community Acquired Pneumonia,final,2025-11-13 08:44:34
-DOCREF0034,ENC0023,PAT0003,Diagnostic Report,Diagnostic Report - Community Acquired Pneumonia,final,2025-11-13 08:44:34
-DOCREF0035,ENC0024,PAT0003,Prescription,Prescription - Congestive Heart Failure,final,2026-03-28 00:44:34
-DOCREF0036,ENC0024,PAT0003,Diagnostic Report,Diagnostic Report - Congestive Heart Failure,final,2026-03-28 00:44:34
-DOCREF0037,ENC0025,PAT0003,Prescription,Prescription - Ischemic Heart Disease,final,2025-03-20 07:44:34
-DOCREF0038,ENC0025,PAT0003,Diagnostic Report,Diagnostic Report - Ischemic Heart Disease,final,2025-03-20 07:44:34
-DOCREF0039,ENC0026,PAT0004,Prescription,Prescription - Acute Bronchitis,final,2025-07-24 09:44:34
-DOCREF0040,ENC0027,PAT0004,Prescription,Prescription - Conjunctivitis,final,2026-03-21 07:44:34
-DOCREF0041,ENC0028,PAT0004,Prescription,Prescription - Childhood Fever,final,2024-08-13 09:44:34
-DOCREF0042,ENC0029,PAT0004,Referral Note,Referral Note - Hydrocele,final,2024-12-18 07:44:34
-DOCREF0043,ENC0030,PAT0005,Prescription,Prescription - Metabolic Syndrome,final,2026-06-06 07:44:34
-DOCREF0044,ENC0030,PAT0005,Diagnostic Report,Diagnostic Report - Metabolic Syndrome,final,2026-06-06 07:44:34
-DOCREF0045,ENC0031,PAT0005,Prescription,Prescription - Vertigo,final,2025-06-13 04:44:34
-DOCREF0046,ENC0032,PAT0005,Prescription,Prescription - Urticaria,final,2026-06-04 09:44:34
-DOCREF0047,ENC0033,PAT0005,Prescription,Prescription - Dengue Fever,final,2025-11-16 10:44:34
-DOCREF0048,ENC0033,PAT0005,Diagnostic Report,Diagnostic Report - Dengue Fever,final,2025-11-16 10:44:34
-DOCREF0049,ENC0034,PAT0005,Prescription,Prescription - Tension Headache,final,2025-07-04 04:44:34
-DOCREF0050,ENC0035,PAT0006,Discharge Summary,Discharge Summary - Syncope,final,2025-09-19 02:44:34
-DOCREF0051,ENC0036,PAT0006,Prescription,Prescription - Hemorrhoids,final,2026-04-17 23:44:34
-DOCREF0052,ENC0037,PAT0006,Prescription,Prescription - COPD,final,2026-05-06 09:44:34
-DOCREF0053,ENC0038,PAT0006,Prescription,Prescription - Childhood Fever,final,2026-02-18 11:44:34
-DOCREF0054,ENC0039,PAT0006,Prescription,Prescription - Allergic Rhinitis,final,2025-04-03 07:44:34
-DOCREF0055,ENC0040,PAT0007,Prescription,Prescription - Conjunctivitis,final,2024-08-08 04:44:34
-DOCREF0056,ENC0041,PAT0007,Prescription,Prescription - Bronchial Asthma,final,2025-10-30 23:44:34
-DOCREF0057,ENC0042,PAT0008,Prescription,Prescription - Childhood Fever,final,2024-10-03 09:44:34
-DOCREF0058,ENC0043,PAT0008,Prescription,Prescription - Acute Viral Fever,final,2026-02-08 23:44:34
-DOCREF0059,ENC0044,PAT0008,Prescription,Prescription - Refractive Error,final,2024-12-23 07:44:34
-DOCREF0060,ENC0045,PAT0009,Prescription,Prescription - Allergic Rhinitis,final,2024-08-11 05:44:34
-DOCREF0061,ENC0046,PAT0009,Prescription,Prescription - Childhood Fever,final,2025-05-06 10:44:34
-DOCREF0062,ENC0047,PAT0009,Prescription,Prescription - Dry Eye Syndrome,final,2024-11-17 07:44:34
-DOCREF0063,ENC0048,PAT0009,Prescription,Prescription - Hypertensive Heart Disease,final,2024-09-06 02:44:34
-DOCREF0064,ENC0048,PAT0009,Diagnostic Report,Diagnostic Report - Hypertensive Heart Disease,final,2024-09-06 02:44:34
-DOCREF0065,ENC0049,PAT0009,Prescription,Prescription - Vertigo,final,2024-12-15 11:44:34
-DOCREF0066,ENC0050,PAT0010,Prescription,Prescription - Adjustment Disorder,final,2026-01-24 02:44:34
-DOCREF0067,ENC0051,PAT0010,Discharge Summary,Discharge Summary - Road Traffic Accident,final,2025-04-03 06:44:34
-DOCREF0068,ENC0052,PAT0010,Prescription,Prescription - Obesity,final,2026-04-12 09:44:34
-DOCREF0069,ENC0053,PAT0011,Prescription,Prescription - Acute Bronchitis,final,2025-06-12 23:44:34
-DOCREF0070,ENC0054,PAT0011,Prescription,Prescription - Dengue Fever,final,2025-11-12 06:44:34
-DOCREF0071,ENC0054,PAT0011,Diagnostic Report,Diagnostic Report - Dengue Fever,final,2025-11-12 06:44:34
-DOCREF0072,ENC0055,PAT0011,Diagnostic Report,Diagnostic Report - Hematuria,final,2026-07-27 01:44:34
-DOCREF0073,ENC0056,PAT0011,Prescription,Prescription - Type 2 Diabetes Mellitus,final,2025-02-13 06:44:34
-DOCREF0074,ENC0056,PAT0011,Diagnostic Report,Diagnostic Report - Type 2 Diabetes Mellitus,final,2025-02-13 06:44:34
-DOCREF0075,ENC0057,PAT0012,Prescription,Prescription - Atrial Fibrillation,final,2025-01-12 09:44:34
-DOCREF0076,ENC0057,PAT0012,Diagnostic Report,Diagnostic Report - Atrial Fibrillation,final,2025-01-12 09:44:34
-DOCREF0077,ENC0058,PAT0012,Prescription,Prescription - Generalized Anxiety Disorder,final,2025-03-19 10:44:34
-DOCREF0078,ENC0059,PAT0012,Prescription,Prescription - Tinea Corporis,final,2025-11-25 00:44:34
-DOCREF0079,ENC0060,PAT0012,Prescription,Prescription - Childhood Fever,final,2025-01-09 05:44:34
-DOCREF0080,ENC0061,PAT0012,Discharge Summary,Discharge Summary - Syncope,final,2026-04-03 04:44:34
-DOCREF0081,ENC0062,PAT0013,Referral Note,Referral Note - Inguinal Hernia,final,2025-10-03 03:44:34
-DOCREF0082,ENC0063,PAT0013,Prescription,Prescription - Urinary Tract Infection,final,2025-04-01 08:44:34
-DOCREF0083,ENC0063,PAT0013,Diagnostic Report,Diagnostic Report - Urinary Tract Infection,final,2025-04-01 08:44:34
-DOCREF0084,ENC0064,PAT0014,Prescription,Prescription - Congestive Heart Failure,final,2024-11-22 03:44:34
-DOCREF0085,ENC0064,PAT0014,Diagnostic Report,Diagnostic Report - Congestive Heart Failure,final,2024-11-22 03:44:34
-DOCREF0086,ENC0065,PAT0014,Prescription,Prescription - Community Acquired Pneumonia,final,2025-05-30 06:44:34
-DOCREF0087,ENC0065,PAT0014,Diagnostic Report,Diagnostic Report - Community Acquired Pneumonia,final,2025-05-30 06:44:34
-DOCREF0088,ENC0066,PAT0014,Prescription,Prescription - Acute Bronchitis,final,2025-09-26 02:44:34
-DOCREF0089,ENC0067,PAT0014,Prescription,Prescription - PCOS,final,2025-03-20 06:44:34
-DOCREF0090,ENC0067,PAT0014,Diagnostic Report,Diagnostic Report - PCOS,final,2025-03-20 06:44:34
-DOCREF0091,ENC0068,PAT0014,Prescription,Prescription - Migraine,final,2025-07-07 04:44:34
-DOCREF0092,ENC0069,PAT0015,Wellness Record,Wellness Record - Routine Immunization Visit,final,2025-11-30 23:44:34
-DOCREF0093,ENC0070,PAT0015,Prescription,Prescription - Obesity,final,2025-03-31 00:44:34
-DOCREF0094,ENC0071,PAT0015,Discharge Summary,Discharge Summary - Syncope,final,2024-09-29 09:44:34
-DOCREF0095,ENC0072,PAT0015,Prescription,Prescription - Iron Deficiency Anemia,final,2024-12-01 06:44:34
-DOCREF0096,ENC0072,PAT0015,Diagnostic Report,Diagnostic Report - Iron Deficiency Anemia,final,2024-12-01 06:44:34
-DOCREF0097,ENC0073,PAT0016,Prescription,Prescription - Acute Diarrhea,final,2025-04-17 11:44:34
-DOCREF0098,ENC0074,PAT0016,Referral Note,Referral Note - Hydrocele,final,2026-02-20 10:44:34
-DOCREF0099,ENC0075,PAT0017,Prescription,Prescription - Psoriasis,final,2025-06-16 01:44:34
-DOCREF0100,ENC0076,PAT0017,Prescription,Prescription - Renal Calculus,final,2025-01-28 05:44:34
-DOCREF0101,ENC0076,PAT0017,Diagnostic Report,Diagnostic Report - Renal Calculus,final,2025-01-28 05:44:34
-DOCREF0102,ENC0077,PAT0017,Referral Note,Referral Note - Hydrocele,final,2026-06-22 02:44:34
-DOCREF0103,ENC0078,PAT0017,Prescription,Prescription - Urticaria,final,2025-10-07 08:44:34
-DOCREF0104,ENC0079,PAT0017,Discharge Summary,Discharge Summary - Acute Chest Pain,final,2024-10-18 00:44:34
-DOCREF0105,ENC0080,PAT0018,Prescription,Prescription - Allergic Rhinitis,final,2026-06-29 11:44:34
-DOCREF0106,ENC0081,PAT0018,Prescription,Prescription - Acute Bronchitis,final,2025-07-10 05:44:34
-DOCREF0107,ENC0082,PAT0019,Wellness Record,Wellness Record - Routine Immunization Visit,final,2026-01-25 09:44:34
-DOCREF0108,ENC0083,PAT0019,Prescription,Prescription - Tinea Corporis,final,2025-07-02 02:44:34
-DOCREF0109,ENC0084,PAT0019,Prescription,Prescription - Adjustment Disorder,final,2026-03-04 08:44:34
-DOCREF0110,ENC0085,PAT0020,Prescription,Prescription - COPD,final,2026-07-18 23:44:34
-DOCREF0111,ENC0086,PAT0020,Prescription,Prescription - Acute Tonsillitis,final,2026-02-17 10:44:34
-DOCREF0112,ENC0087,PAT0020,Discharge Summary,Discharge Summary - Syncope,final,2025-09-25 01:44:34
-DOCREF0113,ENC0088,PAT0020,Prescription,Prescription - Dysmenorrhea,final,2025-09-22 08:44:34
-DOCREF0114,ENC0089,PAT0020,Prescription,Prescription - Acute Gastroenteritis,final,2025-07-03 02:44:34
+DOCREF0001,ENC0001,PAT9001,Prescription,Prescription - Childhood Fever,final,2025-08-08 08:54:17
+DOCREF0002,ENC0002,PAT9001,Prescription,Prescription - Type 2 Diabetes Mellitus,final,2026-07-01 08:54:17
+DOCREF0003,ENC0002,PAT9001,Diagnostic Report,Diagnostic Report - Type 2 Diabetes Mellitus,final,2026-07-01 08:54:17
+DOCREF0004,ENC0003,PAT9001,Prescription,Prescription - Atopic Dermatitis,final,2025-11-30 09:54:17
+DOCREF0005,ENC0004,PAT9001,Prescription,Prescription - Otitis Media,final,2025-12-21 04:54:17
+DOCREF0006,ENC0005,PAT9001,Prescription,Prescription - Stable Angina,final,2024-11-18 00:54:17
+DOCREF0007,ENC0005,PAT9001,Diagnostic Report,Diagnostic Report - Stable Angina,final,2024-11-18 00:54:17
+DOCREF0008,ENC0006,PAT9002,Prescription,Prescription - Acute Gastroenteritis,final,2026-07-06 07:54:17
+DOCREF0009,ENC0007,PAT9002,Prescription,Prescription - Cholelithiasis,final,2026-01-10 10:54:17
+DOCREF0010,ENC0007,PAT9002,Diagnostic Report,Diagnostic Report - Cholelithiasis,final,2026-01-10 10:54:17
+DOCREF0011,ENC0008,PAT9003,Prescription,Prescription - Migraine,final,2024-08-31 02:54:17
+DOCREF0012,ENC0009,PAT9003,Prescription,Prescription - Tension Headache,final,2025-08-11 03:54:17
+DOCREF0013,ENC0010,PAT9003,Prescription,Prescription - Acute Viral Fever,final,2024-10-07 06:54:17
+DOCREF0014,ENC0011,PAT9004,Prescription,Prescription - Acute Gastroenteritis,final,2025-07-27 01:54:17
+DOCREF0015,ENC0012,PAT9004,Prescription,Prescription - Normal Pregnancy,final,2025-02-13 01:54:17
+DOCREF0016,ENC0012,PAT9004,Diagnostic Report,Diagnostic Report - Normal Pregnancy,final,2025-02-13 01:54:17
+DOCREF0017,ENC0013,PAT0001,Prescription,Prescription - Normal Pregnancy,final,2024-12-03 07:54:17
+DOCREF0018,ENC0013,PAT0001,Diagnostic Report,Diagnostic Report - Normal Pregnancy,final,2024-12-03 07:54:17
+DOCREF0019,ENC0014,PAT0001,Prescription,Prescription - Urinary Tract Infection,final,2026-05-05 07:54:17
+DOCREF0020,ENC0014,PAT0001,Diagnostic Report,Diagnostic Report - Urinary Tract Infection,final,2026-05-05 07:54:17
+DOCREF0021,ENC0015,PAT0001,Prescription,Prescription - Stye,final,2024-12-26 02:54:17
+DOCREF0022,ENC0016,PAT0001,Prescription,Prescription - Type 2 Diabetes Mellitus,final,2025-09-03 09:54:17
+DOCREF0023,ENC0016,PAT0001,Diagnostic Report,Diagnostic Report - Type 2 Diabetes Mellitus,final,2025-09-03 09:54:17
+DOCREF0024,ENC0017,PAT0002,Prescription,Prescription - Epilepsy,final,2025-08-18 07:54:17
+DOCREF0025,ENC0018,PAT0002,Prescription,Prescription - Essential Hypertension,final,2026-01-18 10:54:17
+DOCREF0026,ENC0019,PAT0002,Prescription,Prescription - Urinary Tract Infection,final,2025-11-28 00:54:17
+DOCREF0027,ENC0019,PAT0002,Diagnostic Report,Diagnostic Report - Urinary Tract Infection,final,2025-11-28 00:54:17
+DOCREF0028,ENC0020,PAT0002,Prescription,Prescription - PCOS,final,2026-07-15 10:54:17
+DOCREF0029,ENC0020,PAT0002,Diagnostic Report,Diagnostic Report - PCOS,final,2026-07-15 10:54:17
+DOCREF0030,ENC0021,PAT0002,Prescription,Prescription - Ankle Sprain,final,2025-11-25 07:54:17
+DOCREF0031,ENC0022,PAT0003,Prescription,Prescription - Normal Pregnancy,final,2025-01-15 06:54:17
+DOCREF0032,ENC0022,PAT0003,Diagnostic Report,Diagnostic Report - Normal Pregnancy,final,2025-01-15 06:54:17
+DOCREF0033,ENC0023,PAT0003,Prescription,Prescription - Community Acquired Pneumonia,final,2025-11-17 08:54:17
+DOCREF0034,ENC0023,PAT0003,Diagnostic Report,Diagnostic Report - Community Acquired Pneumonia,final,2025-11-17 08:54:17
+DOCREF0035,ENC0024,PAT0003,Prescription,Prescription - Congestive Heart Failure,final,2026-04-01 00:54:17
+DOCREF0036,ENC0024,PAT0003,Diagnostic Report,Diagnostic Report - Congestive Heart Failure,final,2026-04-01 00:54:17
+DOCREF0037,ENC0025,PAT0003,Prescription,Prescription - Ischemic Heart Disease,final,2025-03-24 07:54:17
+DOCREF0038,ENC0025,PAT0003,Diagnostic Report,Diagnostic Report - Ischemic Heart Disease,final,2025-03-24 07:54:17
+DOCREF0039,ENC0026,PAT0004,Prescription,Prescription - Acute Bronchitis,final,2025-07-28 09:54:17
+DOCREF0040,ENC0027,PAT0004,Prescription,Prescription - Conjunctivitis,final,2026-03-25 07:54:17
+DOCREF0041,ENC0028,PAT0004,Prescription,Prescription - Childhood Fever,final,2024-08-17 09:54:17
+DOCREF0042,ENC0029,PAT0004,Referral Note,Referral Note - Hydrocele,final,2024-12-22 07:54:17
+DOCREF0043,ENC0030,PAT0005,Prescription,Prescription - Metabolic Syndrome,final,2026-06-10 07:54:17
+DOCREF0044,ENC0030,PAT0005,Diagnostic Report,Diagnostic Report - Metabolic Syndrome,final,2026-06-10 07:54:17
+DOCREF0045,ENC0031,PAT0005,Prescription,Prescription - Vertigo,final,2025-06-17 04:54:17
+DOCREF0046,ENC0032,PAT0005,Prescription,Prescription - Urticaria,final,2026-06-08 09:54:17
+DOCREF0047,ENC0033,PAT0005,Prescription,Prescription - Dengue Fever,final,2025-11-20 10:54:17
+DOCREF0048,ENC0033,PAT0005,Diagnostic Report,Diagnostic Report - Dengue Fever,final,2025-11-20 10:54:17
+DOCREF0049,ENC0034,PAT0005,Prescription,Prescription - Tension Headache,final,2025-07-08 04:54:17
+DOCREF0050,ENC0035,PAT0006,Discharge Summary,Discharge Summary - Syncope,final,2025-09-23 02:54:17
+DOCREF0051,ENC0036,PAT0006,Prescription,Prescription - Hemorrhoids,final,2026-04-21 23:54:17
+DOCREF0052,ENC0037,PAT0006,Prescription,Prescription - COPD,final,2026-05-10 09:54:17
+DOCREF0053,ENC0038,PAT0006,Prescription,Prescription - Childhood Fever,final,2026-02-22 11:54:17
+DOCREF0054,ENC0039,PAT0006,Prescription,Prescription - Allergic Rhinitis,final,2025-04-07 07:54:17
+DOCREF0055,ENC0040,PAT0007,Prescription,Prescription - Conjunctivitis,final,2024-08-12 04:54:17
+DOCREF0056,ENC0041,PAT0007,Prescription,Prescription - Bronchial Asthma,final,2025-11-03 23:54:17
+DOCREF0057,ENC0042,PAT0008,Prescription,Prescription - Childhood Fever,final,2024-10-07 09:54:17
+DOCREF0058,ENC0043,PAT0008,Prescription,Prescription - Acute Viral Fever,final,2026-02-12 23:54:17
+DOCREF0059,ENC0044,PAT0008,Prescription,Prescription - Refractive Error,final,2024-12-27 07:54:17
+DOCREF0060,ENC0045,PAT0009,Prescription,Prescription - Allergic Rhinitis,final,2024-08-15 05:54:17
+DOCREF0061,ENC0046,PAT0009,Prescription,Prescription - Childhood Fever,final,2025-05-10 10:54:17
+DOCREF0062,ENC0047,PAT0009,Prescription,Prescription - Dry Eye Syndrome,final,2024-11-21 07:54:17
+DOCREF0063,ENC0048,PAT0009,Prescription,Prescription - Hypertensive Heart Disease,final,2024-09-10 02:54:17
+DOCREF0064,ENC0048,PAT0009,Diagnostic Report,Diagnostic Report - Hypertensive Heart Disease,final,2024-09-10 02:54:17
+DOCREF0065,ENC0049,PAT0009,Prescription,Prescription - Vertigo,final,2024-12-19 11:54:17
+DOCREF0066,ENC0050,PAT0010,Prescription,Prescription - Adjustment Disorder,final,2026-01-28 02:54:17
+DOCREF0067,ENC0051,PAT0010,Discharge Summary,Discharge Summary - Road Traffic Accident,final,2025-04-07 06:54:17
+DOCREF0068,ENC0052,PAT0010,Prescription,Prescription - Obesity,final,2026-04-16 09:54:17
+DOCREF0069,ENC0053,PAT0011,Prescription,Prescription - Acute Bronchitis,final,2025-06-16 23:54:17
+DOCREF0070,ENC0054,PAT0011,Prescription,Prescription - Dengue Fever,final,2025-11-16 06:54:17
+DOCREF0071,ENC0054,PAT0011,Diagnostic Report,Diagnostic Report - Dengue Fever,final,2025-11-16 06:54:17
+DOCREF0072,ENC0055,PAT0011,Diagnostic Report,Diagnostic Report - Hematuria,final,2026-07-31 01:54:17
+DOCREF0073,ENC0056,PAT0011,Prescription,Prescription - Type 2 Diabetes Mellitus,final,2025-02-17 06:54:17
+DOCREF0074,ENC0056,PAT0011,Diagnostic Report,Diagnostic Report - Type 2 Diabetes Mellitus,final,2025-02-17 06:54:17
+DOCREF0075,ENC0057,PAT0012,Prescription,Prescription - Atrial Fibrillation,final,2025-01-16 09:54:17
+DOCREF0076,ENC0057,PAT0012,Diagnostic Report,Diagnostic Report - Atrial Fibrillation,final,2025-01-16 09:54:17
+DOCREF0077,ENC0058,PAT0012,Prescription,Prescription - Generalized Anxiety Disorder,final,2025-03-23 10:54:17
+DOCREF0078,ENC0059,PAT0012,Prescription,Prescription - Tinea Corporis,final,2025-11-29 00:54:17
+DOCREF0079,ENC0060,PAT0012,Prescription,Prescription - Childhood Fever,final,2025-01-13 05:54:17
+DOCREF0080,ENC0061,PAT0012,Discharge Summary,Discharge Summary - Syncope,final,2026-04-07 04:54:17
+DOCREF0081,ENC0062,PAT0013,Referral Note,Referral Note - Inguinal Hernia,final,2025-10-07 03:54:17
+DOCREF0082,ENC0063,PAT0013,Prescription,Prescription - Urinary Tract Infection,final,2025-04-05 08:54:17
+DOCREF0083,ENC0063,PAT0013,Diagnostic Report,Diagnostic Report - Urinary Tract Infection,final,2025-04-05 08:54:17
+DOCREF0084,ENC0064,PAT0014,Prescription,Prescription - Congestive Heart Failure,final,2024-11-26 03:54:17
+DOCREF0085,ENC0064,PAT0014,Diagnostic Report,Diagnostic Report - Congestive Heart Failure,final,2024-11-26 03:54:17
+DOCREF0086,ENC0065,PAT0014,Prescription,Prescription - Community Acquired Pneumonia,final,2025-06-03 06:54:17
+DOCREF0087,ENC0065,PAT0014,Diagnostic Report,Diagnostic Report - Community Acquired Pneumonia,final,2025-06-03 06:54:17
+DOCREF0088,ENC0066,PAT0014,Prescription,Prescription - Acute Bronchitis,final,2025-09-30 02:54:17
+DOCREF0089,ENC0067,PAT0014,Prescription,Prescription - PCOS,final,2025-03-24 06:54:17
+DOCREF0090,ENC0067,PAT0014,Diagnostic Report,Diagnostic Report - PCOS,final,2025-03-24 06:54:17
+DOCREF0091,ENC0068,PAT0014,Prescription,Prescription - Migraine,final,2025-07-11 04:54:17
+DOCREF0092,ENC0069,PAT0015,Wellness Record,Wellness Record - Routine Immunization Visit,final,2025-12-04 23:54:17
+DOCREF0093,ENC0070,PAT0015,Prescription,Prescription - Obesity,final,2025-04-04 00:54:17
+DOCREF0094,ENC0071,PAT0015,Discharge Summary,Discharge Summary - Syncope,final,2024-10-03 09:54:17
+DOCREF0095,ENC0072,PAT0015,Prescription,Prescription - Iron Deficiency Anemia,final,2024-12-05 06:54:17
+DOCREF0096,ENC0072,PAT0015,Diagnostic Report,Diagnostic Report - Iron Deficiency Anemia,final,2024-12-05 06:54:17
+DOCREF0097,ENC0073,PAT0016,Prescription,Prescription - Acute Diarrhea,final,2025-04-21 11:54:17
+DOCREF0098,ENC0074,PAT0016,Referral Note,Referral Note - Hydrocele,final,2026-02-24 10:54:17
+DOCREF0099,ENC0075,PAT0017,Prescription,Prescription - Psoriasis,final,2025-06-20 01:54:17
+DOCREF0100,ENC0076,PAT0017,Prescription,Prescription - Renal Calculus,final,2025-02-01 05:54:17
+DOCREF0101,ENC0076,PAT0017,Diagnostic Report,Diagnostic Report - Renal Calculus,final,2025-02-01 05:54:17
+DOCREF0102,ENC0077,PAT0017,Referral Note,Referral Note - Hydrocele,final,2026-06-26 02:54:17
+DOCREF0103,ENC0078,PAT0017,Prescription,Prescription - Urticaria,final,2025-10-11 08:54:17
+DOCREF0104,ENC0079,PAT0017,Discharge Summary,Discharge Summary - Acute Chest Pain,final,2024-10-22 00:54:17
+DOCREF0105,ENC0080,PAT0018,Prescription,Prescription - Allergic Rhinitis,final,2026-07-03 11:54:17
+DOCREF0106,ENC0081,PAT0018,Prescription,Prescription - Acute Bronchitis,final,2025-07-14 05:54:17
+DOCREF0107,ENC0082,PAT0019,Wellness Record,Wellness Record - Routine Immunization Visit,final,2026-01-29 09:54:17
+DOCREF0108,ENC0083,PAT0019,Prescription,Prescription - Tinea Corporis,final,2025-07-06 02:54:17
+DOCREF0109,ENC0084,PAT0019,Prescription,Prescription - Adjustment Disorder,final,2026-03-08 08:54:17
+DOCREF0110,ENC0085,PAT0020,Prescription,Prescription - COPD,final,2026-07-22 23:54:17
+DOCREF0111,ENC0086,PAT0020,Prescription,Prescription - Acute Tonsillitis,final,2026-02-21 10:54:17
+DOCREF0112,ENC0087,PAT0020,Discharge Summary,Discharge Summary - Syncope,final,2025-09-29 01:54:17
+DOCREF0113,ENC0088,PAT0020,Prescription,Prescription - Dysmenorrhea,final,2025-09-26 08:54:17
+DOCREF0114,ENC0089,PAT0020,Prescription,Prescription - Acute Gastroenteritis,final,2025-07-07 02:54:17

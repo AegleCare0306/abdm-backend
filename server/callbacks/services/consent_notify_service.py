@@ -61,7 +61,7 @@ async def process_consent_notify(
 
         log_api_call("Acknowledging Consent Notification to ABDM", "POST .../hip/on-notify", response.status_code)
 
-        if response.status_code not in (200, 202):
+        if response.status_code != 202:
             print_api_response(response)
             return
 

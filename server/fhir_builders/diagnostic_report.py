@@ -8,18 +8,14 @@ from fhir.resources.R4B.coding import Coding
 from fhir.resources.R4B.reference import Reference
 from fhir.resources.R4B.meta import Meta
 
+from server.fhir_builders.datetime_utils import to_fhir_datetime
+
 
 ABDM_DIAGNOSTIC_REPORT_PROFILE = "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DiagnosticReportLab"
 LOINC_SYSTEM = "http://loinc.org"
 
 CATEGORY_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0074"
 LAB_CATEGORY_CODE = "LAB"
-
-
-def _to_fhir_datetime(value):
-    if not value:
-        return None
-    return value.replace(" ", "T") + "+05:30"
 
 
 def build_diagnostic_report(diagnostic_report_row):
@@ -61,7 +57,7 @@ def build_diagnostic_report(diagnostic_report_row):
         ),
         "subject": Reference(reference=f"Patient/{diagnostic_report_row['patient_reference']}"),
         "encounter": Reference(reference=f"Encounter/{diagnostic_report_row['encounter_reference']}"),
-        "issued": _to_fhir_datetime(diagnostic_report_row["issued_datetime"]),
+        "issued": to_fhir_datetime(diagnostic_report_row["issued_datetime"]),
         "conclusion": " | ".join(conclusion_parts),
     }
 

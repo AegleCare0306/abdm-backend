@@ -10,6 +10,7 @@ persistent log file (logs/flow.log, already covered by .gitignore's
 *.log pattern) so nothing is lost between server restarts.
 """
 
+import contextvars
 import logging
 from pathlib import Path
 
@@ -32,13 +33,39 @@ if not _logger.handlers:
     _logger.addHandler(_file_handler)
 
 
+# Set once per incoming request (see dispatch_callback()) so every log call
+# made anywhere downstream during that request's handling -- including deep
+# inside the service functions, with no new parameter needed at any of their
+# call sites -- can tag its lines with the same ID. A ContextVar (not a plain
+# module-level global) is required here specifically because this is a
+# FastAPI app handling requests via async def: a plain global would leak
+# across concurrently-handled requests, where a ContextVar stays correctly
+# scoped to the async task that set it.
+_correlation_id: contextvars.ContextVar = contextvars.ContextVar("correlation_id", default=None)
+
+
+def set_correlation_id(correlation_id):
+    _correlation_id.set(correlation_id)
+
+
+def get_correlation_id():
+    return _correlation_id.get()
+
+
+def _prefix(message):
+    correlation_id = _correlation_id.get()
+    if correlation_id is not None:
+        return f"[{correlation_id}] {message}"
+    return message
+
+
 def log_phase(message):
     """
     A story beat -- describes what's happening in plain language.
 
     Example: log_phase("Patient search request received from ABDM")
     """
-    _logger.info(f"-> {message}")
+    _logger.info(_prefix(f"-> {message}"))
 
 
 def log_api_call(description, url, response_code=None):
@@ -49,9 +76,9 @@ def log_api_call(description, url, response_code=None):
     Example: log_api_call("Reporting Patient Match to ABDM", "POST .../on-discover", 202)
     """
     if response_code is not None:
-        _logger.info(f"   [API] {description} -- {url} -> {response_code}")
+        _logger.info(_prefix(f"   [API] {description} -- {url} -> {response_code}"))
     else:
-        _logger.info(f"   [API] {description} -- {url}")
+        _logger.info(_prefix(f"   [API] {description} -- {url}"))
 
 
 def log_waiting(message):
@@ -61,9 +88,9 @@ def log_waiting(message):
 
     Example: log_waiting("Waiting for the patient to choose to link these records in the PHR app")
     """
-    _logger.info(f"   [WAITING] {message}")
+    _logger.info(_prefix(f"   [WAITING] {message}"))
 
 
 def log_error(message):
     """A problem that stopped this flow from completing."""
-    _logger.info(f"   [ERROR] {message}")
+    _logger.info(_prefix(f"   [ERROR] {message}"))

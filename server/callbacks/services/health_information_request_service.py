@@ -1,7 +1,10 @@
 import hashlib
 import json
 
-from server.callbacks.repository.health_information_repository import save_health_information_session
+from server.callbacks.repository.health_information_repository import (
+    save_health_information_session,
+    update_health_information_session,
+)
 from server.callbacks.repository.consent_repository import get_consent
 from server.callbacks.services.health_information_data_service import build_bundles_for_care_contexts
 from server.healthinformation import (
@@ -27,20 +30,28 @@ def _compute_checksum(encrypted_content):
 
 def _push_and_notify(
     fhir_bundles,
-    care_context_references,
     data_push_url,
     hiu_key_material,
     transaction_id,
     consent_id,
     hip_id,
 ):
+    """
+    fhir_bundles: {care_context_reference: bundle}, as returned by
+    build_bundles_for_care_contexts(). Keyed rather than positional
+    deliberately -- that function can return fewer bundles than were
+    requested (encounter missing, or filtered out by the consent's
+    dateRange), and zipping bundles against the full requested list would
+    mis-attribute every bundle after the first gap, pushing one care
+    context's data to ABDM labelled as another's.
+    """
 
     entries = []
     status_responses = []
 
     hip_key_material = generate_key_material()
 
-    for bundle, care_context_reference in zip(fhir_bundles, care_context_references):
+    for care_context_reference, bundle in fhir_bundles.items():
 
         plaintext = json.dumps(bundle)
 
@@ -95,7 +106,7 @@ def _push_and_notify(
 
         log_api_call("Pushing Encrypted Records to HIU", f"POST {data_push_url}", push_response.status_code)
 
-        pushed_ok = push_response.status_code in (200, 202)
+        pushed_ok = push_response.status_code == 200
 
         for entry in entries:
             status_responses.append({
@@ -112,6 +123,28 @@ def _push_and_notify(
 
     session_status = "TRANSFERRED" if (entries and pushed_ok) else "FAILED"
 
+    # Already keyed exactly the way this field needs. Copied rather than
+    # aliased because update_health_information_session() stores what it is
+    # given by reference (no deepcopy on update), and the session shouldn't
+    # share a mutable dict with the caller.
+    records_by_care_context = dict(fhir_bundles)
+    encrypted_bundle_by_care_context = {
+        entry["careContextReference"]: entry["content"] for entry in entries
+    }
+    checksum_by_care_context = {
+        entry["careContextReference"]: entry["checksum"] for entry in entries
+    }
+
+    update_health_information_session(
+        transaction_id,
+        {
+            "records": records_by_care_context,
+            "encrypted_bundle": encrypted_bundle_by_care_context,
+            "checksum": checksum_by_care_context,
+            "transfer_status": session_status,
+        },
+    )
+
     notify_response = send_health_information_notify(
         consent_id=consent_id,
         transaction_id=transaction_id,
@@ -123,7 +156,7 @@ def _push_and_notify(
 
     log_api_call("Notifying ABDM of Transfer Outcome", "POST .../health-information/notify", notify_response.status_code)
 
-    if notify_response.status_code not in (200, 202):
+    if notify_response.status_code != 202:
         print_api_response(notify_response)
 
     if session_status == "TRANSFERRED":
@@ -167,7 +200,7 @@ async def process_health_information_request(
                 for care_context in consent.get("care_contexts", [])
                 if care_context.get("careContextReference")
             ]
-            fhir_bundles = build_bundles_for_care_contexts(care_context_references)
+            fhir_bundles = build_bundles_for_care_contexts(care_context_references, date_range=date_range)
             log_phase(f"Assembled {len(fhir_bundles)} FHIR record(s) for the approved care context(s)")
 
         session_data = {
@@ -201,7 +234,7 @@ async def process_health_information_request(
 
         log_api_call("Acknowledging Data Request to ABDM", "POST .../hip/on-request", response.status_code)
 
-        if response.status_code not in (200, 202):
+        if response.status_code != 200:
             print_api_response(response)
             return
 
@@ -233,7 +266,7 @@ async def process_health_information_request(
 
             log_api_call("Notifying ABDM of Transfer Outcome", "POST .../health-information/notify", notify_response.status_code)
 
-            if notify_response.status_code not in (200, 202):
+            if notify_response.status_code != 202:
                 print_api_response(notify_response)
 
             log_error(reason)
@@ -243,7 +276,6 @@ async def process_health_information_request(
 
         _push_and_notify(
             fhir_bundles=fhir_bundles,
-            care_context_references=care_context_references,
             data_push_url=data_push_url,
             hiu_key_material=key_material,
             transaction_id=transaction_id,

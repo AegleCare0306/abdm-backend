@@ -23,6 +23,7 @@ pattern looks like.
 
 import csv
 import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 _TOOLS_DIR = Path(__file__).resolve().parents[3] / "tools"
@@ -55,23 +56,197 @@ def _to_fhir_instant(value):
     return value.replace(" ", "T") + "+05:30"
 
 
+# ---------------------------------------------------------------------------
+# Consent dateRange filtering
+#
+# hiRequest.dateRange arrives as two ISO 8601 UTC instants, confirmed from a
+# real ABDM sandbox capture:
+#     {"from": "1926-07-31T12:38:07.220Z", "to": "2026-07-31T12:38:07.220Z"}
+# ("from" 100 years in the past is how the sandbox expresses "no real lower
+# bound" on a broad consent grant -- so the filter has to cope with very wide
+# ranges, not assume "from" is recent.)
+#
+# Each resource is filtered on its OWN date field rather than inheriting its
+# encounter's, since a real EMR could record e.g. a lab result well after the
+# visit it belongs to. Today's dummy data sets every resource's date equal to
+# its encounter's, so this makes no difference to current output -- it is
+# written for the real data it will eventually run against.
+# ---------------------------------------------------------------------------
+
+IST = timezone(timedelta(hours=5, minutes=30))
+
+ENCOUNTER_DATE_FIELD = "encounter_datetime"
+CONDITION_DATE_FIELD = "recorded_date"  # date-only; see _parse_row_datetime
+OBSERVATION_DATE_FIELD = "effective_datetime"
+MEDICATION_REQUEST_DATE_FIELD = "authored_on"
+PROCEDURE_DATE_FIELD = "performed_datetime"
+DIAGNOSTIC_REPORT_DATE_FIELD = "issued_datetime"
+IMMUNIZATION_DATE_FIELD = "occurrence_datetime"
+
+# Distinguishes "this boundary was sent but is broken" from "this boundary
+# was never sent at all" -- the two must not collapse to the same outcome,
+# since they call for opposite behaviour (see _is_within_date_range).
+_MALFORMED = object()
+
+
+def _parse_range_boundary(value):
+    """
+    Parses one side of hiRequest.dateRange (an ISO 8601 UTC instant, e.g.
+    "2026-07-31T12:38:07.220Z").
+
+    Three-way result:
+      - None        -- boundary absent or empty, i.e. deliberately
+                       open-ended on that side (ABDM's own spec allows
+                       this); the caller treats it as unbounded.
+      - _MALFORMED  -- boundary was sent but is not valid ISO 8601. The
+                       instruction is corrupt, so the caller excludes the
+                       row rather than guessing at what was intended.
+      - datetime    -- successfully parsed, timezone-aware.
+    """
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        return _MALFORMED
+
+
+def _parse_row_datetime(value):
+    """
+    Parses an EMR row's date field into an aware datetime.
+
+    Two shapes occur in this data:
+      - full datetime, "YYYY-MM-DD HH:MM:SS" -- encounters, observations,
+        medication requests, procedures, diagnostic reports, immunizations
+      - date-only, "YYYY-MM-DD" -- Condition's recorded_date
+
+    Neither carries timezone info, so both are read as IST (+05:30): the
+    same assumption to_fhir_datetime() makes and documents, since this is
+    Indian hospital data.
+
+    Returns (aware_datetime, is_date_only), or (None, False) if unparseable.
+    """
+    if not value:
+        return None, False
+
+    text = str(value).strip()
+
+    try:
+        if " " in text or "T" in text:
+            return datetime.strptime(text.replace("T", " "), "%Y-%m-%d %H:%M:%S").replace(tzinfo=IST), False
+        return datetime.strptime(text, "%Y-%m-%d").replace(tzinfo=IST), True
+    except ValueError:
+        return None, False
+
+
+def _is_within_date_range(value, date_range):
+    """
+    True if `value` (an EMR row's date field) falls inside `date_range`,
+    inclusive on both ends.
+
+    Passes everything when date_range is None/empty or carries neither a
+    usable "from" nor "to" -- so callers that don't supply one (and any
+    non-M2 code path) behave exactly as they did before date filtering
+    existed. Also passes a row whose own date is missing or unparseable,
+    since there is no basis to prove it out of range.
+
+    Excludes everything when a boundary WAS sent but could not be parsed --
+    see the fail-closed note below.
+    """
+    if not date_range:
+        return True
+
+    range_from = _parse_range_boundary(date_range.get("from"))
+    range_to = _parse_range_boundary(date_range.get("to"))
+
+    # DELIBERATE FAIL-CLOSED. A boundary that was sent but is unparseable
+    # means the window we were told to honour is corrupt -- we cannot know
+    # how wide it was meant to be. Excluding the row is the safe direction
+    # for a filter guarding patient data: worst case we under-share and the
+    # HIU re-requests, versus over-sharing records outside the consented
+    # window. This is deliberately NOT the same as an absent boundary
+    # (None), which is a legitimate open-ended range and stays unbounded.
+    if range_from is _MALFORMED or range_to is _MALFORMED:
+        return False
+
+    if range_from is None and range_to is None:
+        return True
+
+    parsed, is_date_only = _parse_row_datetime(value)
+    if parsed is None:
+        return True
+
+    if is_date_only:
+        # DELIBERATE SIMPLIFICATION: Condition.recorded_date has no time
+        # component, so comparing it against instant-precision boundaries
+        # needs a granularity choice. Rather than inventing an arbitrary
+        # time-of-day (midnight? noon?) and getting spurious edge-day
+        # exclusions, the boundaries are projected onto IST calendar dates
+        # and the comparison is done inclusively at day granularity. A
+        # condition recorded on the same IST calendar day as either
+        # boundary counts as in range.
+        record_date = parsed.date()
+        if range_from is not None and record_date < range_from.astimezone(IST).date():
+            return False
+        if range_to is not None and record_date > range_to.astimezone(IST).date():
+            return False
+        return True
+
+    if range_from is not None and parsed < range_from:
+        return False
+    if range_to is not None and parsed > range_to:
+        return False
+    return True
+
+
 def _rows_for_encounter(rows, encounter_reference):
     return [row for row in rows if row["encounter_reference"] == encounter_reference]
 
 
-def build_bundles_for_care_contexts(care_context_references):
+def _rows_in_range(rows, encounter_reference, date_field, date_range):
+    """
+    This encounter's rows, further narrowed to those whose own date field
+    falls inside the consented range.
+    """
+    return [
+        row
+        for row in _rows_for_encounter(rows, encounter_reference)
+        if _is_within_date_range(row.get(date_field), date_range)
+    ]
+
+
+def build_bundles_for_care_contexts(care_context_references, date_range=None):
     """
     care_context_references: list of strings, e.g. ["ENC0005", "ENC0012"].
     These map 1:1 to encounter_reference in the mock data today -- once
     real EMR data exists, a "care context" may need its own explicit
     mapping to whatever the real system's encounter/episode ID is.
 
-    Returns a list of finished FHIR document Bundle dicts -- one per
-    care context that was actually found. A requested care context with
-    no matching record is silently skipped rather than raising, since a
-    consent could in principle reference something no longer present;
-    the caller can compare len(result) against len(care_context_references)
-    to detect that.
+    date_range: the consent's window, as ABDM sends it in
+    hiRequest.dateRange -- {"from": <ISO 8601 UTC>, "to": <ISO 8601 UTC>}.
+    When None or empty (the default), nothing is filtered and the result
+    is exactly what it was before date filtering existed.
+
+    Returns a dict of {care_context_reference: finished FHIR document
+    Bundle dict}, containing only the care contexts a bundle was actually
+    built for. Keying by reference (rather than returning a bare list)
+    matters because the result can be SHORTER than the requested list, for
+    two distinct reasons:
+
+      1. no matching encounter exists at all -- a consent could in
+         principle reference something no longer present, so this is
+         silently skipped rather than raising; or
+      2. the encounter itself falls outside date_range -- nothing in it
+         could be in range, so no bundle is produced for it.
+
+    Either way that key is simply absent from the result. A third case is
+    narrower: an encounter that IS in range can still have individual
+    clinical resources filtered out of its bundle by their own dates, and
+    that bundle is still returned (with fewer resources in it).
+
+    Callers must therefore pair bundles to care contexts by key, never by
+    position -- positional pairing silently mis-attributes every bundle
+    after the first gap.
     """
 
     organizations = _load_csv(MASTER_OUTPUT_FOLDER, "organizations.csv")
@@ -91,12 +266,17 @@ def build_bundles_for_care_contexts(care_context_references):
     patient_by_ref = {p["patient_reference"]: p for p in patients}
     encounter_by_ref = {e["encounter_reference"]: e for e in encounters}
 
-    bundles = []
+    bundles = {}
 
     for care_context_reference in care_context_references:
 
         encounter_row = encounter_by_ref.get(care_context_reference)
         if encounter_row is None:
+            continue
+
+        # The encounter itself is out of the consented window -- nothing
+        # inside it could be in range, so skip the whole care context.
+        if not _is_within_date_range(encounter_row.get(ENCOUNTER_DATE_FIELD), date_range):
             continue
 
         patient_row = patient_by_ref[encounter_row["patient_reference"]]
@@ -109,12 +289,12 @@ def build_bundles_for_care_contexts(care_context_references):
         organization_resource = build_organization(organization_row)
         encounter_resource = build_encounter(encounter_row)
 
-        condition_resources = [build_condition(r) for r in _rows_for_encounter(conditions, care_context_reference)]
-        observation_resources = [build_observation(r) for r in _rows_for_encounter(observations, care_context_reference)]
-        medication_request_resources = [build_medication_request(r) for r in _rows_for_encounter(medication_requests, care_context_reference)]
-        procedure_resources = [build_procedure(r) for r in _rows_for_encounter(procedures, care_context_reference)]
-        diagnostic_report_resources = [build_diagnostic_report(r) for r in _rows_for_encounter(diagnostic_reports, care_context_reference)]
-        immunization_resources = [build_immunization(r) for r in _rows_for_encounter(immunizations, care_context_reference)]
+        condition_resources = [build_condition(r) for r in _rows_in_range(conditions, care_context_reference, CONDITION_DATE_FIELD, date_range)]
+        observation_resources = [build_observation(r) for r in _rows_in_range(observations, care_context_reference, OBSERVATION_DATE_FIELD, date_range)]
+        medication_request_resources = [build_medication_request(r) for r in _rows_in_range(medication_requests, care_context_reference, MEDICATION_REQUEST_DATE_FIELD, date_range)]
+        procedure_resources = [build_procedure(r) for r in _rows_in_range(procedures, care_context_reference, PROCEDURE_DATE_FIELD, date_range)]
+        diagnostic_report_resources = [build_diagnostic_report(r) for r in _rows_in_range(diagnostic_reports, care_context_reference, DIAGNOSTIC_REPORT_DATE_FIELD, date_range)]
+        immunization_resources = [build_immunization(r) for r in _rows_in_range(immunizations, care_context_reference, IMMUNIZATION_DATE_FIELD, date_range)]
 
         resource_ids_by_category = {
             "condition": [r["id"] for r in condition_resources],
@@ -155,6 +335,6 @@ def build_bundles_for_care_contexts(care_context_references):
             timestamp=_to_fhir_instant(encounter_row["encounter_datetime"]),
         )
 
-        bundles.append(bundle)
+        bundles[care_context_reference] = bundle
 
     return bundles

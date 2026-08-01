@@ -7,6 +7,7 @@ import requests
 from server.config import ABHA_BASE_URL
 from server.utils import generate_request_id, generate_timestamp, get_gateway_token
 from server.callbacks.utils.flow_logger import log_error
+from server.callbacks.utils.api_capture import record_call
 
 
 def _post(url, headers, payload, action_description):
@@ -20,10 +21,39 @@ def _post(url, headers, payload, action_description):
     not an exceptional one).
     """
     try:
-        return requests.post(url=url, headers=headers, json=payload)
+        response = requests.post(url=url, headers=headers, json=payload)
     except requests.exceptions.RequestException as exc:
+        record_call(
+            label=action_description,
+            direction="outgoing",
+            method="POST",
+            url=url,
+            request_headers=headers,
+            request_body=payload,
+            response_status=None,
+            response_body=f"RequestException: {exc}",
+        )
         log_error(f"{action_description} failed: {exc}")
         raise
+
+    try:
+        response_body = response.json()
+    except ValueError:
+        response_body = response.text
+
+    record_call(
+        label=action_description,
+        direction="outgoing",
+        method="POST",
+        url=url,
+        request_headers=headers,
+        request_body=payload,
+        response_status=response.status_code,
+        response_headers=dict(response.headers),
+        response_body=response_body,
+    )
+
+    return response
 
 
 def request_otp(
@@ -119,6 +149,43 @@ def enroll_by_aadhaar(
 
     return _post(url, headers, payload, "ABHA enrollment by Aadhaar")
 
+def create_abha_address(
+    action,
+    txn_id,
+    abha_address,
+    preferred=1,
+):
+
+    """
+    Create a custom ABHA Address during ABDM enrollment.
+    Args:
+        action (str): API path after /v3/.
+            Example: "enrollment/enrol"
+        txn_id (str): Transaction ID from the enrollment flow.
+        abha_address (str): Custom ABHA Address to create.
+        preferred (int): 1 to mark this as the account's preferred
+            address, 0 otherwise. Default is 1.
+    Returns:
+        requests.Response
+    """
+
+    url = f"{ABHA_BASE_URL}/{action}/abha-address"
+
+    headers = {
+        "REQUEST-ID": generate_request_id(),
+        "TIMESTAMP": generate_timestamp(),
+        "Authorization": f"Bearer {get_gateway_token()}",
+        "Content-Type": "application/json",
+    }
+
+    payload = {
+        "txnId": txn_id,
+        "abhaAddress": abha_address,
+        "preferred": preferred,
+    }
+
+    return _post(url, headers, payload, "ABHA Address creation")
+
 def request_email_verification_link(
     x_token,
     action,
@@ -172,8 +239,9 @@ def verify_mobile_linking_otp(
     """
     Verify OTP to Link Mobile using the ABDM authentication service.
     Args:
-        action (str): API path after /v3/.
-            Example: "enrollment/auth"
+        action (str): API path after /v3/, WITHOUT the trailing "/auth"
+            (this function appends "/auth/byAbdm" itself below).
+            Example: "enrollment" -> POSTs to .../enrollment/auth/byAbdm
         scope (list): Workflow scope.
             Example: ["abha-enrol", "mobile-verify"]
         txn_id (str): Transaction ID returned by request_otp().
@@ -392,20 +460,51 @@ def get_resource(
         "TIMESTAMP": generate_timestamp(),
     }
 
+    resource_label = f"get-resource ({action}{'/' + resource if resource else ''})"
+
     try:
-        return requests.get(
+        response = requests.get(
             url=url,
             headers=headers,
         )
     except requests.exceptions.RequestException as exc:
+        record_call(
+            label=resource_label,
+            direction="outgoing",
+            method="GET",
+            url=url,
+            request_headers=headers,
+            request_body=None,
+            response_status=None,
+            response_body=f"RequestException: {exc}",
+        )
         log_error(f"ABDM resource retrieval ({action}{'/' + resource if resource else ''}) failed: {exc}")
         raise
 
-def get_profile(x_token):
-    return get_resource(get_gateway_token(), x_token)
+    try:
+        response_body = response.json()
+    except ValueError:
+        response_body = response.text
 
-def get_qr_code(x_token):
-    return get_resource(get_gateway_token(), x_token, resource="qrCode")
+    record_call(
+        label=resource_label,
+        direction="outgoing",
+        method="GET",
+        url=url,
+        request_headers=headers,
+        request_body=None,
+        response_status=response.status_code,
+        response_headers=dict(response.headers),
+        response_body=response_body,
+    )
 
-def get_abha_card(x_token):
-    return get_resource(get_gateway_token(), x_token, resource="abha-card")
+    return response
+
+def get_profile(x_token, action="profile/account"):
+    return get_resource(x_token, action=action)
+
+def get_qr_code(x_token, action="profile/account"):
+    return get_resource(x_token, action=action, resource="qrCode")
+
+def get_abha_card(x_token, action="profile/account"):
+    return get_resource(x_token, action=action, resource="abha-card")

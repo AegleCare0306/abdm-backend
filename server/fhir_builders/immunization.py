@@ -7,14 +7,10 @@ from fhir.resources.R4B.codeableconcept import CodeableConcept
 from fhir.resources.R4B.reference import Reference
 from fhir.resources.R4B.meta import Meta
 
+from server.fhir_builders.datetime_utils import to_fhir_datetime
+
 
 ABDM_IMMUNIZATION_PROFILE = "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Immunization"
-
-
-def _to_fhir_datetime(value):
-    if not value:
-        return None
-    return value.replace(" ", "T") + "+05:30"
 
 
 def build_immunization(immunization_row):
@@ -31,7 +27,7 @@ def build_immunization(immunization_row):
         "vaccineCode": CodeableConcept(text=immunization_row["vaccine_name"]),
         "patient": Reference(reference=f"Patient/{immunization_row['patient_reference']}"),
         "encounter": Reference(reference=f"Encounter/{immunization_row['encounter_reference']}"),
-        "occurrenceDateTime": _to_fhir_datetime(immunization_row["occurrence_datetime"]),
+        "occurrenceDateTime": to_fhir_datetime(immunization_row["occurrence_datetime"]),
     }
 
     immunization = Immunization(**kwargs)

@@ -8,22 +8,20 @@ from fhir.resources.R4B.quantity import Quantity
 from fhir.resources.R4B.codeableconcept import CodeableConcept
 from fhir.resources.R4B.reference import Reference
 from fhir.resources.R4B.meta import Meta
+from fhir.resources.R4B.coding import Coding
+
+from server.fhir_builders.datetime_utils import to_fhir_datetime
 
 
 ABDM_MEDICATION_REQUEST_PROFILE = "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
-
-
-def _to_fhir_datetime(value):
-    if not value:
-        return None
-    return value.replace(" ", "T") + "+05:30"
+ATC_SYSTEM = "http://www.whocc.no/atc"
 
 
 def build_medication_request(medication_request_row):
     """
     medication_request_row expected keys (matches medication_requests.csv):
         medication_request_reference, encounter_reference, patient_reference,
-        medication_reference, generic_name, brand_name, strength,
+        medication_reference, generic_name, brand_name, strength, atc_code,
         dosage_form, route, frequency, duration_days, quantity, status,
         authored_on
 
@@ -39,15 +37,21 @@ def build_medication_request(medication_request_row):
 
     dosage_text = f"{medication_request_row['frequency']} for {medication_request_row['duration_days']} days"
 
+    medication_code_kwargs = {"text": medication_text}
+    if medication_request_row.get("atc_code"):
+        medication_code_kwargs["coding"] = [
+            Coding(system=ATC_SYSTEM, code=medication_request_row["atc_code"])
+        ]
+
     kwargs = {
         "id": medication_request_row["medication_request_reference"],
         "meta": Meta(profile=[ABDM_MEDICATION_REQUEST_PROFILE]),
         "status": medication_request_row["status"],
         "intent": "order",
-        "medicationCodeableConcept": CodeableConcept(text=medication_text),
+        "medicationCodeableConcept": CodeableConcept(**medication_code_kwargs),
         "subject": Reference(reference=f"Patient/{medication_request_row['patient_reference']}"),
         "encounter": Reference(reference=f"Encounter/{medication_request_row['encounter_reference']}"),
-        "authoredOn": _to_fhir_datetime(medication_request_row["authored_on"]),
+        "authoredOn": to_fhir_datetime(medication_request_row["authored_on"]),
         "dosageInstruction": [
             Dosage(
                 text=dosage_text,

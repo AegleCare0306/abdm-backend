@@ -13,6 +13,7 @@ from server.config import (
 
 from server.utils import generate_request_id, generate_timestamp
 from server.callbacks.utils.flow_logger import log_error
+from server.callbacks.utils.api_capture import record_call
 
 def generate_gateway_token():
 
@@ -48,7 +49,34 @@ def generate_gateway_token():
         )
         response.raise_for_status()
     except requests.exceptions.RequestException as exc:
+        record_call(
+            label="generate-gateway-token",
+            direction="outgoing",
+            method="POST",
+            url=url,
+            request_headers=headers,
+            request_body=payload,
+            response_status=None,
+            response_body=f"RequestException: {exc}",
+        )
         log_error(f"Gateway token generation failed: {exc}")
         raise
+
+    try:
+        response_body = response.json()
+    except ValueError:
+        response_body = response.text
+
+    record_call(
+        label="generate-gateway-token",
+        direction="outgoing",
+        method="POST",
+        url=url,
+        request_headers=headers,
+        request_body=payload,
+        response_status=response.status_code,
+        response_headers=dict(response.headers),
+        response_body=response_body,
+    )
 
     return response

@@ -55,12 +55,15 @@ async def process_link_init(callback_data):
 
         otp_txn_id = otp_response.json()["txnId"]
 
+        otp_expiry = generate_expiry_time()
+
         session_data = {
             "transaction_id": transaction_id,
             "request_id": request_id,
             "abha_address": abha_address,
             "selected_patient_records": patient_records,
             "otp_txn_id": otp_txn_id,
+            "otp_expiry": otp_expiry,
         }
 
         save_link_session(
@@ -75,7 +78,7 @@ async def process_link_init(callback_data):
             authentication_type="DIRECT",
             communication_medium="MOBILE",
             communication_hint="OTP",
-            communication_expiry=generate_expiry_time(),
+            communication_expiry=otp_expiry,
         )
 
         log_api_call("Confirming Link Initiated with ABDM", "POST .../on-init", response.status_code)
