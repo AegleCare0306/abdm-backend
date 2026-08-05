@@ -30,6 +30,18 @@ storage/callbacks/*
 # -- contains real bearer tokens and patient PII once a real flow is run
 storage/api_capture.jsonl
 
+# HIP-Initiated Linking's file-backed pending/confirmed link token stores
+# (server/callbacks/repository/link_token_repository.py,
+# patient_link_token_repository.py, care_context_link_repository.py, via
+# json_file_store.py) -- moved off in-memory dicts 2026-08-04 so the M2
+# test CLI (a separate process from the running server) and the server
+# share state; contain real link tokens (JWTs) and ABHA addresses once a
+# real flow is run
+storage/pending_link_tokens.json
+storage/patient_link_tokens.json
+storage/pending_care_context_links.json
+storage/pending_care_context_notifies.json
+
 # M1 test CLI response logs (tools/m1_test_suite/common.py's log_response())
 # -- contain full session tokens (JWTs), OTPs, ABHA numbers, and mobile
 # numbers in plaintext once a real flow is run against the sandbox

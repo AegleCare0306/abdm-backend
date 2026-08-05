@@ -9,6 +9,10 @@ from server.callbacks.handlers.link_init import handle_link_init
 from server.callbacks.handlers.link_confirm import handle_link_confirm
 from server.callbacks.handlers.consent_notify import handle_consent_notify
 from server.callbacks.handlers.health_information_request import handle_health_information_request
+from server.callbacks.handlers.generate_token import handle_generate_token
+from server.callbacks.handlers.care_context_link import handle_care_context_link
+from server.callbacks.handlers.care_context_notify import handle_care_context_notify
+from server.callbacks.handlers.sms_notify import handle_sms_notify
 from server.callbacks.utils.flow_logger import log_error, set_correlation_id
 
 
@@ -65,6 +69,10 @@ async def dispatch_callback(
             "care_context_confirm": handle_link_confirm,
             "consent_notify": handle_consent_notify,
             "health_information_request": handle_health_information_request,
+            "generate_token": handle_generate_token,
+            "care_context_link": handle_care_context_link,
+            "care_context_notify": handle_care_context_notify,
+            "sms_notify": handle_sms_notify,
         }
 
         handler = handlers.get(callback_type)

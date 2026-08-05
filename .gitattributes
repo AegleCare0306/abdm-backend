@@ -1,0 +1,6 @@
+# Normalize line endings consistently across machines/tools, so a
+# Windows editor/IDE resaving files with CRLF (e.g. PyCharm) doesn't
+# produce a false 100%-changed diff against LF-committed blobs, and any
+# sandbox/CI environment without core.autocrlf configured sees the same
+# thing a properly-configured local git client does.
+* text=auto

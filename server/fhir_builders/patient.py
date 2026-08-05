@@ -99,7 +99,22 @@ def build_patient(patient_row):
         kwargs["gender"] = gender_code
 
     if patient_row.get("date_of_birth"):
-        kwargs["birthDate"] = patient_row["date_of_birth"]
+        # CONFIRMED REAL FAILURE (2026-08-04): patients.csv stores
+        # date_of_birth as DD-MM-YYYY (e.g. "20-10-1997"), but FHIR's
+        # birthDate requires ISO 8601 (YYYY-MM-DD) -- sending the raw
+        # CSV value raised a real pydantic validation error building
+        # the Patient resource for a Health Information Request
+        # ("Date value string does not match spec regex"). Converts
+        # DD-MM-YYYY -> YYYY-MM-DD; passes anything already in ISO
+        # form (or otherwise unparseable) through unchanged rather
+        # than guessing further formats.
+        raw_dob = patient_row["date_of_birth"]
+        parts = raw_dob.split("-")
+        if len(parts) == 3 and len(parts[0]) == 2 and len(parts[2]) == 4:
+            day, month, year = parts
+            kwargs["birthDate"] = f"{year}-{month}-{day}"
+        else:
+            kwargs["birthDate"] = raw_dob
 
     patient = Patient(**kwargs)
 

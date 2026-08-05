@@ -81,3 +81,23 @@ async def health_information_request(
 
     return success()
 
+@router.post("/api/v3/links/context/on-notify")
+async def links_context_on_notify(request: Request):
+
+    await dispatch_callback(
+        callback_type="care_context_notify",
+        request=request,
+    )
+
+    return success()
+
+@router.post("/api/v3/patients/sms/on-notify")
+async def patients_sms_on_notify(request: Request):
+
+    await dispatch_callback(
+        callback_type="sms_notify",
+        request=request,
+    )
+
+    return success()
+
