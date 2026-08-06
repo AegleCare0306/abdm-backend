@@ -10,6 +10,7 @@ from dummy_emr.utils import document_reference
 
 def generate_documents(
     encounters,
+    start_index=1,
 ):
 
     documents = []
@@ -24,7 +25,7 @@ def generate_documents(
         for diagnosis in DIAGNOSES
     }
 
-    document_counter = 1
+    document_counter = start_index
 
     for encounter in encounters:
 

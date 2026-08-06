@@ -14,6 +14,8 @@ DOCUMENT_TYPES = [
 
     "Referral Note",
 
-    "Wellness Record"
+    "Wellness Record",
+
+    "Immunization"
 
 ]

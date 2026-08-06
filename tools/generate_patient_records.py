@@ -22,6 +22,13 @@ a Prescription and a Diagnostic Report produces two rows sharing the same
 care_context_reference (the encounter_reference) but different hi_type,
 matching how ABDM's discovery response groups care contexts by HI Type.
 
+This script always recomputes from the complete, current encounters.csv/
+patients.csv (already fully merged by generate_dummy_emr.py before this
+runs) -- but writes upsert-by-key (care_context_reference), replacing only
+the rows for encounters currently on file and leaving any row whose
+encounter no longer resolves (shouldn't normally happen) untouched, rather
+than blindly overwriting the whole file.
+
 HOW TO RUN
 ----------
     cd tools
@@ -37,6 +44,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from dummy_emr.config import MASTER_OUTPUT_FOLDER, TRANSACTION_OUTPUT_FOLDER
 from dummy_emr.case_library import CLINICAL_CASES
+from dummy_emr.hi_types import hi_types_for_case
 
 
 OUTPUT_PATH = Path(__file__).resolve().parents[1] / "server" / "data" / "patient_records.csv"
@@ -47,37 +55,17 @@ FIELDNAMES = [
     "care_context_display", "hi_type",
 ]
 
-# case_library document_types (dummy EMR's own vocabulary) -> ABDM's actual
-# HealthInformationType codes. "Referral Note" has no direct ABDM HI type
-# and is covered by the base OPConsultation/DischargeSummary type instead.
-DOCUMENT_TYPE_TO_HI_TYPE = {
-    "Prescription": "Prescription",
-    "Diagnostic Report": "DiagnosticReport",
-    "Discharge Summary": "DischargeSummary",
-    "Wellness Record": "WellnessRecord",
-}
-
-# encounter_type -> the base ABDM HI type every care context of that kind
-# carries, regardless of which other document types it also has.
-BASE_HI_TYPE_BY_ENCOUNTER_TYPE = {
-    "OPD": "OPConsultation",
-    "IPD": "DischargeSummary",
-    "Emergency": "OPConsultation",
-}
-
 
 def load_csv(folder, filename):
     with open(Path(folder) / filename, newline="", encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
 
-def hi_types_for_case(case):
-    hi_types = {BASE_HI_TYPE_BY_ENCOUNTER_TYPE.get(case["encounter"]["type"], "OPConsultation")}
-    for doc_type in case["document_types"]:
-        mapped = DOCUMENT_TYPE_TO_HI_TYPE.get(doc_type)
-        if mapped:
-            hi_types.add(mapped)
-    return hi_types
+def load_existing_output():
+    if not OUTPUT_PATH.exists():
+        return []
+    with open(OUTPUT_PATH, newline="", encoding="utf-8") as f:
+        return list(csv.DictReader(f))
 
 
 def main():
@@ -89,7 +77,19 @@ def main():
     case_lookup = {case["case_id"]: case for case in CLINICAL_CASES}
     patient_lookup = {p["patient_reference"]: p for p in patients}
 
-    rows = []
+    # Upsert by care_context_reference (== encounter_reference): existing
+    # rows for an encounter no longer present in encounters.csv are kept
+    # as-is (defensive; this shouldn't happen since encounters are never
+    # deleted); every encounter currently on file gets its hi_type rows
+    # (re)computed and replaces whatever it had before.
+    existing_rows = load_existing_output()
+    rows_by_encounter = {}
+    order = []
+    for row in existing_rows:
+        key = row["care_context_reference"]
+        if key not in rows_by_encounter:
+            order.append(key)
+        rows_by_encounter.setdefault(key, []).append(row)
 
     for encounter in encounters:
 
@@ -98,21 +98,27 @@ def main():
 
         care_context_display = f"{case['name']} - {encounter['encounter_datetime'][:10]}"
 
-        for hi_type in sorted(hi_types_for_case(case)):
-            rows.append(
-                {
-                    "abha_address": patient["abha_address"],
-                    "abha_number": patient["abha_number"],
-                    "mobile": patient["mobile"],
-                    "mr_number": encounter["mr_number"],
-                    "facility_id": encounter["hip_id"],
-                    "patient_reference": patient["patient_reference"],
-                    "name": patient["full_name"],
-                    "care_context_reference": encounter["encounter_reference"],
-                    "care_context_display": care_context_display,
-                    "hi_type": hi_type,
-                }
-            )
+        key = encounter["encounter_reference"]
+        if key not in rows_by_encounter:
+            order.append(key)
+
+        rows_by_encounter[key] = [
+            {
+                "abha_address": patient["abha_address"],
+                "abha_number": patient["abha_number"],
+                "mobile": patient["mobile"],
+                "mr_number": encounter["mr_number"],
+                "facility_id": encounter["hip_id"],
+                "patient_reference": patient["patient_reference"],
+                "name": patient["full_name"],
+                "care_context_reference": encounter["encounter_reference"],
+                "care_context_display": care_context_display,
+                "hi_type": hi_type,
+            }
+            for hi_type in sorted(hi_types_for_case(case))
+        ]
+
+    rows = [row for key in order for row in rows_by_encounter[key]]
 
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(OUTPUT_PATH, "w", newline="", encoding="utf-8") as f:

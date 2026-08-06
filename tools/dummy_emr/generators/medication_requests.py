@@ -59,6 +59,7 @@ def _duration_days(medication, chronic, follow_up_interval_days):
 
 def generate_medication_requests(
     encounters,
+    start_index=1,
 ):
 
     medication_requests = []
@@ -78,7 +79,7 @@ def generate_medication_requests(
         for medication in MEDICATIONS
     }
 
-    request_counter = 1
+    request_counter = start_index
 
     for encounter in encounters:
 

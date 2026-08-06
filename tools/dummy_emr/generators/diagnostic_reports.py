@@ -96,6 +96,7 @@ def _generate_result(lab, diagnosis_name):
 
 def generate_diagnostic_reports(
     encounters,
+    start_index=1,
 ):
 
     diagnostic_reports = []
@@ -115,7 +116,7 @@ def generate_diagnostic_reports(
         for lab in LAB_TESTS
     }
 
-    report_counter = 1
+    report_counter = start_index
 
     for encounter in encounters:
 

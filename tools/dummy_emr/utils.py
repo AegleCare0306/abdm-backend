@@ -19,25 +19,6 @@ def random_phone():
     )
 
 
-def random_abha_number():
-
-    return (
-        f"{random.randint(10,99)}-"
-        f"{random.randint(1000,9999)}-"
-        f"{random.randint(1000,9999)}-"
-        f"{random.randint(1000,9999)}"
-    )
-
-
-def random_abha_address(first_name, last_name, index):
-
-    return (
-        f"{first_name.lower()}"
-        f"{last_name.lower()}"
-        f"{index}@sbx"
-    )
-
-
 def patient_reference(index):
 
     return f"PAT{index:04d}"
@@ -53,9 +34,31 @@ def organization_reference(index):
     return f"ORG{index:04d}"
 
 
-def encounter_reference(index):
+def patient_number_suffix(patient_reference):
+    """"PAT9001" -> "9001". Used to build identity-derived IDs."""
 
-    return f"ENC{index:04d}"
+    return patient_reference[3:]
+
+
+def new_encounter_reference(
+    patient_reference,
+    facility_prefix,
+    slot,
+):
+    """
+    Identity-derived encounter_reference for encounters created after the
+    ENC0001-ENC0012 frozen block, e.g. new_encounter_reference("PAT9001",
+    "AHC", 3) -> "ENC9001AHC03" (PAT9001's 3rd new encounter at Aayush
+    Health Care). Never overlaps the frozen ENC000N block, and the same
+    (patient, facility, slot) always means the same thing forever -- slot
+    must be the next unused value for that (patient, facility) pair, read
+    from existing data, never a fresh in-memory counter.
+    """
+
+    return (
+        f"ENC{patient_number_suffix(patient_reference)}"
+        f"{facility_prefix}{slot:02d}"
+    )
 
 
 def condition_reference(index):

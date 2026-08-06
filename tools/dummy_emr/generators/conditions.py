@@ -9,6 +9,7 @@ from dummy_emr.utils import condition_reference
 
 def generate_conditions(
     encounters,
+    start_index=1,
 ):
 
     conditions = []
@@ -23,7 +24,7 @@ def generate_conditions(
         for diagnosis in DIAGNOSES
     }
 
-    for index, encounter in enumerate(encounters, start=1):
+    for index, encounter in enumerate(encounters, start=start_index):
 
         case = case_lookup[
             encounter["clinical_case"]

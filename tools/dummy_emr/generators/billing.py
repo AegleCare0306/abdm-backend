@@ -15,6 +15,7 @@ def generate_billing(
     medication_requests,
     diagnostic_reports,
     procedures,
+    start_index=1,
 ):
 
     billing = []
@@ -60,7 +61,7 @@ def generate_billing(
     investigation_markup = BILLING["investigation_markup"]
     pharmacy_markup = BILLING["pharmacy_markup"]
 
-    invoice_counter = 1
+    invoice_counter = start_index
 
     for encounter in encounters:
 

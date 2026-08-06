@@ -9,6 +9,7 @@ from dummy_emr.utils import procedure_reference
 
 def generate_procedures(
     encounters,
+    start_index=1,
 ):
 
     procedures = []
@@ -23,7 +24,7 @@ def generate_procedures(
         for procedure in PROCEDURES
     }
 
-    procedure_counter = 1
+    procedure_counter = start_index
 
     for encounter in encounters:
 

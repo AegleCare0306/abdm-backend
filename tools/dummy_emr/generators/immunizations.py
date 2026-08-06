@@ -9,6 +9,7 @@ from dummy_emr.utils import immunization_reference
 
 def generate_immunizations(
     encounters,
+    start_index=1,
 ):
 
     immunizations = []
@@ -23,7 +24,7 @@ def generate_immunizations(
         for vaccine in VACCINES
     }
 
-    immunization_counter = 1
+    immunization_counter = start_index
 
     for encounter in encounters:
 

@@ -66,7 +66,7 @@ def _print_link_care_context_failure(response):
     return False
 
 
-def _link_care_context_with_reused_token(reused, requested_hip_id, patient, start_time):
+def _link_care_context_with_reused_token(reused, requested_hip_id, patient, start_time, selected_records):
     """
     Reuse path for Flow 5 -- generate_link_token() returned a
     ReusedLinkToken instead of firing a real generate-token call (a
@@ -76,6 +76,15 @@ def _link_care_context_with_reused_token(reused, requested_hip_id, patient, star
     real, then still waits for the on_carecontext callback (that part of
     the chain has no server-side auto-trigger here, since there was no
     generate-token call for the server to react to).
+
+    CONFIRMED REAL BUG (2026-08-06), now fixed: this used to call
+    select_care_contexts() again here, re-prompting the user for the
+    exact same choice they'd already made in run_link_token_and_care_context()
+    right before generate_link_token() was called -- that earlier
+    selection is only consumed by the NEW-token path (threaded into the
+    pending session for the server to read back later), so the reuse
+    path was silently discarding it and asking a second time. Takes the
+    already-made selected_records directly now; no second prompt.
     """
     print_success(
         f"Reusing an existing saved link token for {reused.abha_address} "
@@ -92,9 +101,7 @@ def _link_care_context_with_reused_token(reused, requested_hip_id, patient, star
     hip_id = reused.hip_id
 
     print_info("Calling link_care_context() directly with the reused token...")
-    patient_records = build_patient_payload(
-        select_care_contexts(reused.abha_address, hip_id=hip_id, multi_select=True)
-    )
+    patient_records = build_patient_payload(selected_records)
 
     response = link_care_context(
         hip_id=hip_id,
@@ -172,7 +179,7 @@ def run_link_token_and_care_context():
     )
 
     if isinstance(result, ReusedLinkToken):
-        return _link_care_context_with_reused_token(result, hip_id, patient, start_time)
+        return _link_care_context_with_reused_token(result, hip_id, patient, start_time, selected_records)
 
     response = result
 

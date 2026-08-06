@@ -41,12 +41,27 @@ def _matches(name, keywords):
     return any(keyword in lowered for keyword in keywords)
 
 
+def _extract_year(date_str):
+    """
+    Tolerant of either YYYY-MM-DD (this generator's own format) or
+    DD-MM-YYYY (how patients.csv's real rows -- PAT9001-PAT9004 -- are
+    hand-entered, e.g. "20-10-1997") -- whichever dash-separated segment
+    is 4 digits is taken as the year. Mirrors
+    tools/m2_test_suite/common.py's _extract_year().
+    """
+    for part in date_str.split("-"):
+        if len(part) == 4 and part.isdigit():
+            return int(part)
+    return None
+
+
 def _patient_age(date_of_birth, encounter_datetime):
 
-    if not date_of_birth:
-        return 35  # unknown DOB (real patient not yet profiled) -> assume adult
+    birth_year = _extract_year(date_of_birth) if date_of_birth else None
 
-    birth_year = int(date_of_birth[:4])
+    if birth_year is None:
+        return 35  # unknown/unparsable DOB -> assume adult
+
     encounter_year = int(encounter_datetime[:4])
     return max(encounter_year - birth_year, 0)
 
@@ -111,6 +126,7 @@ def _generate_value(obs_master, diagnosis_name, department_reference, age):
 def generate_observations(
     encounters,
     patients,
+    start_index=1,
 ):
 
     observations = []
@@ -135,7 +151,7 @@ def generate_observations(
         for patient in patients
     }
 
-    obs_counter = 1
+    obs_counter = start_index
 
     for encounter in encounters:
 

@@ -76,6 +76,10 @@ java_error_in_pycharm_*.log
 .vscode/
 .idea/
 
+# Claude Code local settings (permission grants, local paths -- not shared
+# team config, accumulates across sessions)
+.claude/
+
 # OS junk
 .DS_Store
 Thumbs.db

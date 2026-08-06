@@ -2,59 +2,44 @@
 Patient Generator.
 """
 
-import random
-
-from dummy_emr.config import NUMBER_OF_PATIENTS
-
-from dummy_emr.constant import (
-    FIRST_NAMES,
-    LAST_NAMES,
-    BLOOD_GROUPS,
-)
-
-from dummy_emr.utils import (
-    patient_reference,
-    random_phone,
-    random_abha_number,
-    random_abha_address,
-)
+from dummy_emr.utils import patient_reference
 
 
-# Real patients needed for actual ABDM sandbox testing (not synthetic data).
-# Reserved in the PAT9001+ range so they never collide with the randomly
-# generated PAT0001..PATNNNN range above, regardless of NUMBER_OF_PATIENTS.
+# Real, ABHA-linked patients used for M2 (HIP-Initiated Linking) testing
+# against the real ABDM sandbox. Synthetic patients are never generated --
+# M2 can only be tested against patients we can actually log into on the
+# sandbox ABHA app, so this is the complete, exhaustive patient list.
 #
-# gender / date_of_birth / blood_group / email are left blank where not
-# supplied — these matter for real sandbox registration, so they should be
-# filled in with confirmed values rather than guessed.
+# Values confirmed directly by the project owner. email/blood_group are
+# left blank -- not confirmed, not invented.
 FIXED_PATIENTS = [
     {
         "full_name": "Aayush Chordia",
         "mobile": "7904191949",
-        "abha_address": "aayushchordia1997@sbx",
+        "abha_address": "aayushchordia4611@sbx",
         "abha_number": "91-6182-1610-5253",
-        "gender": "",
-        "date_of_birth": "",
+        "gender": "Male",
+        "date_of_birth": "20-10-1997",
         "email": "",
         "blood_group": "",
     },
     {
         "full_name": "Manya Shah",
         "mobile": "9898034665",
-        "abha_address": "",
-        "abha_number": "",
-        "gender": "",
-        "date_of_birth": "",
+        "abha_address": "91770048252272@sbx",
+        "abha_number": "91-7700-4825-2272",
+        "gender": "Female",
+        "date_of_birth": "01-12-1999",
         "email": "",
         "blood_group": "",
     },
     {
         "full_name": "Priya Shah",
         "mobile": "9898034665",
-        "abha_address": "",
-        "abha_number": "",
-        "gender": "",
-        "date_of_birth": "",
+        "abha_address": "91162304663600@sbx",
+        "abha_number": "91-1623-0466-3600",
+        "gender": "Female",
+        "date_of_birth": "05-08-2000",
         "email": "",
         "blood_group": "",
     },
@@ -63,8 +48,8 @@ FIXED_PATIENTS = [
         "mobile": "7904191949",
         "abha_address": "91466530750069@sbx",
         "abha_number": "91-4665-3075-0069",
-        "gender": "",
-        "date_of_birth": "",
+        "gender": "Female",
+        "date_of_birth": "17-10-1998",
         "email": "",
         "blood_group": "",
     },
@@ -72,6 +57,11 @@ FIXED_PATIENTS = [
 
 
 def generate_patients():
+    """
+    Returns a row dict for every real patient in FIXED_PATIENTS (PAT9001..).
+    Callers filter this down to whichever patient(s) were selected this run
+    before upserting into patients.csv.
+    """
 
     patients = []
 
@@ -105,65 +95,6 @@ def generate_patients():
 
                 "blood_group":
                     fixed_patient["blood_group"],
-            }
-        )
-
-    for index in range(
-        1,
-        NUMBER_OF_PATIENTS + 1,
-    ):
-
-        first_name = random.choice(FIRST_NAMES)
-
-        last_name = random.choice(LAST_NAMES)
-
-        patients.append(
-            {
-                "patient_reference":
-                    patient_reference(index),
-
-                "abha_address":
-                    random_abha_address(
-                        first_name,
-                        last_name,
-                        index,
-                    ),
-
-                "abha_number":
-                    random_abha_number(),
-
-                "full_name":
-                    f"{first_name} {last_name}",
-
-                "gender":
-                    random.choice(
-                        [
-                            "Male",
-                            "Female",
-                        ]
-                    ),
-
-                "date_of_birth":
-                    (
-                        f"{random.randint(1960,2015):04d}-"
-                        f"{random.randint(1,12):02d}-"
-                        f"{random.randint(1,28):02d}"
-                    ),
-
-                "mobile":
-                    random_phone(),
-
-                "email":
-                    (
-                        f"{first_name.lower()}."
-                        f"{last_name.lower()}"
-                        "@gmail.com"
-                    ),
-
-                "blood_group":
-                    random.choice(
-                        BLOOD_GROUPS
-                    ),
             }
         )
 

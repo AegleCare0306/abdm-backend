@@ -94,8 +94,10 @@ def main():
     immunizations_by_encounter = group_by(immunizations, "encounter_reference")
 
     FHIR_OUTPUT_FOLDER.mkdir(parents=True, exist_ok=True)
-    for existing in FHIR_OUTPUT_FOLDER.glob("*.json"):
-        existing.unlink()
+    # Upsert by filename (== encounter_reference): only bundles for
+    # encounters currently in encounters.csv are (re)written below: no
+    # upfront wholesale delete, so a bundle for an encounter that somehow
+    # isn't in this pass is never destroyed.
 
     written = 0
 
