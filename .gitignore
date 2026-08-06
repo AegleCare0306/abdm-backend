@@ -30,17 +30,27 @@ storage/callbacks/*
 # -- contains real bearer tokens and patient PII once a real flow is run
 storage/api_capture.jsonl
 
-# HIP-Initiated Linking's file-backed pending/confirmed link token stores
-# (server/callbacks/repository/link_token_repository.py,
-# patient_link_token_repository.py, care_context_link_repository.py, via
-# json_file_store.py) -- moved off in-memory dicts 2026-08-04 so the M2
-# test CLI (a separate process from the running server) and the server
-# share state; contain real link tokens (JWTs) and ABHA addresses once a
-# real flow is run
-storage/pending_link_tokens.json
-storage/patient_link_tokens.json
-storage/pending_care_context_links.json
-storage/pending_care_context_notifies.json
+# File-backed, append-only session/artifact stores (server/callbacks/
+# repository/link_token_repository.py, patient_link_token_repository.py,
+# care_context_link_repository.py, care_context_notify_repository.py,
+# consent_repository.py, patient_identity_repository.py,
+# link_repository.py, all via json_file_store.py). Moved off
+# in-memory dicts 2026-08-04 so the M2 test CLI (a separate process from
+# the running server) and the server share state, then moved 2026-08-05
+# from read-modify-write to an append-only .jsonl log so a couple of
+# people/requests writing concurrently don't silently clobber each
+# other's writes (see json_file_store.py's own docstring for the real
+# limits of this -- it's a middle ground, not a database -- tracked as
+# a standing, deliberately-not-closed gap on the To-Do Tracker, T-80).
+# Contain real link tokens (JWTs), ABHA addresses, and consent/patient
+# details once a real flow is run.
+storage/pending_link_tokens.jsonl
+storage/patient_link_tokens.jsonl
+storage/pending_care_context_links.jsonl
+storage/pending_care_context_notifies.jsonl
+storage/consents.jsonl
+storage/patient_identities.jsonl
+storage/link_sessions.jsonl
 
 # M1 test CLI response logs (tools/m1_test_suite/common.py's log_response())
 # -- contain full session tokens (JWTs), OTPs, ABHA numbers, and mobile

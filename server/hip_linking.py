@@ -114,16 +114,22 @@ def generate_link_token(
     calling ABDM again.
 
     REUSE BEHAVIOR: before making any outbound call, this checks
-    patient_link_token_repository.get_patient_link_token(abha_address).
-    If a token was already saved for this patient (persisted by
-    generate_token_service.py.process_generate_token() once a prior
-    on-generate-token callback confirmed one), the outbound generate-token
-    call and the whole async callback wait are skipped entirely -- a
-    ReusedLinkToken is returned instead of a requests.Response. This is
-    deliberate, not just an optimization: the M2 doc documents `400
-    ABDM-1092 "Duplicate link token request"` as a real ABDM failure mode,
-    confirming ABDM does not want repeated generate-token calls for a
-    patient who already has a valid/pending token.
+    patient_link_token_repository.get_patient_link_token(abha_address,
+    hip_id) -- for this EXACT (patient, facility) pair, not the patient
+    alone (fixed 2026-08-05; see that module's docstring for the real
+    bug this replaced). If a token was already saved for this patient at
+    this facility (persisted by generate_token_service.py.process_generate_token()
+    once a prior on-generate-token callback confirmed one), the outbound
+    generate-token call and the whole async callback wait are skipped
+    entirely -- a ReusedLinkToken is returned instead of a
+    requests.Response. This is deliberate, not just an optimization: the
+    M2 doc documents `400 ABDM-1092 "Duplicate link token request"` as a
+    real ABDM failure mode, confirming ABDM does not want repeated
+    generate-token calls for a patient who already has a valid/pending
+    token. A token saved for this patient at a DIFFERENT facility is
+    never returned here and is treated exactly like no saved token at
+    all -- this function falls through to the normal NEW-token path
+    below for that facility.
 
     UNCONFIRMED (flagged, not guessed): there is no confirmed information
     anywhere -- doc or Postman collection -- about a link token's
@@ -156,10 +162,11 @@ def generate_link_token(
     Args:
         hip_id (str): Our HIP identifier for this facility. Required --
             there's no single "current HIP" constant in server/config.py.
-            On the reuse path, if this differs from the hip_id the saved
-            token was actually issued under, that's logged as a mismatch
-            and the token's own (saved) hip_id is used/returned instead --
-            see ReusedLinkToken.hip_id.
+            A saved token only reuses (the REUSE path below) if one
+            exists for this EXACT hip_id -- a token saved for a
+            different facility is never returned, and this falls
+            through to the normal NEW-token path instead (fixed
+            2026-08-05, see patient_link_token_repository.py).
         abha_address (str): Patient's ABHA address.
         name (str): Patient's name.
         gender (str): Patient's gender.
@@ -193,16 +200,21 @@ def generate_link_token(
             reuse path, since no request is made.
     """
 
-    existing = get_patient_link_token(abha_address)
+    # CONFIRMED REAL BUG (2026-08-05), now fixed: this used to look up a
+    # saved token by abha_address alone, and would silently reuse a
+    # token issued for a DIFFERENT facility if one existed -- discarding
+    # whatever facility/care-context selection the caller had just
+    # made. get_patient_link_token() now requires an exact (abha_address,
+    # hip_id) match, so a token saved for a different facility is
+    # treated the same as no token existing at all, and this function
+    # falls through to generating a brand-new one for the requested
+    # hip_id below -- the standard behavior for any patient/facility
+    # pair with nothing saved yet, not a special case. See
+    # patient_link_token_repository.py's module docstring for the full
+    # writeup.
+    existing = get_patient_link_token(abha_address, hip_id)
 
     if existing is not None:
-        if existing["hip_id"] != hip_id:
-            log_error(
-                f"Reusing a saved link token for {abha_address} that was issued "
-                f"under hip_id {existing['hip_id']!r}, not the requested {hip_id!r} "
-                f"-- using the token's original hip_id."
-            )
-
         log_phase(
             f"Reusing existing link token for {abha_address} "
             f"(received {existing['received_at']}) -- skipping generate-token call."
@@ -298,6 +310,23 @@ def generate_link_token(
     )
 
     return response
+
+def is_duplicate_link_error(response_body):
+    """
+    True if response_body is ABDM's real, confirmed "this care context
+    is already linked" response (2026-08-05) -- matched on the message
+    text, not the error code, since the real observed code (ABDM-9999)
+    doesn't match the doc's stated ABDM-1090 for this same message.
+    Used to log this specific, expected case as informational rather
+    than a genuine failure -- see link_care_context()'s use of this.
+    """
+    if not isinstance(response_body, dict):
+        return False
+    error = response_body.get("error")
+    if not isinstance(error, dict):
+        return False
+    return (error.get("message") or "").strip() == "Duplicate HIP link request"
+
 
 def _invert_for_notify(patient_records):
     """
@@ -476,10 +505,30 @@ def link_care_context(
         response_body = response.text
 
     if response.status_code != 202:
-        log_error(
-            f"Care context linking returned unexpected status "
-            f"{response.status_code}: {response_body}"
-        )
+        if is_duplicate_link_error(response_body):
+            # CONFIRMED REAL RESPONSE (2026-08-05): re-submitting a care
+            # context that's already linked returns a real 400 with
+            # message "Duplicate HIP link request" -- the doc's own
+            # §4.3.3 failure table calls this ABDM-1090, but the real
+            # body observed tags it generically as ABDM-9999 instead
+            # (worth noting -- the message text is the reliable
+            # identifier here, not the code prefix). This isn't a
+            # genuine failure the way the other 400s are -- it just
+            # means nothing needs to change on ABDM's side, since the
+            # link already exists. Logged as informational, not an
+            # error, so it doesn't read as scary as an unexpected
+            # failure -- the actual 400 response is still returned
+            # unchanged below, so callers that need to know can still
+            # tell.
+            log_phase(
+                f"Care context already linked (ABDM: \"Duplicate HIP link request\") -- "
+                f"nothing to do, not treating this as a real failure."
+            )
+        else:
+            log_error(
+                f"Care context linking returned unexpected status "
+                f"{response.status_code}: {response_body}"
+            )
 
     record_call(
         label="link-care-context",

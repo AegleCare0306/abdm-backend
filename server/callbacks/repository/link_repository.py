@@ -1,8 +1,23 @@
 """
-Repository for temporarily storing ABDM Care Context linking sessions.
+Repository for temporarily storing ABDM Care Context linking sessions
+(UIL's Link Init -> Link Confirm chain), keyed by link_reference_number.
 
 Current Implementation:
-    - In-memory storage (for sandbox/testing)
+    - File-backed, append-only JSON log under storage/link_sessions.jsonl
+      (via server/callbacks/utils/json_file_store.py) -- CHANGED
+      2026-08-05, was a plain in-memory dict (T-80 on the To-Do Tracker).
+      Same reasons as every other repository converted this way: a
+      link session saved by one server process (e.g. before a
+      `--reload` restart) was invisible to a later process, even though
+      the gap between Link Init and Link Confirm "can be seconds or
+      days" per the M2 flow docs -- a restart in that window silently
+      broke the flow with nothing surfaced to ABDM. Concurrency-wise,
+      same append-only middle ground as the other stores -- see
+      json_file_store.py's own docstring for why this is NOT a full
+      database, just safe enough for a couple of testers working at
+      once.
+    - Contains real patient/ABHA data -- gitignored, same as the other
+      file-backed stores.
 
 Future Implementation:
     - Redis
@@ -12,11 +27,9 @@ Future Implementation:
 
 from copy import deepcopy
 
-# -----------------------------------------------------------------------------
-# In-Memory Storage
-# -----------------------------------------------------------------------------
+from server.callbacks.utils.json_file_store import set_key, get_key, delete_key, get_all
 
-_link_sessions = {}
+_STORE_FILE = "link_sessions.jsonl"
 
 
 # -----------------------------------------------------------------------------
@@ -35,7 +48,7 @@ def save_link_session(link_reference_number, session_data):
         None
     """
 
-    _link_sessions[link_reference_number] = deepcopy(session_data)
+    set_key(_STORE_FILE, link_reference_number, deepcopy(session_data))
 
 
 # -----------------------------------------------------------------------------
@@ -53,7 +66,7 @@ def get_link_session(link_reference_number):
         dict | None
     """
 
-    session = _link_sessions.get(link_reference_number)
+    session = get_key(_STORE_FILE, link_reference_number)
 
     if session is None:
         return None
@@ -67,7 +80,10 @@ def get_link_session(link_reference_number):
 
 def update_link_session(link_reference_number, updated_data):
     """
-    Updates an existing link session.
+    Updates an existing link session (read-modify-write at the
+    application level -- appends one new full-value line to the log,
+    same as every other write here). Returns False without writing
+    anything if the session doesn't currently exist.
 
     Args:
         link_reference_number (str): ABDM Link Reference Number.
@@ -77,10 +93,14 @@ def update_link_session(link_reference_number, updated_data):
         bool
     """
 
-    if link_reference_number not in _link_sessions:
+    session = get_key(_STORE_FILE, link_reference_number)
+
+    if session is None:
         return False
 
-    _link_sessions[link_reference_number].update(updated_data)
+    session = dict(session)
+    session.update(updated_data)
+    set_key(_STORE_FILE, link_reference_number, session)
 
     return True
 
@@ -91,7 +111,9 @@ def update_link_session(link_reference_number, updated_data):
 
 def delete_link_session(link_reference_number):
     """
-    Deletes a link session.
+    Deletes a stored link session (appends a delete tombstone -- see
+    json_file_store.py). Returns True if the session existed
+    immediately before this call, False otherwise.
 
     Args:
         link_reference_number (str): ABDM Link Reference Number.
@@ -100,11 +122,7 @@ def delete_link_session(link_reference_number):
         bool
     """
 
-    if link_reference_number in _link_sessions:
-        del _link_sessions[link_reference_number]
-        return True
-
-    return False
+    return delete_key(_STORE_FILE, link_reference_number)
 
 
 # -----------------------------------------------------------------------------
@@ -122,7 +140,7 @@ def link_session_exists(link_reference_number):
         bool
     """
 
-    return link_reference_number in _link_sessions
+    return get_key(_STORE_FILE, link_reference_number) is not None
 
 
 # -----------------------------------------------------------------------------
@@ -137,7 +155,7 @@ def get_all_link_sessions():
         dict
     """
 
-    return deepcopy(_link_sessions)
+    return deepcopy(get_all(_STORE_FILE))
 
 
 # -----------------------------------------------------------------------------
@@ -146,10 +164,15 @@ def get_all_link_sessions():
 
 def clear_all_link_sessions():
     """
-    Clears all stored link sessions.
+    Clears all stored link sessions -- appends a delete tombstone for
+    every key currently present. Best-effort: the append-only log
+    design has no true "truncate" operation, so this grows the file
+    rather than shrinking it. Debugging only; no caller in this
+    codebase today.
 
     Returns:
         None
     """
 
-    _link_sessions.clear()
+    for key in get_all(_STORE_FILE):
+        delete_key(_STORE_FILE, key)

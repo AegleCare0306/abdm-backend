@@ -33,7 +33,7 @@ Future Implementation:
 
 from server.callbacks.utils.json_file_store import set_key, get_key, delete_key
 
-_STORE_FILE = "pending_care_context_notifies.json"
+_STORE_FILE = "pending_care_context_notifies.jsonl"
 
 
 def save_pending_care_context_notify(request_id, session_data):

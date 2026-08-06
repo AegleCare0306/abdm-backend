@@ -1,17 +1,36 @@
 """
-Repository for temporarily storing granted Consent artifacts.
+Repository for storing granted Consent artifacts, keyed by consentId.
 
 Current Implementation:
-    - In-memory storage
+    - File-backed, append-only JSON log under storage/consents.jsonl
+      (via server/callbacks/utils/json_file_store.py) -- CHANGED
+      2026-08-05, was a plain in-memory dict. Two real reasons:
+      (1) same cross-process/cross-restart gap already fixed for the
+      other repositories in this codebase -- a consent granted by one
+      server process (e.g. before a `--reload` restart) was invisible
+      to a later process, even though ABDM still considers that
+      consentId validly granted and will reference it again in a later
+      Health Information Request. (2) discussed 2026-08-05: multiple
+      people/requests genuinely writing concurrently needs more than a
+      plain dict or a read-modify-write file -- see
+      json_file_store.py's own docstring for why append-only is the
+      chosen middle ground (not a full database, but safe enough for a
+      couple of testers working at once).
+    - Still not database-grade concurrency -- see json_file_store.py.
+    - Contains real patient/consent data -- gitignored, same as the
+      other file-backed stores.
 
-Future:
+Future Implementation:
     - Redis
     - PostgreSQL
+    - MongoDB
 """
 
 from copy import deepcopy
 
-_consents = {}
+from server.callbacks.utils.json_file_store import set_key, get_key, delete_key, get_all
+
+_STORE_FILE = "consents.jsonl"
 
 
 def save_consent(
@@ -22,9 +41,7 @@ def save_consent(
     Stores a granted Consent artifact, keyed by consentId.
     """
 
-    _consents[
-        consent_id
-    ] = deepcopy(consent_data)
+    set_key(_STORE_FILE, consent_id, deepcopy(consent_data))
 
 
 def get_consent(
@@ -36,9 +53,7 @@ def get_consent(
     consentId is unrecognized).
     """
 
-    consent = _consents.get(
-        consent_id
-    )
+    consent = get_key(_STORE_FILE, consent_id)
 
     if consent is None:
         return None
@@ -50,16 +65,12 @@ def delete_consent(
     consent_id,
 ):
     """
-    Deletes a stored Consent artifact.
+    Deletes a stored Consent artifact (appends a delete tombstone --
+    see json_file_store.py). Returns True if the consent existed
+    immediately before this call, False otherwise.
     """
 
-    if consent_id in _consents:
-        del _consents[
-            consent_id
-        ]
-        return True
-
-    return False
+    return delete_key(_STORE_FILE, consent_id)
 
 
 def get_all_consents():
@@ -68,5 +79,5 @@ def get_all_consents():
     """
 
     return deepcopy(
-        _consents
+        get_all(_STORE_FILE)
     )

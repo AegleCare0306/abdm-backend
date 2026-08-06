@@ -2,7 +2,7 @@ from server.callbacks.repository.link_token_repository import get_pending_link_t
 from server.callbacks.repository.patient_link_token_repository import save_patient_link_token
 from server.callbacks.repository.patient_repository import search_patient
 from server.callbacks.transformers.patient_transformer import build_patient_payload
-from server.hip_linking import link_care_context
+from server.hip_linking import link_care_context, is_duplicate_link_error
 from server.utils import print_api_response
 from server.callbacks.utils.flow_logger import log_phase, log_api_call, log_waiting, log_error
 
@@ -105,7 +105,16 @@ async def process_generate_token(callback_data):
         delete_pending_link_token(request_id)
 
         if response.status_code != 202:
-            print_api_response(response)
+            try:
+                response_body = response.json()
+            except ValueError:
+                response_body = response.text
+
+            if not is_duplicate_link_error(response_body):
+                print_api_response(response)
+            # Already-linked case is logged as informational by
+            # link_care_context() itself (see is_duplicate_link_error()
+            # usage there) -- nothing further to print here.
             return
 
         log_waiting("Waiting for ABDM's on_carecontext confirmation")

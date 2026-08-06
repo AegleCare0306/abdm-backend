@@ -35,7 +35,7 @@ Future Implementation:
 
 from server.callbacks.utils.json_file_store import set_key, get_key, delete_key
 
-_STORE_FILE = "pending_link_tokens.json"
+_STORE_FILE = "pending_link_tokens.jsonl"
 
 
 # -----------------------------------------------------------------------------

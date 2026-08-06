@@ -19,6 +19,7 @@ from server.hip_linking import (
     notify_care_context_update,
     send_sms_notification,
     ReusedLinkToken,
+    is_duplicate_link_error,
 )
 from server.callbacks.repository.patient_link_token_repository import get_patient_link_token
 from server.callbacks.transformers.patient_transformer import build_patient_payload
@@ -41,6 +42,30 @@ from tools.m2_test_suite.common import (
 SERVER_NOT_RUNNING_MESSAGE = "Start the server first: `uvicorn server.main:app --reload` (with the ngrok tunnel active)."
 
 
+def _print_link_care_context_failure(response):
+    """
+    Shared by both Flow 5 paths (new-token and reused-token) for a
+    non-202 link_care_context() response. Distinguishes ABDM's real,
+    confirmed "this care context is already linked" response
+    (is_duplicate_link_error(), 2026-08-05) from a genuine failure --
+    printing it as informational rather than the scary ABDM API ERROR
+    dump, since re-submitting an already-linked care context isn't
+    actually a problem, just redundant.
+    """
+    try:
+        body = response.json()
+    except ValueError:
+        body = response.text
+
+    if is_duplicate_link_error(body):
+        print_info(f"Already linked (ABDM: \"Duplicate HIP link request\") -- nothing to do, not a real failure.")
+        return True
+
+    print_failure(f"Unexpected status {response.status_code} (expected 202).")
+    print_api_response(response)
+    return False
+
+
 def _link_care_context_with_reused_token(reused, requested_hip_id, patient, start_time):
     """
     Reuse path for Flow 5 -- generate_link_token() returned a
@@ -57,9 +82,14 @@ def _link_care_context_with_reused_token(reused, requested_hip_id, patient, star
         f"(received {reused.received_at}) -- no generate-token call made, nothing to wait for there."
     )
 
+    # reused.hip_id is guaranteed to equal requested_hip_id as of
+    # 2026-08-05 -- generate_link_token() only reuses a token saved for
+    # the EXACT hip_id requested (see patient_link_token_repository.py).
+    # A mismatch here used to be possible and was silently worked around
+    # by using the token's own hip_id instead of the one actually
+    # selected -- that was the real bug; this parameter is kept for the
+    # caller's convenience/logging, not because a mismatch can occur.
     hip_id = reused.hip_id
-    if hip_id != requested_hip_id:
-        print_info(f"Note: this token was issued under hip_id {hip_id!r}, not the facility selected above ({requested_hip_id!r}) -- using the token's original hip_id.")
 
     print_info("Calling link_care_context() directly with the reused token...")
     patient_records = build_patient_payload(
@@ -77,8 +107,7 @@ def _link_care_context_with_reused_token(reused, requested_hip_id, patient, star
     print_info(f"Status: {response.status_code}")
 
     if response.status_code != 202:
-        print_failure(f"Unexpected status {response.status_code} (expected 202).")
-        print_api_response(response)
+        _print_link_care_context_failure(response)
         return {"hip_id": hip_id, "abha_address": reused.abha_address, "reused_token": True, "status_code": response.status_code}
 
     print_success("Care context link accepted (202).")
@@ -213,7 +242,7 @@ def run_notify_care_context_update():
     if care_context is None:
         return None
 
-    saved_token = get_patient_link_token(patient["abha_address"])
+    saved_token = get_patient_link_token(patient["abha_address"], hip_id)
 
     if saved_token is not None:
         print_success(f"Using a saved link token for {patient['abha_address']} (received {saved_token['received_at']}) -- no manual paste needed.")
