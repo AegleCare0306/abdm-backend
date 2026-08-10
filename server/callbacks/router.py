@@ -101,3 +101,63 @@ async def patients_sms_on_notify(request: Request):
 
     return success()
 
+@router.post("/api/v3/hiu/consent/request/on-init")
+async def hiu_consent_request_on_init(request: Request):
+
+    await dispatch_callback(
+        callback_type="consent_hiu_on_init",
+        request=request,
+    )
+
+    return success()
+
+@router.post("/api/v3/hiu/consent/request/notify")
+async def hiu_consent_request_notify(request: Request):
+
+    await dispatch_callback(
+        callback_type="consent_hiu_notify",
+        request=request,
+    )
+
+    return success()
+
+@router.post("/api/v3/hiu/consent/on-fetch")
+async def hiu_consent_on_fetch(request: Request):
+
+    await dispatch_callback(
+        callback_type="consent_hiu_on_fetch",
+        request=request,
+    )
+
+    return success()
+
+@router.post("/api/v3/hiu/health-information/on-request")
+async def hiu_health_information_on_request(request: Request):
+    # CONFIRMED: this exact URL is stated explicitly in the M3 spec doc
+    # (M3_Dcoument_16_02_2026_2319bac7bf.docx, section 5.3.2 "Data flow --
+    # call back to HIU": "URL: {callback_url}/api/v3/hiu/health-information/
+    # on-request"), and that section includes a real captured webhook.site
+    # example showing an actual ABDM call hitting this exact path with the
+    # body shape already implemented below. Originally built as a guess
+    # (following the /api/v3/hiu/<resource>/on-<verb> convention used by
+    # M3 Block 1's 3 callbacks) before this doc section was found and
+    # cross-checked -- confirmed correct, not just a lucky guess.
+    await dispatch_callback(
+        callback_type="health_information_hiu_on_request",
+        request=request,
+    )
+
+    return success()
+
+@router.post("/api/v3/hiu/health-information/push")
+async def hiu_health_information_push(request: Request):
+    # Our own choice of path -- we supply it ourselves as dataPushUrl in
+    # initiate_health_information_request() (server/hiu_health_information.py),
+    # so this one is confirmed-by-construction, not a guess.
+    await dispatch_callback(
+        callback_type="health_information_hiu_push",
+        request=request,
+    )
+
+    return success()
+

@@ -1,0 +1,5 @@
+from server.callbacks.services.health_information_hiu_push_service import process_health_information_hiu_push
+
+
+async def handle_health_information_hiu_push(callback_data):
+    return await process_health_information_hiu_push(callback_data)

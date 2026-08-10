@@ -145,6 +145,38 @@ def to_x509_public_key(raw_public_key_b64):
     return base64.b64encode(_X509_DER_PREFIX + raw_point).decode()
 
 
+def from_x509_public_key(x509_public_key_b64):
+    """
+    Inverse of to_x509_public_key() -- strips the fixed X.509 DER
+    SubjectPublicKeyInfo prefix off an incoming key and returns the raw
+    uncompressed-point public key (base64) that decrypt_health_data()/
+    _decode_public_key() expect.
+
+    Added for M3 Block 2 (server/callbacks/services/
+    health_information_hiu_push_service.py): when we (the HIU) receive an
+    HIP's direct data push, its keyMaterial.dhPublicKey.keyValue arrives
+    in this X.509 format -- mirroring what
+    health_information_request_service.py's _push_and_notify() does for
+    its OWN outbound key when M2 pushes to an HIU's dataPushUrl (see that
+    function's comment: "Our own public key must be sent in X.509 DER
+    format -- confirmed as the actual root cause of the earlier
+    'ABDM-9999: Could not read encrypted content' 400 error"). Since this
+    codebase runs both the HIP and HIU roles for sandbox testing, a push
+    received at our own dataPushUrl in practice comes from our own M2
+    code, which is confirmed to send X.509 -- this is the certain,
+    matching inverse for that specific case, not a guess about every
+    possible third-party HIP's behavior.
+    """
+    der_bytes = base64.b64decode(x509_public_key_b64)
+    raw_point = der_bytes[len(_X509_DER_PREFIX):]
+    if len(raw_point) != 65 or raw_point[0] != 0x04:
+        raise ValueError(
+            f"Expected a 65-byte uncompressed point (0x04 prefix) after "
+            f"stripping the X.509 DER prefix, got {len(raw_point)} bytes"
+        )
+    return base64.b64encode(raw_point).decode()
+
+
 def _decode_public_key(raw_bytes):
     if raw_bytes[0] != 0x04:
         raise ValueError(f"Expected uncompressed EC point (0x04 prefix), got {raw_bytes[0]:#x}")

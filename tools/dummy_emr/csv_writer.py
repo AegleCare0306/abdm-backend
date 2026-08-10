@@ -96,7 +96,20 @@ def upsert_csv(
     output_file = Path(folder) / filename
 
     if fieldnames is None:
-        fieldnames = list(output_rows[0].keys())
+        # Union of every row's keys, not just output_rows[0]'s -- a schema
+        # change (new columns added to a generator, e.g. documents.py
+        # gaining file_path/content_type/file_size_bytes) means old rows
+        # already on disk and new rows being merged in can have different
+        # key sets. DictWriter raises if any row has a key outside
+        # fieldnames, so fieldnames must cover the union; restval="" below
+        # backfills the columns a given row is missing.
+        fieldnames = []
+        seen = set()
+        for row in output_rows:
+            for key in row.keys():
+                if key not in seen:
+                    seen.add(key)
+                    fieldnames.append(key)
 
     with open(
         output_file,
@@ -105,7 +118,7 @@ def upsert_csv(
         encoding="utf-8",
     ) as file:
 
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer = csv.DictWriter(file, fieldnames=fieldnames, restval="")
         writer.writeheader()
         writer.writerows(output_rows)
 

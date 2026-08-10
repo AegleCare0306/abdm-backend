@@ -30,6 +30,12 @@ storage/callbacks/*
 # -- contains real bearer tokens and patient PII once a real flow is run
 storage/api_capture.jsonl
 
+# API capture, split one-file-per-category-per-day (CHANGED 2026-08-10,
+# was the single storage/api_capture.jsonl above -- that file is kept as
+# historical data, not deleted, but new calls are filed here instead).
+# Same real-PII/token reasoning as storage/api_capture.jsonl.
+storage/api_capture/*.jsonl
+
 # File-backed, append-only session/artifact stores (server/callbacks/
 # repository/link_token_repository.py, patient_link_token_repository.py,
 # care_context_link_repository.py, care_context_notify_repository.py,
@@ -52,10 +58,30 @@ storage/consents.jsonl
 storage/patient_identities.jsonl
 storage/link_sessions.jsonl
 
+# M3 HIU Consent Request stores (server/callbacks/repository/
+# pending_consent_request_repository.py, hiu_consent_repository.py) --
+# same append-only pattern and same real-PII/consent-detail reasoning as
+# the M2 stores above.
+storage/pending_consent_requests.jsonl
+storage/pending_consent_requests_by_consent_request_id.jsonl
+storage/hiu_consents.jsonl
+
+# M3 Block 2 Health Information Request stores (server/callbacks/
+# repository/pending_health_information_request_repository.py,
+# hiu_health_information_repository.py) -- same append-only pattern;
+# contains real decrypted patient FHIR bundles once a real flow is run.
+storage/pending_health_information_requests.jsonl
+storage/pending_health_information_requests_by_transaction_id.jsonl
+storage/hiu_health_information.jsonl
+
 # M1 test CLI response logs (tools/m1_test_suite/common.py's log_response())
 # -- contain full session tokens (JWTs), OTPs, ABHA numbers, and mobile
 # numbers in plaintext once a real flow is run against the sandbox
 tools/m1_test_suite/logs/
+
+# M3 test CLI response logs (tools/m3_test_suite/common.py's log_response())
+# -- same reasoning as M1's above, contains ABHA addresses/consent context
+tools/m3_test_suite/logs/
 
 # M1 test CLI downloads (tools/m1_test_suite/flows/profile_utilities.py)
 # -- contains a real ABHA Card and QR Code once Flow 12 is run for real,

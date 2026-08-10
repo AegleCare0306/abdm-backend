@@ -1,0 +1,404 @@
+"""
+Shared helpers for the M3 test CLI's flow modules.
+
+Separate from tools/m2_test_suite/common.py -- kept self-contained the
+same way m1_test_suite and m2_test_suite are separate from each other,
+rather than importing across test-suite packages.
+"""
+
+import csv
+import json
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
+
+import requests
+
+from server.callbacks.repository.hiu_consent_repository import get_all_hiu_consents
+
+# tools/m3_test_suite/common.py -> parents[2] is the repo root. Resolved
+# once here so every path below is anchored to the repo root regardless
+# of the CLI's/server's actual working directory.
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+
+ORGANIZATIONS_CSV = _REPO_ROOT / "server" / "data" / "master" / "organizations.csv"
+PATIENTS_CSV = _REPO_ROOT / "server" / "data" / "master" / "patients.csv"
+PRACTITIONERS_CSV = _REPO_ROOT / "server" / "data" / "master" / "practitioners.csv"
+PRACTITIONER_ORGANIZATIONS_CSV = _REPO_ROOT / "server" / "data" / "master" / "practitioner_organizations.csv"
+
+# CHANGED 2026-08-10: api_capture entries are split one file per category
+# per day (server/callbacks/utils/api_capture.py) -- every M3
+# callback_type wait_for_callback() below is ever called with is tagged
+# category "m3" by dispatcher.py's own mapping, so this only needs this
+# suite's own m3_*.jsonl files. Mirrors tools/m2_test_suite/common.py's
+# own CAPTURE_DIR/wait_for_callback().
+CAPTURE_DIR = _REPO_ROOT / "storage" / "api_capture"
+
+if str(_REPO_ROOT / "tools") not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT / "tools"))
+from dummy_emr.hi_types import ALL_HI_TYPES
+
+_LOG_DIR = Path(__file__).resolve().parent / "logs"
+# One file per CLI process run (fixed at import time), not one per call --
+# every log_response() call during this run appends to the same file.
+_RUN_LOG_FILE = _LOG_DIR / f"run_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+
+
+# -----------------------------------------------------------------------------
+# Prompt / print helpers (same style as tools/m2_test_suite/common.py)
+# -----------------------------------------------------------------------------
+
+def prompt(label):
+    """Prompts for one line of raw input, stripped."""
+    return input(f"{label}: ").strip()
+
+
+def prompt_with_default(label, default):
+    """Prompts for one line of raw input, falling back to `default` if
+    left blank."""
+    value = input(f"{label} [default: {default}]: ").strip()
+    return value or default
+
+
+def print_header(title):
+    print("\n" + "=" * 60)
+    print(title)
+    print("=" * 60)
+
+
+def print_success(message):
+    print(f"\n[OK] {message}")
+
+
+def print_info(message):
+    print(f"      {message}")
+
+
+def print_failure(message):
+    print(f"\n[FAIL] {message}")
+
+
+def log_response(context, body):
+    """
+    Appends a full response/callback body to this process run's log file
+    under tools/m3_test_suite/logs/, instead of printing it to the
+    console.
+
+    SENSITIVE: these log files can contain ABHA addresses and consent
+    request context in plaintext. This directory is gitignored (same
+    *.log pattern as the other test suites' logs directories) -- never
+    paste its contents anywhere; treat it as sensitive local-only debug
+    output.
+    """
+    _LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+    entry = {
+        "timestamp": datetime.now().isoformat(timespec="seconds"),
+        "context": context,
+        "body": body,
+    }
+
+    with open(_RUN_LOG_FILE, "a", encoding="utf-8") as f:
+        f.write(json.dumps(entry, indent=2, default=str) + "\n")
+
+
+# -----------------------------------------------------------------------------
+# CSV-backed data selection -- never free-type patient/facility details
+# -----------------------------------------------------------------------------
+
+def select_facility():
+    """
+    Reads server/data/master/organizations.csv, prints a numbered list,
+    and prompts for a selection.
+
+    Returns:
+        dict: The selected CSV row (hip_id, organization_name,
+            organization_type, address_line1, city, state, pincode,
+            phone, email).
+    """
+    with open(ORGANIZATIONS_CSV, newline="", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+
+    print_info(f"{len(rows)} facilit{'y' if len(rows) == 1 else 'ies'} available:")
+    for i, row in enumerate(rows, start=1):
+        print_info(f"  [{i}] {row['hip_id']}  |  {row['organization_name']}  |  {row['city']}")
+
+    while True:
+        choice = prompt(f"Select a facility (1-{len(rows)})")
+        if choice.isdigit() and 1 <= int(choice) <= len(rows):
+            return rows[int(choice) - 1]
+        print_info("Invalid choice, try again.")
+
+
+def select_patient():
+    """
+    Reads server/data/master/patients.csv, prints a numbered list, and
+    prompts for a selection.
+
+    Returns:
+        dict: {patient_reference, abha_address, abha_number, name,
+            gender, mobile}.
+    """
+    with open(PATIENTS_CSV, newline="", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+
+    print_info(f"{len(rows)} patient(s) available:")
+    for i, row in enumerate(rows, start=1):
+        print_info(f"  [{i}] {row['full_name']}  |  {row['abha_address']}")
+
+    while True:
+        choice = prompt(f"Select a patient (1-{len(rows)})")
+        if choice.isdigit() and 1 <= int(choice) <= len(rows):
+            row = rows[int(choice) - 1]
+            return {
+                "patient_reference": row["patient_reference"],
+                "abha_address": row["abha_address"],
+                "abha_number": row["abha_number"],
+                "name": row["full_name"],
+                "gender": row["gender"] or None,
+                "mobile": row["mobile"],
+            }
+        print_info("Invalid choice, try again.")
+
+
+def select_practitioner(hip_id):
+    """
+    Reads server/data/master/practitioner_organizations.csv filtered to
+    active practitioners at `hip_id`, joins each to their record in
+    server/data/master/practitioners.csv, prints a numbered list, and
+    prompts for a selection.
+
+    This is the requester (treating clinician) for a Consent Init
+    Request -- their real registration identity, not something the
+    doctor using the EMR should have to type by hand every time they
+    request a patient's records.
+
+    Args:
+        hip_id (str): The facility's hip_id, from select_facility()'s
+            returned row -- only practitioners linked to this facility
+            (and marked active) are shown.
+
+    Returns:
+        dict: {practitioner_reference, full_name, registration_number,
+            registration_system, speciality}.
+    """
+    with open(PRACTITIONER_ORGANIZATIONS_CSV, newline="", encoding="utf-8") as f:
+        links = [
+            row for row in csv.DictReader(f)
+            if row["hip_id"] == hip_id and row["active"] == "True"
+        ]
+
+    with open(PRACTITIONERS_CSV, newline="", encoding="utf-8") as f:
+        practitioner_by_ref = {row["practitioner_reference"]: row for row in csv.DictReader(f)}
+
+    rows = [practitioner_by_ref[link["practitioner_reference"]] for link in links if link["practitioner_reference"] in practitioner_by_ref]
+
+    if not rows:
+        print_info(f"No active practitioners found for facility {hip_id} -- falling back to the full practitioner list.")
+        with open(PRACTITIONERS_CSV, newline="", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+
+    print_info(f"{len(rows)} practitioner(s) available at this facility:")
+    for i, row in enumerate(rows, start=1):
+        print_info(f"  [{i}] {row['full_name']}  |  {row['speciality']}  |  {row['registration_number']} ({row['registration_system']})")
+
+    while True:
+        choice = prompt(f"Select the requesting practitioner (1-{len(rows)})")
+        if choice.isdigit() and 1 <= int(choice) <= len(rows):
+            row = rows[int(choice) - 1]
+            return {
+                "practitioner_reference": row["practitioner_reference"],
+                "full_name": row["full_name"],
+                "registration_number": row["registration_number"],
+                "registration_system": row["registration_system"],
+                "speciality": row["speciality"],
+            }
+        print_info("Invalid choice, try again.")
+
+
+# -----------------------------------------------------------------------------
+# Consent purpose selection -- text and code are two representations of the
+# SAME fixed choice, not independent fields; asking for both separately lets
+# them go out of sync. Confirmed from the M3 spec doc's own purpose table
+# (Purpose of Use, a subset of HL7's v3-PurposeOfUse valueset) -- the table's
+# own docx export merges the Display column across rows, but the code->text
+# pairing below is unambiguous (each code is a standard abbreviation of
+# exactly one display name in its row) and "Self Requested"/PATRQT is
+# independently confirmed via a separate real captured example elsewhere in
+# the same document.
+# -----------------------------------------------------------------------------
+
+PURPOSE_OPTIONS = [
+    {"text": "Care Management", "code": "CAREMGT"},
+    {"text": "Break the Glass", "code": "BTG"},
+    {"text": "Public Health", "code": "PUBHLTH"},
+    {"text": "Healthcare Payment", "code": "HPAYMT"},
+    {"text": "Disease Specific Healthcare Research", "code": "DSRCH"},
+    {"text": "Self Requested", "code": "PATRQT"},
+]
+
+
+def select_hi_types():
+    """
+    Prints the 8 ABDM Health Information Types (from
+    tools/dummy_emr/hi_types.py's ALL_HI_TYPES -- confirmed against real
+    ABDM sandbox data, see that module's docstring) as a numbered list and
+    prompts for a multi-selection, same comma-separated-indices / 'all'
+    UX as tools/m2_test_suite/common.py's select_care_contexts(multi_select=True).
+
+    Returns:
+        list[str]: The selected HI type strings, e.g.
+            ["Prescription", "DiagnosticReport"].
+    """
+    hi_types = sorted(ALL_HI_TYPES)
+
+    print_info(f"{len(hi_types)} HI type(s) available:")
+    for i, hi_type in enumerate(hi_types, start=1):
+        print_info(f"  [{i}] {hi_type}")
+
+    while True:
+        choice = prompt(f"Select HI types (comma-separated, e.g. 1,3) or 'all' (1-{len(hi_types)})")
+        stripped = choice.strip().lower()
+        if stripped == "all":
+            return hi_types
+        parts = [p.strip() for p in choice.split(",") if p.strip()]
+        if parts and all(p.isdigit() and 1 <= int(p) <= len(hi_types) for p in parts):
+            indices = sorted(set(int(p) for p in parts))
+            selected = [hi_types[i - 1] for i in indices]
+            print_info(f"Selected {len(selected)} of {len(hi_types)}: {', '.join(selected)}")
+            return selected
+        print_info("Invalid choice, try again (e.g. '1,3' or 'all').")
+
+
+def select_purpose():
+    """
+    Prints the 6 confirmed ABDM consent purposes as a numbered list and
+    prompts for a selection -- returns both `text` and `code` together so
+    they can never be set to a mismatched pair.
+
+    Returns:
+        dict: {"text": str, "code": str}
+    """
+    print_info(f"{len(PURPOSE_OPTIONS)} purpose(s) available:")
+    for i, option in enumerate(PURPOSE_OPTIONS, start=1):
+        print_info(f"  [{i}] {option['text']}  ({option['code']})")
+
+    while True:
+        choice = prompt(f"Select a purpose (1-{len(PURPOSE_OPTIONS)})")
+        if choice.isdigit() and 1 <= int(choice) <= len(PURPOSE_OPTIONS):
+            return PURPOSE_OPTIONS[int(choice) - 1]
+        print_info("Invalid choice, try again.")
+
+
+def select_granted_consent():
+    """
+    Reads every stored HIU consent artefact
+    (hiu_consent_repository.get_all_hiu_consents()), filters to status ==
+    "GRANTED" (the only status Block 2 can act on -- a fetched consent
+    can also be DENIED/REVOKED, which this excludes), prints a numbered
+    list, and prompts for a selection -- same numbered-list UX as
+    select_practitioner()/select_purpose().
+
+    Used by the Health Information Request flow (M3 Block 2) to pick
+    which already-fetched consent to request data for.
+
+    Returns:
+        dict | None: {"consent_id": str, "consent_detail": dict} for the
+            selected consent, or None if no GRANTED consents are stored
+            yet (nothing to select).
+    """
+    all_consents = get_all_hiu_consents()
+
+    granted = [
+        {"consent_id": consent_id, "consent_detail": data.get("consent_detail") or {}}
+        for consent_id, data in all_consents.items()
+        if data.get("status") == "GRANTED"
+    ]
+
+    if not granted:
+        print_info("No GRANTED consents stored yet -- run 'Consent Init Request' first and wait for the patient to grant it (Block 1).")
+        return None
+
+    print_info(f"{len(granted)} GRANTED consent(s) available:")
+    for i, item in enumerate(granted, start=1):
+        detail = item["consent_detail"]
+        hip_id = (detail.get("hip") or {}).get("id")
+        patient_id = (detail.get("patient") or {}).get("id")
+        print_info(f"  [{i}] {item['consent_id']}  |  HIP: {hip_id}  |  Patient: {patient_id}")
+
+    while True:
+        choice = prompt(f"Select a consent (1-{len(granted)})")
+        if choice.isdigit() and 1 <= int(choice) <= len(granted):
+            return granted[int(choice) - 1]
+        print_info("Invalid choice, try again.")
+
+
+# -----------------------------------------------------------------------------
+# Local server helper
+# -----------------------------------------------------------------------------
+
+def check_server_running(base_url="http://127.0.0.1:8000"):
+    """
+    Checks whether the local FastAPI server is up by hitting its /health
+    endpoint. Connection errors (server not running) are treated as a
+    plain False, not a crash.
+
+    Returns:
+        bool
+    """
+    try:
+        response = requests.get(f"{base_url}/health", timeout=3)
+        return response.status_code == 200
+    except requests.exceptions.RequestException:
+        return False
+
+
+# -----------------------------------------------------------------------------
+# Async callback polling
+# -----------------------------------------------------------------------------
+
+def wait_for_callback(callback_type, since, timeout=90, poll_interval=2):
+    """
+    Polls storage/api_capture/m3_*.jsonl for a fresh incoming callback
+    matching callback_type, appearing after `since` (a timezone-aware
+    datetime). Mirrors tools/m2_test_suite/common.py's wait_for_callback()
+    exactly, scoped to this suite's own m3_*.jsonl files -- every M3
+    callback_type is tagged category "m3" by dispatcher.py's own mapping,
+    so this only needs this suite's own m3_*.jsonl files.
+
+    Matches the exact "label" values used in
+    server/callbacks/dispatcher.py's handlers dict (e.g.
+    "consent_hiu_on_init", "consent_hiu_notify", "consent_hiu_on_fetch",
+    "health_information_hiu_on_request", "health_information_hiu_push")
+    -- dispatch_callback() records every incoming callback via
+    record_call(label=callback_type, direction="incoming", ...), so label
+    IS the callback_type string.
+
+    On timeout (returns None), the caller should check: is the server
+    running? Is the ngrok tunnel up? Did ABDM actually receive the
+    original outbound call?
+
+    Returns:
+        dict | None: The matching api_capture entry, or None on timeout.
+    """
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if CAPTURE_DIR.exists():
+            for capture_file in sorted(CAPTURE_DIR.glob("m3_*.jsonl")):
+                with open(capture_file, encoding="utf-8") as f:
+                    lines = f.readlines()
+                for line in reversed(lines):
+                    try:
+                        entry = json.loads(line)
+                    except ValueError:
+                        continue
+                    if entry.get("label") != callback_type:
+                        continue
+                    if entry.get("direction") != "incoming":
+                        continue
+                    entry_time = datetime.fromisoformat(entry["timestamp"].replace("Z", "+00:00"))
+                    if entry_time > since:
+                        return entry
+        time.sleep(poll_interval)
+    return None

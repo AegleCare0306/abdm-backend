@@ -29,7 +29,12 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 
 ORGANIZATIONS_CSV = _REPO_ROOT / "server" / "data" / "master" / "organizations.csv"
 PATIENTS_CSV = _REPO_ROOT / "server" / "data" / "master" / "patients.csv"
-CAPTURE_FILE = _REPO_ROOT / "storage" / "api_capture.jsonl"
+# CHANGED 2026-08-10: api_capture entries are now split one file per
+# category per day (server/callbacks/utils/api_capture.py) instead of a
+# single shared storage/api_capture.jsonl -- that file is left in place,
+# untouched, but no longer receives new entries. wait_for_callback() below
+# now reads from here instead. See that function's own docstring.
+CAPTURE_DIR = _REPO_ROOT / "storage" / "api_capture"
 
 _LOG_DIR = Path(__file__).resolve().parent / "logs"
 # One file per CLI process run (fixed at import time), not one per call --
@@ -297,38 +302,49 @@ def check_server_running(base_url="http://127.0.0.1:8000"):
 
 def wait_for_callback(callback_type, since, timeout=90, poll_interval=2):
     """
-    Polls storage/api_capture.jsonl for a fresh incoming callback matching
-    callback_type, appearing after `since` (a timezone-aware datetime).
-    Matches the exact "label" values used in server/callbacks/dispatcher.py's
-    handlers dict (e.g. "generate_token", "care_context_link",
-    "care_context_notify", "sms_notify") -- dispatch_callback() records
-    every incoming callback via record_call(label=callback_type,
-    direction="incoming", ...), so label IS the callback_type string.
+    Polls storage/api_capture/m2_*.jsonl for a fresh incoming callback
+    matching callback_type, appearing after `since` (a timezone-aware
+    datetime). Matches the exact "label" values used in
+    server/callbacks/dispatcher.py's handlers dict (e.g. "generate_token",
+    "care_context_link", "care_context_notify", "sms_notify") --
+    dispatch_callback() records every incoming callback via
+    record_call(label=callback_type, direction="incoming", ...), so label
+    IS the callback_type string.
+
+    CHANGED 2026-08-10: reads storage/api_capture/m2_{date}.jsonl instead
+    of the old single storage/api_capture.jsonl -- every M2 callback_type
+    this function is ever called with is tagged category "m2" by
+    dispatcher.py's own category mapping, so this only needs this suite's
+    own m2_*.jsonl files. Scans every m2_*.jsonl found (not just today's)
+    since a call fired right before local midnight could still get its
+    callback recorded under the next day's file -- these files are small
+    enough that scanning a handful of them per poll is not a concern for
+    a manual test CLI.
 
     On timeout (returns None), the caller should check: is the server
     running? Is the ngrok tunnel up? Did ABDM actually receive the
     original outbound call?
 
     Returns:
-        dict | None: The matching api_capture.jsonl entry, or None on
-            timeout.
+        dict | None: The matching api_capture entry, or None on timeout.
     """
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
-        if CAPTURE_FILE.exists():
-            with open(CAPTURE_FILE, encoding="utf-8") as f:
-                lines = f.readlines()
-            for line in reversed(lines):
-                try:
-                    entry = json.loads(line)
-                except ValueError:
-                    continue
-                if entry.get("label") != callback_type:
-                    continue
-                if entry.get("direction") != "incoming":
-                    continue
-                entry_time = datetime.fromisoformat(entry["timestamp"].replace("Z", "+00:00"))
-                if entry_time > since:
-                    return entry
+        if CAPTURE_DIR.exists():
+            for capture_file in sorted(CAPTURE_DIR.glob("m2_*.jsonl")):
+                with open(capture_file, encoding="utf-8") as f:
+                    lines = f.readlines()
+                for line in reversed(lines):
+                    try:
+                        entry = json.loads(line)
+                    except ValueError:
+                        continue
+                    if entry.get("label") != callback_type:
+                        continue
+                    if entry.get("direction") != "incoming":
+                        continue
+                    entry_time = datetime.fromisoformat(entry["timestamp"].replace("Z", "+00:00"))
+                    if entry_time > since:
+                        return entry
         time.sleep(poll_interval)
     return None

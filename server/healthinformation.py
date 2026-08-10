@@ -172,6 +172,7 @@ def send_health_information_data(
     key_material,
     page_number=0,
     page_count=1,
+    attachment_mechanisms=None,
 ):
     """
     Pushes encrypted health information entries to the HIU's dataPushUrl.
@@ -191,6 +192,12 @@ def send_health_information_data(
             (cryptoAlg, curve, dhPublicKey, nonce) -- NOT the HIU's.
         page_number (int)
         page_count (int)
+        attachment_mechanisms (list[str] | None): which FHIR attachment
+            mechanism(s) were present across the bundle(s) behind these
+            (already-encrypted) entries -- passed straight through to
+            record_call() so storage/api_capture.jsonl can be correlated
+            against attachment mechanism later. Purely instrumentation;
+            doesn't affect the actual push.
 
     Returns:
         requests.Response
@@ -225,6 +232,7 @@ def send_health_information_data(
             request_body=payload,
             response_status=None,
             response_body=f"RequestException: {exc}",
+            attachment_mechanisms=attachment_mechanisms,
         )
         log_error(f"Data push to HIU ({data_push_url}) failed: {exc}")
         raise
@@ -244,6 +252,7 @@ def send_health_information_data(
         response_status=response.status_code,
         response_headers=dict(response.headers),
         response_body=response_body,
+        attachment_mechanisms=attachment_mechanisms,
     )
 
     return response
@@ -256,21 +265,43 @@ def send_health_information_notify(
     done_at,
     session_status,
     status_responses,
+    notifier_type="HIP",
+    notifier_id=None,
 ):
     """
     Notifies the CM of the outcome of a health information transfer.
 
+    Shared by both roles this codebase runs -- M2 (the HIP, notifying
+    that it PUSHED data to an HIU) and M3 Block 2 (the HIU, notifying
+    that it RECEIVED data from an HIP) -- confirmed via the "Milestone 3
+    - New" Postman collection that the payload shape is identical between
+    the HIP-sent and HIU-sent versions, with only notifier.type/
+    notifier.id differing by role; statusNotification.hipId stays
+    HIP-scoped regardless of who's calling. Added 2026-08-10 for M3;
+    notifier_type/notifier_id default to M2's original, only behavior
+    (notifier.type="HIP", notifier.id=hip_id) so both of M2's existing
+    call sites (server/callbacks/services/health_information_request_service.py)
+    are completely unchanged.
+
     Args:
         consent_id (str)
         transaction_id (str)
-        hip_id (str)
+        hip_id (str): Always the HIP's own id, regardless of caller role
+            -- goes into statusNotification.hipId either way.
         done_at (str): ISO 8601 timestamp of when the transfer completed.
-        session_status (str): One of TRANSFERRED, FAILED.
+        session_status (str): M2's HIP-role vocabulary is TRANSFERRED/
+            FAILED; M3's HIU-role vocabulary is RECEIVED/FAILED --
+            confirmed as genuinely different per-role values (each role's
+            own Postman example), not unified here.
         status_responses (list): [{careContextReference, hiStatus, description}, ...]
             hiStatus is one of DELIVERED, ERRORED (per the doc's prose --
             flagged separately as an open question against the doc's own
             example, which shows "OK" instead; using DELIVERED/ERRORED per
             team decision).
+        notifier_type (str): "HIP" (default, M2's original behavior) or
+            "HIU" (M3 Block 2's health_information_hiu_push_service.py).
+        notifier_id (str | None): Defaults to hip_id (M2's original
+            behavior) when not given. M3 passes its own hiu_id here.
 
     Returns:
         requests.Response
@@ -295,8 +326,8 @@ def send_health_information_notify(
             "transactionId": transaction_id,
             "doneAt": done_at,
             "notifier": {
-                "type": "HIP",
-                "id": hip_id,
+                "type": notifier_type,
+                "id": notifier_id or hip_id,
             },
             "statusNotification": {
                 "sessionStatus": session_status,

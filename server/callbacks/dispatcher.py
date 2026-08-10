@@ -13,7 +13,39 @@ from server.callbacks.handlers.generate_token import handle_generate_token
 from server.callbacks.handlers.care_context_link import handle_care_context_link
 from server.callbacks.handlers.care_context_notify import handle_care_context_notify
 from server.callbacks.handlers.sms_notify import handle_sms_notify
-from server.callbacks.utils.flow_logger import log_error, set_correlation_id
+from server.callbacks.handlers.consent_hiu_on_init import handle_consent_hiu_on_init
+from server.callbacks.handlers.consent_hiu_notify import handle_consent_hiu_notify
+from server.callbacks.handlers.consent_hiu_on_fetch import handle_consent_hiu_on_fetch
+from server.callbacks.handlers.health_information_hiu_on_request import handle_health_information_hiu_on_request
+from server.callbacks.handlers.health_information_hiu_push import handle_health_information_hiu_push
+from server.callbacks.utils.flow_logger import log_error, set_correlation_id, set_log_category
+
+# Which of the M2/M3 doc milestones each callback_type belongs to, for
+# set_log_category() below -- anything not listed here (including a
+# callback_type nobody registered a handler for) falls back to "server",
+# per the ambient ContextVar's own default. The running server is one
+# persistent process serving both M2's and M3's callbacks, so this is
+# re-decided per incoming request rather than once per process, unlike
+# the M1/M2/M3 test CLIs (each their own process, tagged once in main()).
+M2_CALLBACK_TYPES = {
+    "discover",
+    "care_context_init",
+    "care_context_confirm",
+    "consent_notify",
+    "health_information_request",
+    "generate_token",
+    "care_context_link",
+    "care_context_notify",
+    "sms_notify",
+}
+
+M3_CALLBACK_TYPES = {
+    "consent_hiu_on_init",
+    "consent_hiu_notify",
+    "consent_hiu_on_fetch",
+    "health_information_hiu_on_request",
+    "health_information_hiu_push",
+}
 
 
 async def dispatch_callback(
@@ -33,6 +65,13 @@ async def dispatch_callback(
     try:
         correlation_id = str(uuid.uuid4())[:8]
         set_correlation_id(correlation_id)
+
+        if callback_type in M2_CALLBACK_TYPES:
+            set_log_category("m2")
+        elif callback_type in M3_CALLBACK_TYPES:
+            set_log_category("m3")
+        else:
+            set_log_category("server")
 
         headers = dict(request.headers)
 
@@ -73,6 +112,11 @@ async def dispatch_callback(
             "care_context_link": handle_care_context_link,
             "care_context_notify": handle_care_context_notify,
             "sms_notify": handle_sms_notify,
+            "consent_hiu_on_init": handle_consent_hiu_on_init,
+            "consent_hiu_notify": handle_consent_hiu_notify,
+            "consent_hiu_on_fetch": handle_consent_hiu_on_fetch,
+            "health_information_hiu_on_request": handle_health_information_hiu_on_request,
+            "health_information_hiu_push": handle_health_information_hiu_push,
         }
 
         handler = handlers.get(callback_type)

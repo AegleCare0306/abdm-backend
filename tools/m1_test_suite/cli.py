@@ -29,6 +29,7 @@ from pathlib import Path
 # regardless of how this script was invoked.
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+from server.callbacks.utils.flow_logger import set_log_category
 from tools.m1_test_suite.common import redact_token
 from tools.m1_test_suite.flows import (
     enrollment,
@@ -144,6 +145,14 @@ def print_menu():
 
 
 def main():
+    # Tagged once here, before the menu loop -- this whole process (a
+    # separate OS process from the running server) only ever does M1
+    # work, so every record_call()/log_*() made for the rest of its life
+    # (including shared calls like a gateway token request) inherits this
+    # category automatically. See server/callbacks/utils/flow_logger.py's
+    # get_log_category() docstring.
+    set_log_category("m1")
+
     print("M1 Test CLI -- running against the live ABDM sandbox.")
     print("Each flow will prompt for a real OTP sent to your Aadhaar/mobile number.")
 

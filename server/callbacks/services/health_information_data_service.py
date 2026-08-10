@@ -32,6 +32,7 @@ if str(_TOOLS_DIR) not in sys.path:
 
 from dummy_emr.config import MASTER_OUTPUT_FOLDER, TRANSACTION_OUTPUT_FOLDER
 from dummy_emr.case_library import CLINICAL_CASES
+from dummy_emr.hi_types import DOCUMENT_TYPE_TO_HI_TYPE
 
 from server.fhir_builders.patient import build_patient
 from server.fhir_builders.practitioner import build_practitioner
@@ -43,8 +44,14 @@ from server.fhir_builders.medication_request import build_medication_request
 from server.fhir_builders.procedure import build_procedure
 from server.fhir_builders.diagnostic_report import build_diagnostic_report
 from server.fhir_builders.immunization import build_immunization
+from server.fhir_builders.document_reference import build_document_reference
+from server.fhir_builders.binary import build_binary
+from server.fhir_builders.media import build_media
+from server.fhir_builders.attachment_spec import spec_for
 from server.fhir_builders.composition import build_composition
 from server.fhir_builders.bundle import build_bundle
+from server.callbacks.utils.attachment_metrics import record_payload_size
+from server.config import ATTACHMENT_STRATEGY_OVERRIDE
 
 
 def _load_csv(folder, filename):
@@ -82,6 +89,7 @@ MEDICATION_REQUEST_DATE_FIELD = "authored_on"
 PROCEDURE_DATE_FIELD = "performed_datetime"
 DIAGNOSTIC_REPORT_DATE_FIELD = "issued_datetime"
 IMMUNIZATION_DATE_FIELD = "occurrence_datetime"
+DOCUMENT_DATE_FIELD = "authored_datetime"
 
 # Distinguishes "this boundary was sent but is broken" from "this boundary
 # was never sent at all" -- the two must not collapse to the same outcome,
@@ -215,6 +223,130 @@ def _rows_in_range(rows, encounter_reference, date_field, date_range):
     ]
 
 
+# ---------------------------------------------------------------------------
+# Attachment building (Part A/B/C/E of the file-attachment support task)
+#
+# documents.csv rows carry a file (file_path/content_type/file_size_bytes --
+# see tools/dummy_emr/generators/documents.py) for every HI type that has a
+# real ABDM attachment slot, except:
+#   - "Diagnostic Report" (Lab sub-profile has no attachment slot at all)
+#   - "Wellness Record" (no sample file was provided for it)
+# "Diagnostic Report Imaging" is a pseudo document_type documents.py adds
+# (never present in case_library.py) for a coin-flip subset of Diagnostic
+# Report encounters, exercising the Media mechanism.
+# ---------------------------------------------------------------------------
+
+def _hi_type_and_subkind(document_type):
+    """
+    Maps a documents.csv row's document_type to (hi_type, sub_kind).
+    sub_kind is only non-None for DiagnosticReport's two sub-profiles
+    (Lab/Imaging), which carry different attachment rules -- see
+    server/fhir_builders/attachment_spec.py.
+    """
+    if document_type == "Diagnostic Report Imaging":
+        return "DiagnosticReport", "Imaging"
+    if document_type == "Diagnostic Report":
+        return "DiagnosticReport", "Lab"
+    return DOCUMENT_TYPE_TO_HI_TYPE.get(document_type), None
+
+
+def _build_attachment(document_row, patient_id, encounter_id):
+    """
+    Builds the FHIR resource(s) for one documents.csv row that carries a
+    file, honoring ATTACHMENT_STRATEGY_OVERRIDE (server/config.py -- Part
+    E's shelve-not-delete override point).
+
+    Returns (resources, composition_entry):
+      - resources: list of resource dicts to add to the bundle (usually
+        one; two when an override pairs a Binary with a URL-referencing
+        DocumentReference).
+      - composition_entry: {"document_type", "resource_type",
+        "resource_id"} for build_composition()'s attachment_entries, or
+        None if this row has no file or no attachment mechanism applies
+        at all (e.g. a Lab-sub-profile "Diagnostic Report" row).
+
+    Always returns ([], None) for a row with no file_path -- callers don't
+    need to check that themselves.
+    """
+
+    file_path = document_row.get("file_path")
+    if not file_path:
+        return [], None
+
+    document_type = document_row["document_type"]
+    hi_type, sub_kind = _hi_type_and_subkind(document_type)
+
+    default_spec = spec_for(hi_type, sub_kind)
+    default_mechanism = default_spec["mechanism"] if default_spec else None
+    mechanism = ATTACHMENT_STRATEGY_OVERRIDE.get(hi_type, default_mechanism)
+
+    if not mechanism:
+        return [], None
+
+    document_id = document_row["document_reference"]
+    title = document_row["title"]
+    creation = document_row["authored_datetime"]
+
+    if mechanism == "Binary" and default_mechanism == "Binary":
+        # Native Binary-attaching HI type (Prescription) -- the bare
+        # Binary IS the composition section entry, no wrapping
+        # DocumentReference (per the real IG: direct entry, not
+        # DocumentReference).
+        binary_resource = build_binary(binary_id=document_id, file_path=file_path)
+        record_payload_size(binary_resource, hi_type=hi_type, mechanism="Binary", sub_kind=sub_kind, care_context_reference=encounter_id)
+        return [binary_resource], {"document_type": document_type, "resource_type": "Binary", "resource_id": document_id}
+
+    if mechanism == "Binary":
+        # Override forcing a normally DocumentReference/Media-attaching HI
+        # type onto the general HL7 large-file pattern (attachment.url ->
+        # separate Binary resource): a bare Binary has no subject/context
+        # of its own, so it can't stand in as the section entry the way
+        # Prescription's native path does -- a DocumentReference whose
+        # attachment.url points at the Binary becomes the section entry
+        # instead.
+        binary_id = f"BIN-{document_id}"
+        binary_resource = build_binary(binary_id=binary_id, file_path=file_path)
+        document_reference_resource = build_document_reference(
+            document_id=document_id,
+            patient_id=patient_id,
+            encounter_id=encounter_id,
+            title=title,
+            creation_datetime=creation,
+            attachment_url=f"Binary/{binary_id}",
+        )
+        record_payload_size(binary_resource, hi_type=hi_type, mechanism="Binary", sub_kind=sub_kind, care_context_reference=encounter_id)
+        return (
+            [binary_resource, document_reference_resource],
+            {"document_type": document_type, "resource_type": "DocumentReference", "resource_id": document_id},
+        )
+
+    if mechanism == "Media":
+        media_resource = build_media(
+            media_id=document_id,
+            patient_id=patient_id,
+            encounter_id=encounter_id,
+            title=title,
+            creation_datetime=creation,
+            file_path=file_path,
+        )
+        record_payload_size(media_resource, hi_type=hi_type, mechanism="Media", sub_kind=sub_kind, care_context_reference=encounter_id)
+        return [media_resource], {"document_type": document_type, "resource_type": "Media", "resource_id": document_id}
+
+    # mechanism == "DocumentReference" (the default for every other
+    # attaching HI type, and also what an override targeting
+    # "DocumentReference" produces directly, inline data).
+    document_reference_resource = build_document_reference(
+        document_id=document_id,
+        patient_id=patient_id,
+        encounter_id=encounter_id,
+        title=title,
+        creation_datetime=creation,
+        file_path=file_path,
+    )
+    record_payload_size(document_reference_resource, hi_type=hi_type, mechanism="DocumentReference", sub_kind=sub_kind, care_context_reference=encounter_id)
+    return [document_reference_resource], {"document_type": document_type, "resource_type": "DocumentReference", "resource_id": document_id}
+
+
 def build_bundles_for_care_contexts(care_context_references, date_range=None):
     """
     care_context_references: list of strings, e.g. ["ENC0005", "ENC0012"].
@@ -259,6 +391,7 @@ def build_bundles_for_care_contexts(care_context_references, date_range=None):
     procedures = _load_csv(TRANSACTION_OUTPUT_FOLDER, "procedures.csv")
     diagnostic_reports = _load_csv(TRANSACTION_OUTPUT_FOLDER, "diagnostic_reports.csv")
     immunizations = _load_csv(TRANSACTION_OUTPUT_FOLDER, "immunizations.csv")
+    documents = _load_csv(TRANSACTION_OUTPUT_FOLDER, "documents.csv")
 
     case_lookup = {case["case_id"]: case for case in CLINICAL_CASES}
     organization_by_hip = {org["hip_id"]: org for org in organizations}
@@ -296,6 +429,14 @@ def build_bundles_for_care_contexts(care_context_references, date_range=None):
         diagnostic_report_resources = [build_diagnostic_report(r) for r in _rows_in_range(diagnostic_reports, care_context_reference, DIAGNOSTIC_REPORT_DATE_FIELD, date_range)]
         immunization_resources = [build_immunization(r) for r in _rows_in_range(immunizations, care_context_reference, IMMUNIZATION_DATE_FIELD, date_range)]
 
+        attachment_resources = []
+        attachment_entries = []
+        for document_row in _rows_in_range(documents, care_context_reference, DOCUMENT_DATE_FIELD, date_range):
+            resources, entry = _build_attachment(document_row, patient_row["patient_reference"], care_context_reference)
+            attachment_resources.extend(resources)
+            if entry is not None:
+                attachment_entries.append(entry)
+
         resource_ids_by_category = {
             "condition": [r["id"] for r in condition_resources],
             "medication_request": [r["id"] for r in medication_request_resources],
@@ -316,6 +457,7 @@ def build_bundles_for_care_contexts(care_context_references, date_range=None):
             document_types=case["document_types"],
             chief_complaint=encounter_row["chief_complaint"],
             resource_ids_by_category=resource_ids_by_category,
+            attachment_entries=attachment_entries,
         )
 
         all_resources = (
@@ -326,6 +468,7 @@ def build_bundles_for_care_contexts(care_context_references, date_range=None):
             + procedure_resources
             + diagnostic_report_resources
             + immunization_resources
+            + attachment_resources
         )
 
         bundle = build_bundle(

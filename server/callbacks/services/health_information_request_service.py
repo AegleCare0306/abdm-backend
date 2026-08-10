@@ -15,6 +15,7 @@ from server.healthinformation import (
 from server.fidelius_crypto import generate_key_material, encrypt_health_data, to_x509_public_key
 from server.utils import print_api_response, generate_timestamp, generate_expiry_time, generate_safe_past_timestamp
 from server.callbacks.utils.flow_logger import log_phase, log_api_call, log_waiting, log_error
+from server.callbacks.utils.attachment_metrics import time_block, mechanisms_in_bundle
 
 
 def _compute_checksum(encrypted_content):
@@ -48,21 +49,31 @@ def _push_and_notify(
 
     entries = []
     status_responses = []
+    all_mechanisms = set()
 
     hip_key_material = generate_key_material()
 
     for care_context_reference, bundle in fhir_bundles.items():
 
+        bundle_mechanisms = mechanisms_in_bundle(bundle)
+        all_mechanisms.update(bundle_mechanisms)
+
         plaintext = json.dumps(bundle)
 
         try:
-            encrypted_content = encrypt_health_data(
-                plaintext=plaintext,
-                sender_private_key=hip_key_material["private_key"],
-                sender_nonce=hip_key_material["nonce"],
-                requester_public_key=hiu_key_material["dhPublicKey"]["keyValue"],
-                requester_nonce=hiu_key_material["nonce"],
-            )
+            with time_block(
+                "encrypt",
+                transaction_id=transaction_id,
+                care_context_reference=care_context_reference,
+                mechanisms=bundle_mechanisms,
+            ):
+                encrypted_content = encrypt_health_data(
+                    plaintext=plaintext,
+                    sender_private_key=hip_key_material["private_key"],
+                    sender_nonce=hip_key_material["nonce"],
+                    requester_public_key=hiu_key_material["dhPublicKey"]["keyValue"],
+                    requester_nonce=hiu_key_material["nonce"],
+                )
         except Exception as exc:
             log_error(f"Encryption failed for care context {care_context_reference}: {exc}")
             status_responses.append({
@@ -97,12 +108,18 @@ def _push_and_notify(
             "nonce": hip_key_material["nonce"],
         }
 
-        push_response = send_health_information_data(
-            data_push_url=data_push_url,
+        with time_block(
+            "transmit",
             transaction_id=transaction_id,
-            entries=entries,
-            key_material=outbound_key_material,
-        )
+            mechanisms=sorted(all_mechanisms),
+        ):
+            push_response = send_health_information_data(
+                data_push_url=data_push_url,
+                transaction_id=transaction_id,
+                entries=entries,
+                key_material=outbound_key_material,
+                attachment_mechanisms=sorted(all_mechanisms),
+            )
 
         log_api_call("Pushing Encrypted Records to HIU", f"POST {data_push_url}", push_response.status_code)
 
@@ -200,7 +217,8 @@ async def process_health_information_request(
                 for care_context in consent.get("care_contexts", [])
                 if care_context.get("careContextReference")
             ]
-            fhir_bundles = build_bundles_for_care_contexts(care_context_references, date_range=date_range)
+            with time_block("bundle_assembly", transaction_id=transaction_id):
+                fhir_bundles = build_bundles_for_care_contexts(care_context_references, date_range=date_range)
             log_phase(f"Assembled {len(fhir_bundles)} FHIR record(s) for the approved care context(s)")
 
         session_data = {

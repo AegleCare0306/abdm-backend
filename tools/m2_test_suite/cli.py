@@ -45,6 +45,7 @@ from pathlib import Path
 # regardless of how this script was invoked.
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+from server.callbacks.utils.flow_logger import set_log_category
 from tools.m2_test_suite.flows import bridge_gateway, hip_linking
 
 
@@ -98,6 +99,11 @@ def print_menu():
 
 
 def main():
+    # Tagged once here, before the menu loop -- see the same note in
+    # tools/m1_test_suite/cli.py's main(). This process only ever does M2
+    # work.
+    set_log_category("m2")
+
     print("M2 Test CLI -- running against the live ABDM sandbox.")
     print("Flows marked (async) require the local server (`uvicorn server.main:app --reload`) running with the ngrok tunnel active.")
 
