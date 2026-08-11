@@ -82,6 +82,10 @@ def main():
 
     print("M3 Test CLI -- running against the live ABDM sandbox.")
     print("Flows marked (async) require the local server (`uvicorn server.main:app --reload`) running with the ngrok tunnel active.")
+    print("NOTE: this CLI process holds its imported modules in memory for its whole run -- if server/*.py or any "
+          "tools/m3_test_suite/*.py file changes while this is open, restart this CLI to pick up the change. "
+          "Confirmed live, 2026-08-11: an already-running process kept using pre-fix code after an edit was saved "
+          "to disk, since edits to already-imported modules do not hot-reload.")
 
     while True:
         print_menu()

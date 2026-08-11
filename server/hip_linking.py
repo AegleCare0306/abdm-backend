@@ -271,6 +271,7 @@ def generate_link_token(
             url=url,
             json=payload,
             headers=headers,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -484,6 +485,7 @@ def link_care_context(
             url=url,
             json=payload,
             headers=headers,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -659,6 +661,7 @@ def notify_care_context_update(
             url=url,
             json=payload,
             headers=headers,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -771,6 +774,7 @@ def send_sms_notification(hip_id, hip_name, phone_no):
             url=url,
             json=payload,
             headers=headers,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         record_call(

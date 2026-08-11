@@ -163,6 +163,7 @@ def initiate_consent_request(
             url=url,
             json=payload,
             headers=headers,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -257,6 +258,7 @@ def send_consent_hiu_on_notify(acknowledgements, request_id):
             url=url,
             json=payload,
             headers=headers,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -361,6 +363,7 @@ def fetch_consent(hiu_id, consent_id):
             url=url,
             json=payload,
             headers=headers,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         record_call(

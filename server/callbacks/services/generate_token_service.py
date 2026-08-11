@@ -1,3 +1,5 @@
+import asyncio
+
 from server.callbacks.repository.link_token_repository import get_pending_link_token, delete_pending_link_token
 from server.callbacks.repository.patient_link_token_repository import save_patient_link_token
 from server.callbacks.repository.patient_repository import search_patient
@@ -92,7 +94,11 @@ async def process_generate_token(callback_data):
 
         patient_records = build_patient_payload(patient_data)
 
-        response = link_care_context(
+        # Off the event loop thread -- see discover_service.py's
+        # process_discover() for why every blocking requests.* call
+        # reachable from an async def callback handler is wrapped this way.
+        response = await asyncio.to_thread(
+            link_care_context,
             hip_id=pending["hip_id"],
             abha_address=resolved_abha_address,
             link_token=link_token,

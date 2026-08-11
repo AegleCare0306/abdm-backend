@@ -21,7 +21,7 @@ def _post(url, headers, payload, action_description):
     not an exceptional one).
     """
     try:
-        response = requests.post(url=url, headers=headers, json=payload)
+        response = requests.post(url=url, headers=headers, json=payload, timeout=30)
     except requests.exceptions.RequestException as exc:
         record_call(
             label=action_description,
@@ -466,6 +466,7 @@ def get_resource(
         response = requests.get(
             url=url,
             headers=headers,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         record_call(

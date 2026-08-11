@@ -1,3 +1,5 @@
+import asyncio
+
 from server.hiu_consent import fetch_consent, send_consent_hiu_on_notify
 from server.utils import print_api_response
 from server.callbacks.repository.pending_consent_request_repository import get_pending_consent_request_by_consent_request_id
@@ -64,7 +66,12 @@ async def process_consent_hiu_notify(callback_data):
                     consent_id = artefact.get("id")
                     if not consent_id:
                         continue
-                    response = fetch_consent(hiu_id=hiu_id, consent_id=consent_id)
+                    # Off the event loop thread -- see discover_service.py's
+                    # process_discover() for why every blocking requests.*
+                    # call reachable from an async def callback handler is
+                    # wrapped this way. Runs once per artefact in the loop,
+                    # sequentially.
+                    response = await asyncio.to_thread(fetch_consent, hiu_id=hiu_id, consent_id=consent_id)
                     log_api_call(f"Fetching granted consent artefact {consent_id}", "POST .../consent/v3/fetch", response.status_code)
                     if response.status_code != 202:
                         print_api_response(response)
@@ -78,7 +85,8 @@ async def process_consent_hiu_notify(callback_data):
             if artefact.get("id")
         ]
 
-        response = send_consent_hiu_on_notify(
+        response = await asyncio.to_thread(
+            send_consent_hiu_on_notify,
             acknowledgements=acknowledgements,
             request_id=request_id,
         )

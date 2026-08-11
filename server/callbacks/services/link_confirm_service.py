@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime, timezone
 
 from server.callbacks.repository.link_repository import get_link_session
@@ -36,7 +37,15 @@ async def process_link_confirm(callback_data):
                 log_error("OTP window has expired -- cannot confirm link.")
                 return
 
-        if not verify_otp(
+        # Off the event loop thread -- see discover_service.py's
+        # process_discover() for why every blocking requests.* call
+        # reachable from an async def callback handler is wrapped this way.
+        # verify_otp() (otp_service.py) itself stays synchronous; it
+        # internally calls get_public_certificate() and abha.py's own
+        # verify_otp() -- both move to the worker thread together as one
+        # unit along with this call.
+        if not await asyncio.to_thread(
+                verify_otp,
                 otp=otp,
                 txn_id=session["otp_txn_id"],
         ):
@@ -58,7 +67,8 @@ async def process_link_confirm(callback_data):
 
         patient_payload = build_patient_payload(records)
 
-        response = send_on_confirm(
+        response = await asyncio.to_thread(
+            send_on_confirm,
             patient=patient_payload,
             request_id=request_id,
         )

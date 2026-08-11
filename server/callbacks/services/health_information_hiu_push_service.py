@@ -7,6 +7,7 @@ is the SENDER side (HIP encrypts and pushes); this module is the
 RECEIVER side (HIU receives and decrypts).
 """
 
+import asyncio
 import hashlib
 import json
 
@@ -214,7 +215,15 @@ async def process_health_information_hiu_push(callback_data):
             for ref, result in care_contexts.items()
         ]
 
-        notify_response = send_health_information_notify(
+        # Off the event loop thread -- see discover_service.py's
+        # process_discover() for why every blocking requests.* call
+        # reachable from an async def callback handler is wrapped this
+        # way. Especially relevant here: this handler is itself the
+        # deadlock-prone side of the M2<->M3 self-test loop (see
+        # health_information_request_service.py's process_health_information_request()
+        # for the confirmed deadlock this whole pass fixes).
+        notify_response = await asyncio.to_thread(
+            send_health_information_notify,
             consent_id=consent_id,
             transaction_id=transaction_id,
             hip_id=hip_id,

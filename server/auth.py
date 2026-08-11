@@ -47,6 +47,7 @@ def generate_gateway_token():
             url=url,
             json=payload,
             headers=headers,
+            timeout=30,
         )
         response.raise_for_status()
     except requests.exceptions.RequestException as exc:
@@ -209,6 +210,7 @@ def find_bridge_service_by_id(service_id):
         response = requests.get(
             url=url,
             headers=headers,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -301,6 +303,7 @@ def find_services_by_bridge_id():
         response = requests.get(
             url=url,
             headers=headers,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         record_call(

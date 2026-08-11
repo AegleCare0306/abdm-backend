@@ -1,3 +1,4 @@
+import asyncio
 import hashlib
 import json
 
@@ -245,7 +246,11 @@ async def process_health_information_request(
             session_data,
         )
 
-        response = send_on_health_information_request(
+        # Off the event loop thread -- see discover_service.py's
+        # process_discover() for why every blocking requests.* call
+        # reachable from an async def callback handler is wrapped this way.
+        response = await asyncio.to_thread(
+            send_on_health_information_request,
             transaction_id=transaction_id,
             request_id=request_id,
         )
@@ -259,7 +264,17 @@ async def process_health_information_request(
         if not fhir_bundles or not data_push_url or not key_material:
 
             if not fhir_bundles:
-                reason = "Could not prepare any FHIR records for the approved care context(s)."
+                # No parentheses in this string -- ABDM's health-information/notify
+                # endpoint rejected this exact description with "ABDM-9999:
+                # Invalid description" (a genuine 400 seen live, 2026-08-11)
+                # when it read "...care context(s)."; an otherwise
+                # identically-shaped FAILED/ERRORED notify call using a
+                # description with no parentheses ("Push failed with status
+                # 503") was accepted (202) the day before. Not a confirmed,
+                # documented ABDM rule -- just the one direct comparison
+                # available -- so treat this as a working hypothesis until
+                # confirmed by a clean live retest.
+                reason = "Could not prepare any FHIR records for the approved care contexts."
             elif not data_push_url:
                 reason = "HIU did not provide a dataPushUrl in the request -- unable to deliver records."
             elif not key_material:
@@ -273,7 +288,8 @@ async def process_health_information_request(
                 for ref in care_context_references
             ]
 
-            notify_response = send_health_information_notify(
+            notify_response = await asyncio.to_thread(
+                send_health_information_notify,
                 consent_id=consent_id,
                 transaction_id=transaction_id,
                 hip_id=hip_id,
@@ -292,7 +308,24 @@ async def process_health_information_request(
 
         log_waiting("Encrypting and pushing records to the HIU")
 
-        _push_and_notify(
+        # THE DEADLOCK FIX: _push_and_notify() is a plain synchronous
+        # function that internally calls send_health_information_data()
+        # (a blocking requests.post()) and then send_health_information_notify()
+        # sequentially, as one logical unit (encrypt -> push -> notify).
+        # Confirmed live: because this server runs both the M2 HIP role and
+        # the M3 HIU role in one process, data_push_url here can be our OWN
+        # server's dataPushUrl -- so without this wrap, this HIP-role code
+        # (already running inside this same event loop, handling this
+        # inbound health_information_request callback) would block that
+        # loop making a synchronous call back into itself, waiting on a
+        # response only that same (now-blocked) loop could ever serve.
+        # Genuine deadlock, reproduced and fixed 2026-08-10. Wrapping the
+        # whole _push_and_notify() call (rather than making it async def,
+        # or wrapping its two internal calls separately) moves the entire
+        # synchronous chain to a worker thread as one piece, leaving this
+        # function's own internal logic/control-flow untouched.
+        await asyncio.to_thread(
+            _push_and_notify,
             fhir_bundles=fhir_bundles,
             data_push_url=data_push_url,
             hiu_key_material=key_material,

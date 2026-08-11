@@ -49,6 +49,7 @@ def download_public_certificate():
         response = requests.get(
             url=url,
             headers=headers,
+            timeout=30,
         )
         response.raise_for_status()
     except requests.exceptions.RequestException as exc:

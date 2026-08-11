@@ -1,3 +1,5 @@
+import asyncio
+
 from server.callbacks.repository.care_context_link_repository import get_pending_care_context_link, delete_pending_care_context_link
 from server.hip_linking import notify_care_context_update
 from server.callbacks.utils.flow_logger import log_phase, log_api_call, log_error
@@ -44,7 +46,14 @@ async def process_care_context_link(callback_data):
         for care_context_reference, hi_types in pending["care_context_hi_types"].items():
 
             try:
-                notify_response = notify_care_context_update(
+                # Off the event loop thread -- see discover_service.py's
+                # process_discover() for why every blocking requests.*
+                # call reachable from an async def callback handler is
+                # wrapped this way. This runs once per care context in
+                # the loop, sequentially -- each await still only blocks
+                # this one request's own handling, never the shared loop.
+                notify_response = await asyncio.to_thread(
+                    notify_care_context_update,
                     hip_id=pending["hip_id"],
                     abha_address=resolved_abha_address,
                     patient_reference=pending["patient_reference"],

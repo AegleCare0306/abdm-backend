@@ -43,14 +43,102 @@ own report, not just here -- read both before live sandbox testing):
    verification, same as item 1.
 """
 
+from datetime import datetime
+
 import requests
 
 from server.config import HIECM_BASE_URL, X_CM_ID, CALLBACK_URL
 from server.utils import generate_request_id, generate_timestamp, get_gateway_token, generate_expiry_time
 from server.fidelius_crypto import generate_key_material
 from server.callbacks.repository.pending_health_information_request_repository import save_pending_health_information_request
+from server.callbacks.repository.hiu_consent_repository import get_hiu_consent
 from server.callbacks.utils.flow_logger import log_error
 from server.callbacks.utils.api_capture import record_call
+
+
+class DateRangeValidationError(ValueError):
+    """
+    Raised by initiate_health_information_request() when the requested
+    dateRange doesn't fall within the consent's own approved dateRange --
+    never sent to ABDM. Deliberately a distinct exception type (not a
+    bare ValueError, not a requests exception) so callers -- the M3 CLI
+    today, any future UI/API layer later -- can catch this specifically
+    and re-prompt/re-render for a corrected date range, rather than
+    treating it the same as a network failure or an ABDM-side rejection.
+
+    Confirmed live, 2026-08-11: requesting a range that starts before a
+    consent's own approved dateRange.from gets rejected by ABDM itself
+    (ABDM-1063 "Date Range given is invalid", delivered async via the
+    on-request callback -- no transactionId, hiRequest is null, error is
+    populated instead). That's a real, wasted round trip (REQUEST-ID
+    generated, a pending session saved, a live call made, a slow async
+    rejection waited on) for something we can check instantly from data
+    we already have locally in hiu_consent_repository -- no reason to
+    hit ABDM at all for a case we can already rule out ourselves.
+    """
+
+
+def _parse_iso8601(value):
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
+def validate_date_range_against_consent(consent_id, date_range_from, date_range_to):
+    """
+    Checks a requested dateRange against the stored consent artefact's
+    own approved permission.dateRange, without making any ABDM call.
+
+    Args:
+        consent_id (str)
+        date_range_from (str): ISO 8601.
+        date_range_to (str): ISO 8601.
+
+    Raises:
+        DateRangeValidationError: if the consent isn't found locally, if
+            either date fails to parse, if from > to, or if the
+            requested range falls outside the consent's own approved
+            window on either end.
+
+    Returns:
+        None (no exception raised means the range is valid to send to
+        ABDM -- callers don't need a truthy return value, only the
+        absence of a raise).
+    """
+
+    consent = get_hiu_consent(consent_id)
+    if consent is None:
+        raise DateRangeValidationError(
+            f"No stored consent artefact found for consentId={consent_id} -- "
+            f"cannot validate a date range against a consent we don't have."
+        )
+
+    approved_range = (consent.get("consent_detail") or {}).get("permission", {}).get("dateRange") or {}
+    approved_from = approved_range.get("from")
+    approved_to = approved_range.get("to")
+
+    if not approved_from or not approved_to:
+        raise DateRangeValidationError(
+            f"Stored consent {consent_id} has no approved permission.dateRange to validate against."
+        )
+
+    try:
+        requested_from_dt = _parse_iso8601(date_range_from)
+        requested_to_dt = _parse_iso8601(date_range_to)
+        approved_from_dt = _parse_iso8601(approved_from)
+        approved_to_dt = _parse_iso8601(approved_to)
+    except (ValueError, AttributeError) as exc:
+        raise DateRangeValidationError(f"Could not parse one of the dates as ISO 8601: {exc}")
+
+    if requested_from_dt > requested_to_dt:
+        raise DateRangeValidationError(
+            f"Requested date range is backwards: from ({date_range_from}) is after to ({date_range_to})."
+        )
+
+    if requested_from_dt < approved_from_dt or requested_to_dt > approved_to_dt:
+        raise DateRangeValidationError(
+            f"Requested date range ({date_range_from} to {date_range_to}) falls outside "
+            f"this consent's own approved date range ({approved_from} to {approved_to}) -- "
+            f"pick a range within the approved window."
+        )
 
 
 def initiate_health_information_request(
@@ -106,11 +194,32 @@ def initiate_health_information_request(
         date_range_to (str): hiRequest.dateRange.to (ISO 8601).
     Returns:
         requests.Response: The raw health-information/request response
-            (202 expected).
+            (202 expected), with one extra dynamically-set attribute --
+            response.aegle_request_id (str) -- carrying this call's own
+            REQUEST-ID. Added 2026-08-11 so callers (the M3 CLI's Block 2
+            flow) can correlate the eventual on-request callback back to
+            THIS specific call via its echoed response.requestId, instead
+            of just matching "any incoming callback of this label" --
+            confirmed live to matter: with more than one Health
+            Information Request in flight close together (e.g. two HIU
+            identities testing concurrently), a label+timestamp-only match
+            can grab a different call's callback entirely, producing a
+            false timeout for the request whose own callback never gets
+            matched, or misattributing another request's transactionId.
     Raises:
+        DateRangeValidationError: if date_range_from/date_range_to fall
+            outside this consent's own approved dateRange -- checked
+            against our own locally-stored consent artefact, BEFORE any
+            ABDM call is made, so an invalid range never costs a live
+            round trip (confirmed live, 2026-08-11: ABDM rejects an
+            out-of-range request asynchronously, via the on-request
+            callback, as ABDM-1063 "Date Range given is invalid" -- slow
+            and avoidable for a case we can already rule out ourselves).
         requests.exceptions.RequestException: If the request fails
             (network error or non-2xx response).
     """
+
+    validate_date_range_against_consent(consent_id, date_range_from, date_range_to)
 
     key_material = generate_key_material()
     request_id = generate_request_id()
@@ -175,6 +284,7 @@ def initiate_health_information_request(
             url=url,
             json=payload,
             headers=headers,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -212,5 +322,9 @@ def initiate_health_information_request(
         response_headers=dict(response.headers),
         response_body=response_body,
     )
+
+    # See this function's own docstring (Returns) -- lets the caller
+    # correlate the later on-request callback to this specific call.
+    response.aegle_request_id = request_id
 
     return response

@@ -115,6 +115,7 @@ def send_on_discover(
             url,
             headers=headers,
             json=payload,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -196,6 +197,7 @@ def send_on_init(
             url,
             headers=headers,
             json=payload,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         record_call(

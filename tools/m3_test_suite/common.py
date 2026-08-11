@@ -296,9 +296,25 @@ def select_granted_consent():
     Reads every stored HIU consent artefact
     (hiu_consent_repository.get_all_hiu_consents()), filters to status ==
     "GRANTED" (the only status Block 2 can act on -- a fetched consent
-    can also be DENIED/REVOKED, which this excludes), prints a numbered
-    list, and prompts for a selection -- same numbered-list UX as
-    select_practitioner()/select_purpose().
+    can also be DENIED/REVOKED, which this excludes), then prompts in
+    THREE steps -- patient, then which HIU requested it, then which
+    facility (HIP) that HIU's request is for -- rather than one flat
+    numbered list.
+
+    CHANGED 2026-08-11 (two passes): originally a single flat list.
+    First pass split it into patient -> consent (with HIU/HIP shown
+    inline on each row). Second pass (this one) splits the second level
+    further into its own HIU step, then a facility step -- explicit
+    per-level narrowing, not one combined row someone has to visually
+    parse -- since with more than one HIU identity being tested against
+    the same patient (each consent artefact already carries its own
+    consent_detail.hiu.id -- who requested it -- alongside
+    consent_detail.hip -- who holds the data, {id, name}), even the
+    patient->consent list read as one undifferentiated block and made it
+    easy to pick the wrong one. Matches how this would actually need to
+    work once this is UI-driven (a real user picks a patient, then which
+    of their own org's requests they're following up on, then which
+    facility).
 
     Used by the Health Information Request flow (M3 Block 2) to pick
     which already-fetched consent to request data for.
@@ -311,7 +327,14 @@ def select_granted_consent():
     all_consents = get_all_hiu_consents()
 
     granted = [
-        {"consent_id": consent_id, "consent_detail": data.get("consent_detail") or {}}
+        {
+            "consent_id": consent_id,
+            "consent_detail": data.get("consent_detail") or {},
+            "patient_id": ((data.get("consent_detail") or {}).get("patient") or {}).get("id"),
+            "hiu_id": ((data.get("consent_detail") or {}).get("hiu") or {}).get("id"),
+            "hip_id": ((data.get("consent_detail") or {}).get("hip") or {}).get("id"),
+            "hip_name": ((data.get("consent_detail") or {}).get("hip") or {}).get("name"),
+        }
         for consent_id, data in all_consents.items()
         if data.get("status") == "GRANTED"
     ]
@@ -320,17 +343,64 @@ def select_granted_consent():
         print_info("No GRANTED consents stored yet -- run 'Consent Init Request' first and wait for the patient to grant it (Block 1).")
         return None
 
-    print_info(f"{len(granted)} GRANTED consent(s) available:")
-    for i, item in enumerate(granted, start=1):
-        detail = item["consent_detail"]
-        hip_id = (detail.get("hip") or {}).get("id")
-        patient_id = (detail.get("patient") or {}).get("id")
-        print_info(f"  [{i}] {item['consent_id']}  |  HIP: {hip_id}  |  Patient: {patient_id}")
+    # Step 1: pick a patient. Order preserved by first appearance rather
+    # than sorted alphabetically, so it roughly tracks recency of
+    # consent creation, same spirit as the rest of this module's lists.
+    patient_ids = []
+    for item in granted:
+        if item["patient_id"] not in patient_ids:
+            patient_ids.append(item["patient_id"])
+
+    print_info(f"{len(patient_ids)} patient(s) with GRANTED consent(s):")
+    for i, patient_id in enumerate(patient_ids, start=1):
+        count = sum(1 for item in granted if item["patient_id"] == patient_id)
+        print_info(f"  [{i}] {patient_id}  ({count} consent(s))")
 
     while True:
-        choice = prompt(f"Select a consent (1-{len(granted)})")
-        if choice.isdigit() and 1 <= int(choice) <= len(granted):
-            return granted[int(choice) - 1]
+        choice = prompt(f"Select a patient (1-{len(patient_ids)})")
+        if choice.isdigit() and 1 <= int(choice) <= len(patient_ids):
+            selected_patient_id = patient_ids[int(choice) - 1]
+            break
+        print_info("Invalid choice, try again.")
+
+    patient_subset = [item for item in granted if item["patient_id"] == selected_patient_id]
+
+    # Step 2: within that patient, pick which HIU requested the data --
+    # two different HIU identities can each hold their own separate
+    # GRANTED consent for the very same patient, so this has to be its
+    # own explicit step, not just a label on a combined row.
+    hiu_ids = []
+    for item in patient_subset:
+        if item["hiu_id"] not in hiu_ids:
+            hiu_ids.append(item["hiu_id"])
+
+    print_info(f"{len(hiu_ids)} HIU(s) with GRANTED consent(s) for {selected_patient_id}:")
+    for i, hiu_id in enumerate(hiu_ids, start=1):
+        count = sum(1 for item in patient_subset if item["hiu_id"] == hiu_id)
+        print_info(f"  [{i}] {hiu_id}  ({count} consent(s))")
+
+    while True:
+        choice = prompt(f"Select a requesting HIU (1-{len(hiu_ids)})")
+        if choice.isdigit() and 1 <= int(choice) <= len(hiu_ids):
+            selected_hiu_id = hiu_ids[int(choice) - 1]
+            break
+        print_info("Invalid choice, try again.")
+
+    # Step 3: within that patient + HIU, pick which facility (HIP) holds
+    # the data -- shown by name, not just the raw hip_id, since that's
+    # what's actually stored on the artefact (consent_detail.hip.name)
+    # and what a real user would recognize.
+    hiu_subset = [item for item in patient_subset if item["hiu_id"] == selected_hiu_id]
+
+    print_info(f"{len(hiu_subset)} facilit{'y' if len(hiu_subset) == 1 else 'ies'} granted to HIU {selected_hiu_id} for {selected_patient_id}:")
+    for i, item in enumerate(hiu_subset, start=1):
+        print_info(f"  [{i}] {item['hip_name']} ({item['hip_id']})")
+
+    while True:
+        choice = prompt(f"Select a facility (1-{len(hiu_subset)})")
+        if choice.isdigit() and 1 <= int(choice) <= len(hiu_subset):
+            selected = hiu_subset[int(choice) - 1]
+            return {"consent_id": selected["consent_id"], "consent_detail": selected["consent_detail"]}
         print_info("Invalid choice, try again.")
 
 
@@ -358,7 +428,7 @@ def check_server_running(base_url="http://127.0.0.1:8000"):
 # Async callback polling
 # -----------------------------------------------------------------------------
 
-def wait_for_callback(callback_type, since, timeout=90, poll_interval=2):
+def wait_for_callback(callback_type, since, match_fn=None, timeout=90, poll_interval=2):
     """
     Polls storage/api_capture/m3_*.jsonl for a fresh incoming callback
     matching callback_type, appearing after `since` (a timezone-aware
@@ -375,9 +445,30 @@ def wait_for_callback(callback_type, since, timeout=90, poll_interval=2):
     record_call(label=callback_type, direction="incoming", ...), so label
     IS the callback_type string.
 
+    ADDED match_fn 2026-08-11: label + timestamp alone can't tell two
+    concurrent Block 2 requests apart -- confirmed live to cause real
+    failures once more than one Health Information Request is in flight
+    close together (e.g. two HIU identities being tested side by side):
+    without a way to pick out THIS call's own callback specifically,
+    polling can return a different call's entry (wrong transactionId
+    picked up silently) while the actual matching callback for this call
+    never gets noticed at all (a false timeout, even though the server
+    genuinely handled it -- visible in api_capture, just never picked up
+    here). Callers should pass a callable that takes one api_capture
+    entry dict and returns True only for the entry belonging to their own
+    specific call (e.g. checking the echoed response.requestId or a
+    transactionId), not just relying on label+time. Optional and
+    defaults to None (matches anything of the right label/time, the
+    original behaviour) so this stays a compatible extension, not a
+    breaking change, for any future caller that only ever has one
+    request in flight at a time.
+
     On timeout (returns None), the caller should check: is the server
     running? Is the ngrok tunnel up? Did ABDM actually receive the
-    original outbound call?
+    original outbound call? And, if match_fn was given: is it possible
+    another concurrent request's callback is what's actually arriving
+    (check the raw m3_*.jsonl file for entries of this label around the
+    same time)?
 
     Returns:
         dict | None: The matching api_capture entry, or None on timeout.
@@ -398,7 +489,10 @@ def wait_for_callback(callback_type, since, timeout=90, poll_interval=2):
                     if entry.get("direction") != "incoming":
                         continue
                     entry_time = datetime.fromisoformat(entry["timestamp"].replace("Z", "+00:00"))
-                    if entry_time > since:
-                        return entry
+                    if entry_time <= since:
+                        continue
+                    if match_fn is not None and not match_fn(entry):
+                        continue
+                    return entry
         time.sleep(poll_interval)
     return None

@@ -1,3 +1,5 @@
+import asyncio
+
 from server.healthinformation import send_on_consent_notify
 from server.utils import print_api_response
 from server.callbacks.repository.consent_repository import save_consent, delete_consent
@@ -54,7 +56,11 @@ async def process_consent_notify(
 
             log_phase(f"Consent notification status='{status}' -- not storing (only GRANTED consents carry a usable artifact)")
 
-        response = send_on_consent_notify(
+        # Off the event loop thread -- see discover_service.py's
+        # process_discover() for why every blocking requests.* call
+        # reachable from an async def callback handler is wrapped this way.
+        response = await asyncio.to_thread(
+            send_on_consent_notify,
             consent_id=consent_id,
             request_id=request_id,
         )

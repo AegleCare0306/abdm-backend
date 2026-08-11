@@ -1,3 +1,5 @@
+import asyncio
+
 from server.callbacks.repository.hiu_consent_repository import save_hiu_consent
 from server.callbacks.services.health_information_trigger import maybe_trigger_health_information_request
 from server.callbacks.utils.flow_logger import log_phase, log_error
@@ -49,8 +51,19 @@ async def process_consent_hiu_on_fetch(callback_data):
         if consent.get("status") == "GRANTED":
             # Pluggable, not hardwired -- see health_information_trigger.py's
             # own docstring. Defaults to a no-op (HEALTH_INFORMATION_TRIGGER_MODE
-            # = "manual" in server/config.py).
-            maybe_trigger_health_information_request(consent_id, consent_detail)
+            # = "manual" in server/config.py) -- but when set to "auto",
+            # maybe_trigger_health_information_request() (itself a plain
+            # synchronous function, like _push_and_notify() in
+            # health_information_request_service.py) internally calls
+            # initiate_health_information_request(), a blocking
+            # requests.post(). Wrapped as one whole unit here for the same
+            # reason as that other special case: off the event loop
+            # thread, without needing to make the trigger module itself
+            # async or split its internal call out separately. Currently
+            # dormant (mode="manual" today) but in scope, since a mode
+            # change alone must not silently reintroduce this pass's
+            # deadlock risk.
+            await asyncio.to_thread(maybe_trigger_health_information_request, consent_id, consent_detail)
 
     except Exception as exc:
         log_error(f"Consent HIU on-fetch callback processing failed unexpectedly: {exc}")

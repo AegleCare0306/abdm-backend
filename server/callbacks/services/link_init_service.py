@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 from server.linking import send_on_init
@@ -38,7 +39,11 @@ async def process_link_init(callback_data):
             patient["abha_number"],get_public_certificate()
         )
 
-        otp_response = request_otp(
+        # Off the event loop thread -- see discover_service.py's
+        # process_discover() for why every blocking requests.* call
+        # reachable from an async def callback handler is wrapped this way.
+        otp_response = await asyncio.to_thread(
+            request_otp,
             action="profile/login",
             scope=["abha-login", "mobile-verify"],
             login_hint="abha-number",
@@ -71,7 +76,8 @@ async def process_link_init(callback_data):
             session_data
         )
 
-        response = send_on_init(
+        response = await asyncio.to_thread(
+            send_on_init,
             transaction_id=transaction_id,
             request_id=request_id,
             link_reference_number=link_reference_number,

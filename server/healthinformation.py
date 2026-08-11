@@ -51,6 +51,7 @@ def send_on_consent_notify(
             url=url,
             headers=headers,
             json=payload,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -130,6 +131,7 @@ def send_on_health_information_request(
             url=url,
             headers=headers,
             json=payload,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -221,6 +223,7 @@ def send_health_information_data(
             url=data_push_url,
             headers=headers,
             json=payload,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -342,6 +345,7 @@ def send_health_information_notify(
             url=url,
             headers=headers,
             json=payload,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         record_call(

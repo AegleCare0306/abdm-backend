@@ -1,3 +1,5 @@
+import asyncio
+
 from server.callbacks.repository.patient_repository import search_patient
 from server.callbacks.transformers.patient_transformer import build_patient_payload
 from server.linking import send_on_discover
@@ -73,7 +75,14 @@ async def process_discover(callback_data):
         else:
             log_phase("No matching records found")
 
-        response = send_on_discover(
+        # Runs the blocking requests.post() chain (and its internal
+        # get_gateway_token() call) on a worker thread -- this server runs
+        # both the M2 HIP and M3 HIU roles in one event loop, so a
+        # synchronous call sitting directly in an async def callback
+        # handler would block that loop for every other in-flight request
+        # for however long the call takes.
+        response = await asyncio.to_thread(
+            send_on_discover,
             transaction_id,
             request_id,
             patient_payload,

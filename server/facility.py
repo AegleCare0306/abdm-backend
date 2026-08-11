@@ -93,6 +93,7 @@ def register_bridge_service(
             url=url,
             json=payload,
             headers=headers,
+            timeout=30,
         )
     except requests.exceptions.RequestException as exc:
         record_call(
