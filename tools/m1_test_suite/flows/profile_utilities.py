@@ -118,7 +118,17 @@ def _link_email(x_token):
         report_failure(response, "Email verification link request failed")
         return
 
-    body = response.json()
+    # MALFORMED-BODY GUARD (tracker case M1-7, extended here for
+    # consistency -- see login_search.py's matching guard for the full
+    # rationale). This one was already caught by run()'s own per-sub-flow
+    # try/except (a generic "raised an unexpected error" message), so not
+    # a silent crash before this fix -- but this gives a clearer, specific
+    # message instead of relying on that generic catch-all.
+    try:
+        body = response.json()
+    except ValueError as exc:
+        print_failure(f"Email verification link request returned a 200 status but the response body wasn't valid JSON ({exc}).")
+        return
     print_success(body.get("message", "Verification link sent."))
     print_info("No further completion step for this one -- per the doc, the user finishes by clicking the link sent to their inbox; no follow-up API call exists in this codebase.")
     log_response("request_email_verification_link response", body)
@@ -166,7 +176,13 @@ def _retrieve_profile(x_token):
         report_failure(response, "Profile retrieval failed")
         return
 
-    body = response.json()
+    # MALFORMED-BODY GUARD (tracker case M1-7, extended here -- see
+    # _link_email()'s matching guard above).
+    try:
+        body = response.json()
+    except ValueError as exc:
+        print_failure(f"Profile retrieval returned a 200 status but the response body wasn't valid JSON ({exc}).")
+        return
 
     name = first_present(body, "name", "fullName")
     abha_number = first_present(body, "ABHANumber", "healthIdNumber", "abhaNumber")

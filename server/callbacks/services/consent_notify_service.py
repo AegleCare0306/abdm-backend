@@ -63,15 +63,55 @@ async def process_consent_notify(
         if status == "GRANTED":
 
             consent_detail = notification.get("consentDetail", {})
+            if not isinstance(consent_detail, dict):
+                log_error(f"Consent notification's 'consentDetail' was not an object (got {type(consent_detail).__name__}) -- treating as empty rather than crashing.")
+                consent_detail = {}
+
+            # SHAPE GUARDS (edge-case-review pass, tracker cases M3-23/
+            # M3-24): the OLD code chained consent_detail.get("patient",
+            # {}).get("id") etc. straight through -- the {} default only
+            # applies when the outer key is MISSING, not when it's
+            # present but explicitly null or shaped differently (a
+            # string, a list, ...). consentDetail.permission explicitly
+            # set to null (M3-24's own scenario) or consentDetail.patient/
+            # hip shaped unexpectedly (M3-23) both raised an uncaught
+            # AttributeError -- caught by this function's outer
+            # try/except, but only AFTER mark_processed() already ran and
+            # BEFORE send_on_consent_notify() (the ABDM ack) was ever
+            # reached, so ABDM got no ack at all, just a silent timeout --
+            # same failure shape as M2-16/M2-25/M2-26's guards. A small
+            # local helper normalizes each nested field to a dict (treating
+            # missing/null/wrongly-shaped the same way) so processing can
+            # continue far enough to still send the ack.
+            def _safe_dict(value, field_name):
+                if isinstance(value, dict):
+                    return value
+                if value is not None:
+                    log_error(f"Consent notification's 'consentDetail.{field_name}' was not an object (got {type(value).__name__}) -- treating as empty rather than crashing.")
+                return {}
+
+            patient_detail = _safe_dict(consent_detail.get("patient"), "patient")
+            permission_detail = _safe_dict(consent_detail.get("permission"), "permission")
+            hip_detail = _safe_dict(consent_detail.get("hip"), "hip")
+
+            care_contexts = consent_detail.get("careContexts", [])
+            if not isinstance(care_contexts, list):
+                log_error(f"Consent notification's 'consentDetail.careContexts' was not a list (got {type(care_contexts).__name__}) -- treating as empty rather than crashing.")
+                care_contexts = []
+
+            hi_types = consent_detail.get("hiTypes", [])
+            if not isinstance(hi_types, list):
+                log_error(f"Consent notification's 'consentDetail.hiTypes' was not a list (got {type(hi_types).__name__}) -- treating as empty rather than crashing.")
+                hi_types = []
 
             save_consent(
                 consent_id,
                 {
-                    "patient_id": consent_detail.get("patient", {}).get("id"),
-                    "care_contexts": consent_detail.get("careContexts", []),
-                    "hi_types": consent_detail.get("hiTypes", []),
-                    "date_range": consent_detail.get("permission", {}).get("dateRange", {}),
-                    "hip_id": consent_detail.get("hip", {}).get("id"),
+                    "patient_id": patient_detail.get("id"),
+                    "care_contexts": care_contexts,
+                    "hi_types": hi_types,
+                    "date_range": permission_detail.get("dateRange", {}),
+                    "hip_id": hip_detail.get("id"),
                 },
             )
 

@@ -6,25 +6,40 @@ def build_patient_payload(records):
     """
     Converts raw patient records into the ABDM patient payload.
 
-    Groups records by HI Type.
+    Groups records by (patient reference, HI Type).
     """
 
     if not records:
         return []
 
+    # GROUPING FIX (tracker case M2-30): grouping was previously keyed by
+    # `hi_type` ALONE. When one real-world patient has two different
+    # hospital record numbers at the same facility (two distinct
+    # `patient_reference` values -- a genuinely supported scenario, e.g.
+    # merged/duplicate hospital registrations later reconciled to the
+    # same ABHA address) and both records happen to share an HI Type, the
+    # old code silently mislabeled the second record's care context under
+    # the FIRST record's `patient_reference`/`name` (`first_record` was
+    # always hi_type_records[0], picked once per hi_type group, discarding
+    # every other record's own identity). Grouping by (patient_reference,
+    # hi_type) instead keeps each hospital record number's care contexts
+    # correctly attributed to their own referenceNumber/display, while
+    # still collapsing multiple care contexts for the SAME patient
+    # reference + HI Type together exactly as before (the common case is
+    # unaffected).
     grouped_records = defaultdict(list)
 
     for record in records:
-        grouped_records[record["hi_type"]].append(record)
+        grouped_records[(record["patient_reference"], record["hi_type"])].append(record)
 
     patient_payload = []
 
-    for hi_type, hi_type_records in grouped_records.items():
+    for (patient_reference, hi_type), hi_type_records in grouped_records.items():
 
         first_record = hi_type_records[0]
 
         patient_object = {
-            "referenceNumber": first_record["patient_reference"],
+            "referenceNumber": patient_reference,
             "display": first_record["name"],
             "careContexts": [],
             "hiType": hi_type,

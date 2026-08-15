@@ -129,11 +129,32 @@ def download_public_certificate():
         response_body=response_body,
     )
 
-    public_key_str = response.json().get("publicKey")
+    # MALFORMED-BODY GUARD (edge-case-review pass, tracker case M1-8): the
+    # OLD code called response.json() a SECOND time here, unguarded --
+    # `response_body` above already handled a non-JSON body gracefully,
+    # but only for the record_call() logging call, not for the actual
+    # certificate-parsing logic. A broken/non-JSON body (e.g. an HTML
+    # error page from something in front of ABDM) on this specific
+    # cert-fetch step used to crash with an uncaught ValueError right
+    # here. Reusing the already-safely-parsed `response_body` instead of
+    # calling .json() again fixes this without a second parse attempt.
+    if not isinstance(response_body, dict):
+        log_error(f"ABDM public certificate response was not a JSON object (got {type(response_body).__name__}).")
+        raise ValueError("ABDM public certificate response body is not a JSON object.")
+
+    public_key_str = response_body.get("publicKey")
 
     if not public_key_str:
         log_error("ABDM public certificate response did not include a publicKey.")
         raise ValueError("ABDM public certificate response is missing 'publicKey'.")
+
+    # SHAPE GUARD (tracker case M1-9): publicKey is expected to be a PEM
+    # body string. If ABDM's response ever shapes this differently (e.g.
+    # a nested object or a list) instead of a plain string, the OLD code
+    # crashed with an uncaught AttributeError on .strip() below.
+    if not isinstance(public_key_str, str):
+        log_error(f"ABDM public certificate 'publicKey' field was not a string (got {type(public_key_str).__name__}: {public_key_str!r}).")
+        raise ValueError("ABDM public certificate 'publicKey' field is not a string.")
 
     public_key_str = public_key_str.strip()
     pem = (

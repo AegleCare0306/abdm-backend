@@ -14,10 +14,34 @@ async def process_discover(callback_data):
 
         headers = callback_data["headers"]
         body = callback_data["body"]
-        patient = body["patient"]
+
+        # MALFORMED-BODY GUARDS (edge-case-review pass, tracker cases
+        # M2-25/M2-26): the OLD code took `body["patient"]` on faith
+        # (direct key access, not .get()) and then assumed every entry
+        # in verifiedIdentifiers/unverifiedIdentifiers was a dict. A
+        # missing/null "patient" field, or an identifier list containing
+        # non-dict entries, raised a KeyError/AttributeError that WAS
+        # caught by this function's own outer try/except -- but only
+        # AFTER nothing useful happened and BEFORE send_on_discover() (the
+        # ABDM ack) was ever reached, so ABDM got no response at all, just
+        # a silent timeout, same failure shape as M2-16's stored-consent
+        # guard. Normalizing defensively here lets processing continue far
+        # enough to still send ABDM a proper "no match" acknowledgment.
+        patient = body.get("patient")
+        if not isinstance(patient, dict):
+            if patient is not None:
+                log_error(f"Discover request's 'patient' field was not an object (got {type(patient).__name__}) -- treating as no identifiers rather than crashing.")
+            patient = {}
 
         verified = patient.get("verifiedIdentifiers") or []
+        if not isinstance(verified, list):
+            log_error(f"Discover request's 'verifiedIdentifiers' was not a list (got {type(verified).__name__}) -- treating as empty rather than crashing.")
+            verified = []
+
         unverified = patient.get("unverifiedIdentifiers") or []
+        if not isinstance(unverified, list):
+            log_error(f"Discover request's 'unverifiedIdentifiers' was not a list (got {type(unverified).__name__}) -- treating as empty rather than crashing.")
+            unverified = []
 
         hip_id = headers.get("x-hip-id")
         abha_address = None
@@ -26,6 +50,9 @@ async def process_discover(callback_data):
         mr_number = None
 
         for identifier in verified:
+
+            if not isinstance(identifier, dict):
+                continue
 
             if identifier.get("type") == "MOBILE":
                 mobile = identifier.get("value")
@@ -37,6 +64,9 @@ async def process_discover(callback_data):
                 abha_address = identifier.get("value")
 
         for identifier in unverified:
+
+            if not isinstance(identifier, dict):
+                continue
 
             if identifier.get("type") == "MR":
                 mr_number = identifier.get("value")

@@ -25,7 +25,13 @@ from pathlib import Path
 
 from server.callbacks.utils.flow_logger import log_error, get_log_category
 
-CAPTURE_DIR = Path("storage/api_capture")
+# ANCHOR FIX (tracker case M2-34/M3-7): was a bare relative path,
+# resolved against the process's current working directory at IMPORT
+# time -- see storage.py's matching fix for the full rationale (this is
+# the exact "M3 api-capture directory path is resolved relative to the
+# launch directory" gap the original test plan flagged for M3-7).
+# server/callbacks/utils/api_capture.py -> parents[3] is the repo root.
+CAPTURE_DIR = Path(__file__).resolve().parents[3] / "storage" / "api_capture"
 
 CAPTURE_DIR.mkdir(parents=True, exist_ok=True)
 

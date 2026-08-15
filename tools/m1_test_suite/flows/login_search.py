@@ -85,13 +85,72 @@ def _search_and_select():
         report_failure(response, "ABHA search failed")
         return None, None
 
-    body = response.json()
+    # MALFORMED-BODY GUARD (edge-case-review pass, tracker case M1-7): a
+    # 200 status only means the HTTP layer succeeded -- the OLD code
+    # called response.json() unguarded, so a broken/non-JSON body (an
+    # HTML error page, etc.) crashed here with an uncaught ValueError.
+    # cli.py's own top-level try/except would have caught it (so the CLI
+    # itself wouldn't have died), but the flow aborted abruptly with a
+    # raw exception message instead of this module's normal clear
+    # reporting -- same fix shape as M1-5's guards in login_runner.py.
+    try:
+        body = response.json()
+    except ValueError as exc:
+        print_failure(
+            f"ABHA search returned a 200 status but the response body wasn't valid "
+            f"JSON ({exc}) -- treating this as a failed search rather than crashing."
+        )
+        log_response("search_abha_by_mobile response was not valid JSON", response.text)
+        return None, None
+
     if not body:
         print_failure("Search returned an empty response.")
         return None, None
 
+    # SHAPE GUARD (tracker case M1-11): the doc's own example response is
+    # a list, but the author flagged uncertainty about whether ABDM ever
+    # returns a single object instead when there's exactly one match.
+    # The OLD code assumed `body` was always a list and indexed body[0]
+    # unconditionally -- for a single dict, `dict[0]` raises KeyError,
+    # not the "no accounts" outcome a real single-object response should
+    # produce. Tolerantly treat a single dict as a one-element list
+    # instead of crashing on it; any other non-list shape is genuinely
+    # malformed, reported clearly rather than guessed at further.
+    if isinstance(body, dict):
+        body = [body]
+    elif not isinstance(body, list):
+        print_failure(
+            f"ABHA search response was not a list or object (got {type(body).__name__}) "
+            f"-- treating this as a failed search rather than crashing."
+        )
+        log_response("search_abha_by_mobile response had an unexpected top-level shape", body)
+        return None, None
+
     result = body[0]
+    if not isinstance(result, dict):
+        print_failure(
+            f"ABHA search response's first entry was not an object (got {type(result).__name__}) "
+            f"-- treating this as a failed search rather than crashing."
+        )
+        log_response("search_abha_by_mobile response's first entry had an unexpected shape", body)
+        return None, None
+
     txn_id = result.get("txnId")
+
+    # MISSING-TXNID GUARD (tracker case M1-38): the OLD code took
+    # result.get("txnId") on faith -- a missing txnId silently became
+    # None, which would then be carried through as the "same txnId from
+    # the search step" into request_login_otp() (per this module's own
+    # docstring, sending a literal txnId: null to ABDM instead of
+    # failing fast locally). Same fix shape as M1-15's enrollment guard.
+    if not txn_id:
+        print_failure(
+            "ABHA search returned a 200/success response but no 'txnId' was found in "
+            "the result -- cannot proceed without a transaction ID to carry through."
+        )
+        log_response("search_abha_by_mobile response (MISSING txnId)", result)
+        return None, None
+
     abha_list = result.get("ABHA", [])
 
     if not abha_list:
