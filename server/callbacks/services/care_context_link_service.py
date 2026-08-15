@@ -2,7 +2,16 @@ import asyncio
 
 from server.callbacks.repository.care_context_link_repository import get_pending_care_context_link, delete_pending_care_context_link
 from server.hip_linking import notify_care_context_update
+from server.callbacks.utils.idempotency import already_processed, mark_processed
 from server.callbacks.utils.flow_logger import log_phase, log_api_call, log_error
+
+# See server/callbacks/utils/idempotency.py's own docstring, and
+# consent_notify_service.py's use of the same pattern (tracker case
+# M2-9) -- this closes the sibling case M2-12 ("sending the same 'care
+# context linked' message twice roughly doubles the notifications
+# sent"). On a detected replay this skips the whole per-care-context
+# Notify Care Context Update loop below rather than re-firing it.
+_IDEMPOTENCY_SCOPE = "care_context_link"
 
 
 async def process_care_context_link(callback_data):
@@ -16,6 +25,12 @@ async def process_care_context_link(callback_data):
         status = body.get("status")
         error = body.get("error")
         request_id = body.get("response", {}).get("requestId")
+
+        if already_processed(_IDEMPOTENCY_SCOPE, request_id):
+            log_phase(f"REQUEST-ID {request_id} already processed for care_context_link -- treating as a replay, skipping the Notify Care Context Update loop.")
+            return
+
+        mark_processed(_IDEMPOTENCY_SCOPE, request_id)
 
         pending = get_pending_care_context_link(request_id) if request_id else None
 

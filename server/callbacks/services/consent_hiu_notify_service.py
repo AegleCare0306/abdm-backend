@@ -62,20 +62,47 @@ async def process_consent_hiu_notify(callback_data):
             if hiu_id is None:
                 log_error(f"Skipping fetch_consent() for {len(consent_artefacts)} artefact(s) -- no hiu_id resolved for consentRequestId {consent_request_id}.")
             else:
+                # PER-ARTEFACT ERROR ISOLATION (edge-case-review pass,
+                # tracker case M3-26): before this fix, a network failure
+                # on fetch_consent() for ANY one artefact in a multi-HIP
+                # grant (this loop -- one entry per hospital) raised
+                # straight out of this loop with no try/except of its own,
+                # which meant the exception propagated all the way to this
+                # function's OUTER try/except, which just logs and
+                # returns -- WITHOUT ever reaching the
+                # send_consent_hiu_on_notify() ack below. That doesn't
+                # just fail the one artefact whose fetch call hit the
+                # hiccup: it silently drops the ack for EVERY artefact in
+                # this notification, including ones whose fetch_consent()
+                # call already succeeded moments earlier in the same loop
+                # (that side effect already happened and can't be undone,
+                # but ABDM is never told about it) and ones later in the
+                # list that never even got a chance to run. From ABDM's
+                # perspective the entire multi-hospital consent grant
+                # looks like it was never received at all. Fixed by
+                # wrapping each artefact's own fetch_consent() call in its
+                # own try/except: one artefact's failure is logged and
+                # skipped, every other artefact in the same notification
+                # still gets its fetch attempted, and the ack step below
+                # always runs afterward for whichever artefacts have an
+                # id, regardless of how any individual fetch went.
                 for artefact in consent_artefacts:
                     consent_id = artefact.get("id")
                     if not consent_id:
                         continue
-                    # Off the event loop thread -- see discover_service.py's
-                    # process_discover() for why every blocking requests.*
-                    # call reachable from an async def callback handler is
-                    # wrapped this way. Runs once per artefact in the loop,
-                    # sequentially.
-                    response = await asyncio.to_thread(fetch_consent, hiu_id=hiu_id, consent_id=consent_id)
-                    log_api_call(f"Fetching granted consent artefact {consent_id}", "POST .../consent/v3/fetch", response.status_code)
-                    if response.status_code != 202:
-                        print_api_response(response)
-                log_phase("Consent granted -- fetch triggered for each artefact")
+                    try:
+                        # Off the event loop thread -- see discover_service.py's
+                        # process_discover() for why every blocking requests.*
+                        # call reachable from an async def callback handler is
+                        # wrapped this way. Runs once per artefact in the loop,
+                        # sequentially.
+                        response = await asyncio.to_thread(fetch_consent, hiu_id=hiu_id, consent_id=consent_id)
+                        log_api_call(f"Fetching granted consent artefact {consent_id}", "POST .../consent/v3/fetch", response.status_code)
+                        if response.status_code != 202:
+                            print_api_response(response)
+                    except Exception as exc:
+                        log_error(f"fetch_consent() failed for artefact {consent_id} (consentRequestId {consent_request_id}): {exc} -- continuing with the remaining artefact(s) in this notification.")
+                log_phase("Consent granted -- fetch attempted for each artefact")
         else:
             log_phase(f"Consent notification status='{status}' -- not fetching (only GRANTED artefacts are fetched)")
 

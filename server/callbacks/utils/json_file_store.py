@@ -42,12 +42,44 @@ JSON object like the old version.
 """
 
 import json
+import threading
+from collections import defaultdict
 from pathlib import Path
 
 # server/callbacks/utils/json_file_store.py -> parents[3] is the repo
 # root, same depth convention used elsewhere in this codebase (e.g.
 # tools/m2_test_suite/common.py resolving to the repo root).
 _STORAGE_ROOT = Path(__file__).resolve().parents[3] / "storage"
+
+# Per-file in-process write lock (edge-case-review pass, tracker case
+# M2-1): this module's docstring already documents that append-only
+# writes are "much less likely to clobber a concurrent writer than
+# read-modify-write" but explicitly stops short of a real guarantee,
+# since a bare `open(path, "a")` gives no atomicity promise for writes
+# larger than the OS pipe buffer (a large consent notification's JSON
+# line can easily exceed that) -- two genuinely simultaneous appends
+# could still interleave their bytes at the OS level, corrupting both
+# lines. A `threading.Lock` per file name serializes every _append()
+# call FROM THIS PROCESS, which is the case that actually matters here:
+# this server runs as one `uvicorn --reload` process handling every
+# request (including two large consent-notify POSTs arriving "at the
+# exact same time"), each request handled on its own thread via
+# asyncio.to_thread() for the blocking file write. This does NOT
+# extend to two truly separate OS processes writing the same file
+# (e.g. a second server instance) -- that remains the documented,
+# unchanged "not database-grade" limitation the module docstring
+# already calls out; a real fix for that is still Redis/Postgres.
+_locks_guard = threading.Lock()
+_file_locks = defaultdict(threading.Lock)
+
+
+def _lock_for(file_name):
+    # The dict itself is mutated from multiple threads (first touch of
+    # a given file_name), so guard the defaultdict's own insertion with
+    # a small top-level lock -- cheap, and avoids two threads racing to
+    # create two different Lock objects for the same file_name.
+    with _locks_guard:
+        return _file_locks[file_name]
 
 
 def _replay(file_name):
@@ -95,11 +127,53 @@ def _replay(file_name):
     return state
 
 
+def _ends_with_newline_or_empty(path):
+    """
+    True if the file doesn't exist yet, is empty, or its last byte is
+    already a newline. Used by _append() below (tracker case M2-14) to
+    detect a stale, no-trailing-newline partial line left behind by a
+    crash mid-write -- see that function's own comment for why this
+    matters.
+    """
+    if not path.exists():
+        return True
+    size = path.stat().st_size
+    if size == 0:
+        return True
+    with open(path, "rb") as f:
+        f.seek(-1, 2)
+        return f.read(1) == b"\n"
+
+
 def _append(file_name, record):
     _STORAGE_ROOT.mkdir(parents=True, exist_ok=True)
     path = _STORAGE_ROOT / file_name
-    with open(path, "a", encoding="utf-8") as f:
-        f.write(json.dumps(record) + "\n")
+    # See _lock_for()'s own comment above -- serializes concurrent
+    # writers to this same file from within this one process.
+    with _lock_for(file_name):
+        # M2-14 HARDENING (found via notebook-based real-code testing,
+        # 2026-08-14 -- this case was previously marked "no fix needed,
+        # the append-only design already handles it," but that assumed a
+        # crash mid-write always leaves a trailing newline after the
+        # partial content, so a later append could never land on the
+        # same physical line as it). That assumption doesn't hold: a
+        # single f.write(json.dumps(record) + "\n") call interrupted
+        # before the trailing "\n" reaches disk leaves a partial line
+        # with NO trailing newline. Without this guard, the next
+        # _append() call (e.g. the server's first write after
+        # restarting) would land directly after that stale partial
+        # content with nothing separating them -- silently concatenating
+        # the new, otherwise-perfectly-good record onto the tail of the
+        # old corrupt line, so _replay()'s per-line json.loads() fails on
+        # BOTH and the fresh record is lost too, not just the crashed
+        # one. Ensuring the file always ends in a newline before writing
+        # isolates any stale partial line onto its own (still skipped,
+        # but harmless) line, so a fresh write is never dragged into it.
+        needs_leading_newline = not _ends_with_newline_or_empty(path)
+        with open(path, "a", encoding="utf-8") as f:
+            if needs_leading_newline:
+                f.write("\n")
+            f.write(json.dumps(record) + "\n")
 
 
 def set_key(file_name, key, value):

@@ -62,6 +62,25 @@ def run():
     txn_id = otp_body.get("txnId")
     print_success(otp_body.get("message", "OTP requested."))
 
+    # MISSING-TXNID GUARD (edge-case-review pass, tracker case M1-15): the
+    # OLD code trusted txn_id unconditionally, even though otp_body.get()
+    # silently returns None if "txnId" is absent from the response. That
+    # None would then flow straight into enroll_by_aadhaar(txn_id=None,
+    # ...), sending a literal "txnId": null to ABDM instead of failing
+    # fast locally with a clear message -- the same "parsed without
+    # raising, but not actually usable" shape as the accounts/token
+    # guards already added to login_runner.verify_login_otp() for M1-10/
+    # M1-12. Caught here instead, before the OTP prompt even happens, so
+    # the user isn't asked to enter an OTP for a transaction that was
+    # never actually opened.
+    if not txn_id:
+        print_failure(
+            "OTP request returned a 200/success response but no 'txnId' was found in "
+            "the body -- cannot proceed to submit an OTP without a transaction ID."
+        )
+        log_response("request_otp response (enrollment, MISSING txnId)", otp_body)
+        return {"mobile_number": mobile_number}
+
     otp_value = prompt("Enter the OTP you received")
 
     # OPEN QUESTION (not fixed in this pass -- do not assume either way):

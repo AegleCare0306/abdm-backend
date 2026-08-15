@@ -12,7 +12,7 @@ from server.config import (
     X_CM_ID,
 )
 
-from server.utils import generate_request_id, generate_timestamp, get_gateway_token
+from server.utils import generate_request_id, generate_timestamp, get_gateway_token, call_with_retry
 from server.callbacks.utils.flow_logger import log_error
 from server.callbacks.utils.api_capture import record_call
 
@@ -20,6 +20,14 @@ def generate_gateway_token():
 
     """
     Generate an ABDM Gateway access token.
+
+    RETRY: category 2 (transient/retryable) is a connection error/timeout
+    or a 5xx/429/408 response -- see call_with_retry(). Background/admin
+    call, not user- or ABDM-callback-facing, so the lower-risk end of the
+    call-site list. Idempotency: minting a session token has no
+    meaningful "twice" side effect (a retry just gets a fresh token, or
+    the same still-valid one) -- safe to retry without reservation.
+
     Returns:
         requests.Response: Gateway token response.
     Raises:
@@ -43,13 +51,17 @@ def generate_gateway_token():
     }
 
     try:
-        response = requests.post(
-            url=url,
-            json=payload,
-            headers=headers,
-            timeout=30,
-        )
-        response.raise_for_status()
+        def _attempt():
+            response = requests.post(
+                url=url,
+                json=payload,
+                headers=headers,
+                timeout=30,
+            )
+            response.raise_for_status()
+            return response
+
+        response = call_with_retry(_attempt, description="Gateway token generation")
     except requests.exceptions.RequestException as exc:
         record_call(
             label="generate-gateway-token",
@@ -95,6 +107,17 @@ def update_bridge_url(callback_url=None):
     failure response for this specific endpoint is NOT confirmed anywhere
     yet.
 
+    RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    response -- see call_with_retry(). Background/admin call. Idempotency:
+    setting the same callback URL twice has the same end state either
+    way (last write wins on ABDM's side) -- safe to retry. Also adds the
+    `timeout=30` this call was previously missing (EDGE_CASE_TEST_PLAN.md
+    M1 §D-23: this was the one outbound call in the codebase with no
+    timeout at all, meaning a stuck connection would hang forever and a
+    retry attempt could never even begin) -- every sibling call already
+    used timeout=30, so this brings it in line rather than introducing a
+    new convention.
+
     Args:
         callback_url (str, optional): Callback URL to register. Defaults
             to config.CALLBACK_URL if not provided.
@@ -123,10 +146,14 @@ def update_bridge_url(callback_url=None):
     }
 
     try:
-        response = requests.patch(
-            url=url,
-            json=payload,
-            headers=headers,
+        response = call_with_retry(
+            lambda: requests.patch(
+                url=url,
+                json=payload,
+                headers=headers,
+                timeout=30,
+            ),
+            description="Bridge URL update",
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -206,11 +233,17 @@ def find_bridge_service_by_id(service_id):
         "X-CM-ID": X_CM_ID,
     }
 
+    # RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    # response -- see call_with_retry(). Read-only lookup, background/
+    # admin call -- trivially safe to retry.
     try:
-        response = requests.get(
-            url=url,
-            headers=headers,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.get(
+                url=url,
+                headers=headers,
+                timeout=30,
+            ),
+            description="Bridge service lookup",
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -299,11 +332,17 @@ def find_services_by_bridge_id():
         "X-CM-ID": X_CM_ID,
     }
 
+    # RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    # response -- see call_with_retry(). Read-only lookup, background/
+    # admin call -- trivially safe to retry.
     try:
-        response = requests.get(
-            url=url,
-            headers=headers,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.get(
+                url=url,
+                headers=headers,
+                timeout=30,
+            ),
+            description="Bridge services lookup",
         )
     except requests.exceptions.RequestException as exc:
         record_call(

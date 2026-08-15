@@ -1,5 +1,6 @@
 from server.callbacks.repository.pending_health_information_request_repository import (
     get_pending_health_information_request,
+    get_request_id_for_transaction_id,
     link_transaction_id,
 )
 from server.callbacks.utils.flow_logger import log_phase, log_waiting, log_error
@@ -57,6 +58,24 @@ async def process_health_information_hiu_on_request(callback_data):
 
         if not transaction_id:
             log_error(f"on-request callback missing hiRequest.transactionId for requestId {request_id}.")
+            return
+
+        # TRANSACTION-ID COLLISION CHECK (edge-case-review pass, tracker
+        # case M3-2): see get_request_id_for_transaction_id()'s own
+        # docstring for the full reasoning -- refuse to relink a
+        # transactionId that's already linked to a DIFFERENT pending
+        # requestId's session, rather than silently overwriting the
+        # index and crossing two overlapping requests' encryption keys.
+        # Same requestId claiming the same transactionId again (a benign
+        # retry of this exact callback) is allowed through unchanged.
+        existing_request_id = get_request_id_for_transaction_id(transaction_id)
+        if existing_request_id is not None and existing_request_id != request_id:
+            log_error(
+                f"transactionId {transaction_id} is already linked to a different pending "
+                f"requestId ({existing_request_id!r}) -- refusing to relink it to requestId "
+                f"{request_id!r}. Ignoring this on-request callback as a probable "
+                f"cross-request mixup/replay rather than crossing two sessions' encryption keys."
+            )
             return
 
         link_transaction_id(request_id, transaction_id)

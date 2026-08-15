@@ -1,7 +1,7 @@
 import requests
 
 from server.config import HIECM_BASE_URL, X_CM_ID
-from server.utils import generate_request_id, generate_timestamp, get_gateway_token
+from server.utils import generate_request_id, generate_timestamp, get_gateway_token, call_with_retry
 from server.callbacks.utils.flow_logger import log_error
 from server.callbacks.utils.api_capture import record_call
 
@@ -46,12 +46,22 @@ def send_on_consent_notify(
         },
     }
 
+    # RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    # response -- see call_with_retry(). Ack of an inbound consent-notify
+    # callback -- server/callbacks/services/consent_notify_service.py IS
+    # wired to the idempotency guard (server/callbacks/utils/idempotency.py,
+    # tracker case M2-9), so a duplicate ack here is safe: ABDM's own
+    # retry of the underlying notify would just hit our idempotency check
+    # and produce the same re-ack behavior either way.
     try:
-        response = requests.post(
-            url=url,
-            headers=headers,
-            json=payload,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.post(
+                url=url,
+                headers=headers,
+                json=payload,
+                timeout=30,
+            ),
+            description="on-notify (consent) ack",
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -126,12 +136,26 @@ def send_on_health_information_request(
         },
     }
 
+    # RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    # response -- see call_with_retry(). Ack of an inbound
+    # health-information-request callback. UNLIKE send_on_consent_notify()
+    # above, the handler for this inbound callback
+    # (server/callbacks/services/health_information_request_service.py)
+    # is NOT currently wired to the idempotency guard (only consent_notify
+    # is, per idempotency.py's own module docstring) -- so whether a
+    # duplicate ack here is truly harmless is not as cleanly confirmed as
+    # the consent-notify case. Retried anyway per the retry-logic spec's
+    # explicit choice to apply the same policy to every ack call
+    # uniformly -- flagged here, not silently assumed safe.
     try:
-        response = requests.post(
-            url=url,
-            headers=headers,
-            json=payload,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.post(
+                url=url,
+                headers=headers,
+                json=payload,
+                timeout=30,
+            ),
+            description="on-request (health information) ack",
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -218,12 +242,31 @@ def send_health_information_data(
         "keyMaterial": key_material,
     }
 
+    # RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    # response -- see call_with_retry(). NOT an ack -- this is the actual
+    # PHI data-push call, to a URL supplied by the inbound request
+    # (data_push_url), not ABDM's own gateway. IDEMPOTENCY (unconfirmed,
+    # explicitly flagged): the payload -- including key_material -- is
+    # built once by the caller and unchanged across retry attempts of
+    # this one call, so a retry resends byte-identical ciphertext, not a
+    # second independent push under a different key. Whether the
+    # receiving HIU treats a duplicate push of the same transactionId/
+    # entries as a safe no-op is NOT confirmed here -- this codebase's
+    # own HIU-side receiver (health_information_hiu_push_service.py's
+    # process_health_information_hiu_push()) happens to merge
+    # care_contexts by careContextReference, which is naturally tolerant
+    # of a duplicate, but a real third-party HIU's behavior is unknown.
+    # Retried anyway per the retry-logic spec's explicit choice to apply
+    # the same policy uniformly -- flagged for Aayush, not assumed safe.
     try:
-        response = requests.post(
-            url=data_push_url,
-            headers=headers,
-            json=payload,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.post(
+                url=data_push_url,
+                headers=headers,
+                json=payload,
+                timeout=30,
+            ),
+            description="Data push to HIU",
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -340,12 +383,23 @@ def send_health_information_notify(
         }
     }
 
+    # RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    # response -- see call_with_retry(). A completion notification, not a
+    # strict ack of one specific inbound message. IDEMPOTENCY
+    # (unconfirmed): neither caller of this function
+    # (health_information_request_service.py's M2 push-and-notify, or
+    # health_information_hiu_push_service.py's M3 push handler) is wired
+    # to the idempotency guard -- flagged, not assumed safe. Retried per
+    # the retry-logic spec's uniform policy regardless.
     try:
-        response = requests.post(
-            url=url,
-            headers=headers,
-            json=payload,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.post(
+                url=url,
+                headers=headers,
+                json=payload,
+                timeout=30,
+            ),
+            description="Health Information notify",
         )
     except requests.exceptions.RequestException as exc:
         record_call(

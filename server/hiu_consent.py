@@ -21,7 +21,7 @@ code across the two roles unsafe here.
 import requests
 
 from server.config import HIECM_BASE_URL, X_CM_ID
-from server.utils import generate_request_id, generate_timestamp, get_gateway_token
+from server.utils import generate_request_id, generate_timestamp, get_gateway_token, call_with_retry
 from server.callbacks.repository.pending_consent_request_repository import save_pending_consent_request
 from server.callbacks.utils.flow_logger import log_error
 from server.callbacks.utils.api_capture import record_call
@@ -158,12 +158,24 @@ def initiate_consent_request(
         "Content-Type": "application/json",
     }
 
+    # RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    # response -- see call_with_retry(). Not an ack -- this is the
+    # initiating call, same request_id reused across retry attempts.
+    # IDEMPOTENCY (unconfirmed): whether ABDM treats a same-REQUEST-ID
+    # resubmission of a fresh consent request as safe (no duplicate
+    # consent-request created) is not documented anywhere in this
+    # module's own reference material (its docstring already notes
+    # "failure scenarios for this endpoint were not part of this pass's
+    # confirmed reference material") -- flagged, not assumed.
     try:
-        response = requests.post(
-            url=url,
-            json=payload,
-            headers=headers,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.post(
+                url=url,
+                json=payload,
+                headers=headers,
+                timeout=30,
+            ),
+            description="Consent init request",
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -253,12 +265,25 @@ def send_consent_hiu_on_notify(acknowledgements, request_id):
         "Content-Type": "application/json",
     }
 
+    # RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    # response -- see call_with_retry(). Ack of an inbound HIU consent
+    # notify callback -- but consent_hiu_notify_service.py's
+    # process_consent_hiu_notify() is NOT currently wired to the
+    # idempotency guard (server/callbacks/utils/idempotency.py, only
+    # consent_notify is, per that module's own docstring) -- so, unlike
+    # send_on_consent_notify() in server/healthinformation.py, a
+    # duplicate ack here isn't as cleanly confirmed-safe. Retried anyway
+    # per the retry-logic spec's uniform ack policy -- flagged, not
+    # silently assumed.
     try:
-        response = requests.post(
-            url=url,
-            json=payload,
-            headers=headers,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.post(
+                url=url,
+                json=payload,
+                headers=headers,
+                timeout=30,
+            ),
+            description="Consent HIU on-notify ack",
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -358,12 +383,36 @@ def fetch_consent(hiu_id, consent_id):
         "Content-Type": "application/json",
     }
 
+    # RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    # response -- see call_with_retry(). Not an ack -- this is the
+    # initiating fetch call, same request_id reused across retry
+    # attempts. IDEMPOTENCY (unconfirmed): re-fetching the same
+    # already-fetched consentId is presumed low-risk (a read of
+    # already-granted consent detail, not a state mutation) but this is
+    # an inference, not a confirmed ABDM guarantee -- flagged rather than
+    # assumed.
+    #
+    # COMPOSES WITH THE M3-26 FIX (consent_hiu_notify_service.py's
+    # per-artefact try/except around this call): retrying happens
+    # entirely INSIDE this function, before it ever returns or raises --
+    # so from that caller's point of view nothing changes. If every
+    # attempt here is exhausted while still transient, this function
+    # raises/returns exactly what it always did on a single failed
+    # attempt (a raised RequestException, or a non-202 response logged
+    # via the `if response.status_code != 202` check below); the
+    # per-artefact try/except still catches the raised case the same way,
+    # and the other artefacts in the same multi-hospital consent grant
+    # still get their own fetch_consent() call (and their own independent
+    # up-to-3-attempt retry budget) regardless of how this one went.
     try:
-        response = requests.post(
-            url=url,
-            json=payload,
-            headers=headers,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.post(
+                url=url,
+                json=payload,
+                headers=headers,
+                timeout=30,
+            ),
+            description="Consent fetch",
         )
     except requests.exceptions.RequestException as exc:
         record_call(

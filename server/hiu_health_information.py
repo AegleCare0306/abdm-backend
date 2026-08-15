@@ -48,7 +48,7 @@ from datetime import datetime
 import requests
 
 from server.config import HIECM_BASE_URL, X_CM_ID, CALLBACK_URL
-from server.utils import generate_request_id, generate_timestamp, get_gateway_token, generate_expiry_time
+from server.utils import generate_request_id, generate_timestamp, get_gateway_token, generate_expiry_time, call_with_retry
 from server.fidelius_crypto import generate_key_material
 from server.callbacks.repository.pending_health_information_request_repository import save_pending_health_information_request
 from server.callbacks.repository.hiu_consent_repository import get_hiu_consent
@@ -279,12 +279,32 @@ def initiate_health_information_request(
         "Content-Type": "application/json",
     }
 
+    # RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    # response -- see call_with_retry(). Not an ack -- this is the
+    # initiating call, same request_id and key_material (generated once,
+    # above) reused across retry attempts of this one call. IDEMPOTENCY
+    # (unconfirmed, explicitly flagged): if a connection error/timeout
+    # retry resends a request ABDM already accepted, it's not documented
+    # anywhere whether ABDM starts a second, independent data-flow
+    # transaction for the same consentId/hipId/dateRange, or recognizes
+    # the resubmission as the same logical request. Genuinely higher risk
+    # than the read-only/register-or-update call sites elsewhere in this
+    # pass, since a spurious second transaction here could mean the HIP
+    # pushes (and encrypts) the same records twice under two different
+    # transactionIds/key_materials. Retried anyway per the retry-logic
+    # spec's scope (every category-2 failure gets the same bounded
+    # retry), but this is exactly the kind of case the spec asks to
+    # surface rather than silently assume safe -- see this session's
+    # summary.
     try:
-        response = requests.post(
-            url=url,
-            json=payload,
-            headers=headers,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.post(
+                url=url,
+                json=payload,
+                headers=headers,
+                timeout=30,
+            ),
+            description="Health information request",
         )
     except requests.exceptions.RequestException as exc:
         record_call(

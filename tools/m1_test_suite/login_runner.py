@@ -56,7 +56,25 @@ def request_login_otp(action, scope, login_hint, login_id, otp_system, txn_id=""
         report_failure(response, "OTP request failed")
         return None
 
-    body = response.json()
+    # MALFORMED-BODY GUARD (edge-case-review pass, tracker case M1-5):
+    # a 200 status only means the HTTP layer succeeded -- it says nothing
+    # about the body actually being valid JSON. A broken/non-JSON body on
+    # an otherwise-200 response (e.g. an HTML error page from a
+    # misbehaving proxy/gateway in front of ABDM, or a truncated response)
+    # used to crash here with an uncaught ValueError from response.json().
+    # Same fix shape as the other malformed-response guards in this
+    # module: log the raw text, report a clear failure, and return None
+    # (this function's existing "failed" contract) instead of crashing.
+    try:
+        body = response.json()
+    except ValueError as exc:
+        print_failure(
+            f"OTP request returned a 200 status but the response body wasn't valid "
+            f"JSON ({exc}) -- treating this as a failed request rather than crashing."
+        )
+        log_response("OTP request response was not valid JSON", response.text)
+        return None
+
     print_success(body.get("message", "OTP requested."))
     return body.get("txnId", txn_id)
 
@@ -139,7 +157,21 @@ def verify_login_otp(action, scope, txn_id, expect_t_token=False):
             report_failure(response, "OTP verification failed")
             return {"x_token": None, "accounts": [], "txn_id": txn_id}
 
-        body = response.json()
+        # MALFORMED-BODY GUARD (tracker case M1-5) -- see the matching
+        # guard in request_login_otp() above for the full rationale. Not
+        # retried like a wrong-OTP failure (this isn't a user-input
+        # problem, so re-prompting for the OTP again wouldn't help) --
+        # reported as a failure immediately, same as an HTTP-level error.
+        try:
+            body = response.json()
+        except ValueError as exc:
+            print_failure(
+                f"OTP verification returned a 200 status but the response body wasn't "
+                f"valid JSON ({exc}) -- treating this as a failed verification rather "
+                f"than crashing."
+            )
+            log_response(f"verify_otp response (action={action}) was not valid JSON", response.text)
+            return {"x_token": None, "accounts": [], "txn_id": txn_id}
 
         if body.get("authResult") not in (None, "success"):
             message = body.get("message", "OTP verification failed.")
@@ -152,6 +184,45 @@ def verify_login_otp(action, scope, txn_id, expect_t_token=False):
 
         accounts = body.get("accounts") or body.get("users", [])
         token = body.get("token") or body.get("tokens", {}).get("token")
+
+        # MALFORMED-SHAPE GUARDS (edge-case-review pass, tracker cases
+        # M1-10/M1-12) -- both added here since both are "the response
+        # parsed without raising, but what it parsed to isn't actually
+        # usable" cases, same fix shape.
+        #
+        # M1-12: `accounts` is supposed to be a list of account dicts.
+        # If ABDM ever returns it as plain text (or any other non-list
+        # value) instead, the OLD code would pass it straight through to
+        # print_accounts()/select_account(), which iterate it expecting
+        # dicts -- for a string that means iterating individual
+        # characters and crashing the CLI with an AttributeError the
+        # first time `.get(...)` is called on one. Caught here instead,
+        # at the one place every login variant's response flows through.
+        if not isinstance(accounts, list):
+            log_response(f"verify_otp response (action={action}, MALFORMED accounts/users field)", body)
+            print_failure(
+                f"OTP verification returned an 'accounts'/'users' field that isn't a list "
+                f"(got {type(accounts).__name__}: {accounts!r}) -- treating this as no "
+                f"accounts returned rather than crashing on it."
+            )
+            accounts = []
+
+        # M1-10: a "tokens" section that's PRESENT but EMPTY (e.g.
+        # `"tokens": {}`) parses to token=None here exactly like a
+        # missing "tokens" section would -- `.get("token")` on an empty
+        # dict is already safe, no crash either way. The actual bug was
+        # one level up: with token=None, the OLD code still unconditionally
+        # printed "Login succeeded." below, misreporting a login that
+        # produced no usable token as a success. Checked explicitly here
+        # so a missing/empty token is reported as a failure instead.
+        if token is None:
+            log_response(f"verify_otp response (action={action}, MISSING/EMPTY token)", body)
+            print_failure(
+                "OTP verification returned a 200/success response but no usable token "
+                "was found under either 'token' or 'tokens.token' -- treating this as a "
+                "failure rather than reporting a successful login with nothing to show for it."
+            )
+            return {"x_token": None, "accounts": accounts, "txn_id": txn_id}
 
         if expect_t_token:
             print_info(f"T-Token received (short-lived -- needs a Verify User exchange, not usable directly): {redact_token(token)}")

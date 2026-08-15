@@ -163,16 +163,44 @@ def from_x509_public_key(x509_public_key_b64):
     'ABDM-9999: Could not read encrypted content' 400 error"). Since this
     codebase runs both the HIP and HIU roles for sandbox testing, a push
     received at our own dataPushUrl in practice comes from our own M2
-    code, which is confirmed to send X.509 -- this is the certain,
-    matching inverse for that specific case, not a guess about every
-    possible third-party HIP's behavior.
+    code, which is confirmed to send X.509.
+
+    TOLERANT FALLBACK (edge-case-review pass, tracker case M3-20): this
+    function's own docstring already flagged that the X.509-wrapped
+    format was "certain" only for OUR OWN self-issued pushes, "not a
+    guess about every possible third-party HIP's behavior." A real,
+    non-self-built HIP is not guaranteed to wrap its dhPublicKey in the
+    same X.509 SubjectPublicKeyInfo envelope -- ABDM's own spec describes
+    the key as a raw base64 point, and this codebase's own choice to
+    X.509-wrap it was originally driven by one specific 400 error on our
+    OWN outbound traffic, not a documented inbound requirement. Before
+    this fix, any push whose keyValue was already a bare 65-byte
+    uncompressed point (no X.509 prefix) would fail this strip
+    unconditionally (wrong byte count after slicing off a prefix that was
+    never there), and every entry in that HIP's push would be rejected as
+    "Could not decode HIP's public key" -- a real interop failure against
+    any HIP that sends the format ABDM's spec actually describes. Fixed
+    by checking for the bare-point shape FIRST (65 bytes, 0x04 prefix) and
+    accepting it as-is before assuming an X.509 wrapper is present; only
+    falls through to stripping the X.509 prefix if the raw decode isn't
+    already a valid point. This keeps the confirmed self-issued-push case
+    working exactly as before (a raw 65-byte point never has the DER
+    prefix, so it never satisfies the X.509 branch by accident) while no
+    longer hard-failing on a spec-compliant third-party HIP.
     """
     der_bytes = base64.b64decode(x509_public_key_b64)
+
+    if len(der_bytes) == 65 and der_bytes[0] == 0x04:
+        # Already a bare uncompressed point -- no X.509 wrapper to strip.
+        return base64.b64encode(der_bytes).decode()
+
     raw_point = der_bytes[len(_X509_DER_PREFIX):]
     if len(raw_point) != 65 or raw_point[0] != 0x04:
         raise ValueError(
-            f"Expected a 65-byte uncompressed point (0x04 prefix) after "
-            f"stripping the X.509 DER prefix, got {len(raw_point)} bytes"
+            f"Expected either a bare 65-byte uncompressed point (0x04 prefix) "
+            f"or one wrapped in the expected X.509 DER prefix, got "
+            f"{len(der_bytes)} raw bytes / {len(raw_point)} bytes after "
+            f"stripping the X.509 prefix"
         )
     return base64.b64encode(raw_point).decode()
 

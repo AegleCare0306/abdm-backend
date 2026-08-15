@@ -163,3 +163,17 @@ def log_waiting(message):
 def log_error(message):
     """A problem that stopped this flow from completing."""
     _logger.info(_prefix(f"   [ERROR] {message}"))
+
+
+def log_retry(message):
+    """
+    A transient outbound-call failure that's about to be retried, or (on
+    the final attempt) one that's being given up on -- see
+    server/utils.py's call_with_retry(). Deliberately its own category
+    (not log_error) so a retry-then-succeed sequence doesn't read as a
+    real failure in the log/console, while still being visible to
+    whoever's watching -- including a real person at an M1 CLI terminal,
+    since this goes through the same console handler as every other
+    flow_logger call.
+    """
+    _logger.info(_prefix(f"   [RETRY] {message}"))

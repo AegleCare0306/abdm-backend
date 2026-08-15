@@ -7,7 +7,17 @@ from server.callbacks.repository.link_repository import save_link_session
 from server.callbacks.repository.patient_identity_repository import get_patient_identity
 from server.crypto import encrypt_value, get_public_certificate
 from server.abha import request_otp
+from server.callbacks.utils.idempotency import already_processed, mark_processed
 from server.callbacks.utils.flow_logger import log_phase, log_api_call, log_waiting, log_error
+
+# See server/callbacks/utils/idempotency.py's own docstring, and
+# consent_notify_service.py's use of the same pattern (tracker case
+# M2-9) -- this closes the sibling case M2-13 ("a duplicated linking
+# request requests a second, brand-new OTP from ABDM and saves a
+# second link session under a second reference number"). On a detected
+# replay this skips requesting a fresh OTP and saving a second session
+# entirely.
+_IDEMPOTENCY_SCOPE = "link_init"
 
 
 async def process_link_init(callback_data):
@@ -22,6 +32,12 @@ async def process_link_init(callback_data):
         transaction_id = body.get("transactionId")
         request_id = headers.get("request-id")
         patient_records= body.get("patient", [])
+
+        if already_processed(_IDEMPOTENCY_SCOPE, request_id):
+            log_phase(f"REQUEST-ID {request_id} already processed for link_init -- treating as a replay, skipping a second OTP request/link session.")
+            return
+
+        mark_processed(_IDEMPOTENCY_SCOPE, request_id)
 
         link_reference_number = generate_request_id()
 

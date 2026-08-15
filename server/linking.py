@@ -2,7 +2,7 @@ import json
 import requests
 
 from server.config import HIECM_BASE_URL, X_CM_ID
-from server.utils import generate_request_id, generate_timestamp, get_gateway_token
+from server.utils import generate_request_id, generate_timestamp, get_gateway_token, call_with_retry
 from server.callbacks.utils.flow_logger import log_error
 from server.callbacks.utils.api_capture import record_call
 
@@ -110,12 +110,23 @@ def send_on_discover(
         "Authorization": f"Bearer {get_gateway_token()}",
     }
 
+    # RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    # response -- see call_with_retry(). Ack of an inbound `discover`
+    # callback -- ABDM's own retry of that inbound callback (if our ack
+    # never arrived) would produce the same outcome anyway, so a
+    # duplicate ack here is generally safe. discover_service.py's
+    # process_discover() is NOT currently wired to the idempotency guard
+    # in server/callbacks/utils/idempotency.py (only consent_notify is,
+    # per that module's own docstring) -- flagged, not assumed silently.
     try:
-        response = requests.post(
-            url,
-            headers=headers,
-            json=payload,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.post(
+                url,
+                headers=headers,
+                json=payload,
+                timeout=30,
+            ),
+            description="on-discover ack",
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -192,12 +203,22 @@ def send_on_init(
         "Authorization": f"Bearer {get_gateway_token()}",
     }
 
+    # RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    # response -- see call_with_retry(). Ack of an inbound `link/init`
+    # callback -- same reasoning as send_on_discover() above: a duplicate
+    # ack is generally safe since ABDM's own retry of the underlying
+    # inbound callback would produce the same outcome. Not currently
+    # wired to the idempotency guard (server/callbacks/utils/idempotency.py)
+    # -- flagged, not assumed.
     try:
-        response = requests.post(
-            url,
-            headers=headers,
-            json=payload,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.post(
+                url,
+                headers=headers,
+                json=payload,
+                timeout=30,
+            ),
+            description="on-init ack",
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -267,12 +288,20 @@ def send_on_confirm(
         "Authorization": f"Bearer {get_gateway_token()}",
     }
 
+    # RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    # response -- see call_with_retry(). Ack of an inbound `link/confirm`
+    # callback -- same reasoning as send_on_discover()/send_on_init()
+    # above. Not currently wired to the idempotency guard
+    # (server/callbacks/utils/idempotency.py) -- flagged, not assumed.
     try:
-        response = requests.post(
-            url,
-            headers=headers,
-            json=payload,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.post(
+                url,
+                headers=headers,
+                json=payload,
+                timeout=30,
+            ),
+            description="on-confirm ack",
         )
     except requests.exceptions.RequestException as exc:
         record_call(

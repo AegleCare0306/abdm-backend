@@ -27,6 +27,7 @@ from tools.m1_test_suite.common import (
     print_header,
     print_info,
     print_success,
+    print_failure,
     log_response,
     redact_token,
     first_present,
@@ -83,6 +84,23 @@ def run():
 
     select_body = select_response.json()
     x_token = select_body.get("token")
+
+    # MISSING-TOKEN GUARD (edge-case-review pass, tracker case M1-14):
+    # verify_login_otp() above already guards the T-Token step (a missing
+    # 'token'/'tokens.token' there is reported as a failure, tracker case
+    # M1-10). This verify_user() step has its own separate 'token' field
+    # for the real X-Token, and the OLD code here printed "Login complete"
+    # unconditionally even if x_token came back None -- misreporting a
+    # login that produced no usable session token as a success, same bug
+    # shape as M1-10 but one step later in this flow.
+    if x_token is None:
+        print_failure(
+            "Account selection (verify_user) returned a 200/success response but no "
+            "usable token was found under 'token' -- treating this as a failed login "
+            "rather than reporting success with nothing to show for it."
+        )
+        log_response("verify_user response (MISSING token)", select_body)
+        return {"x_token": None, "accounts": accounts, "txn_id": txn_id}
 
     print_success("Login complete for the selected account.")
     print_info(f"X-Token: {redact_token(x_token)}")

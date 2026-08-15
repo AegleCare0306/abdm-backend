@@ -105,6 +105,33 @@ def link_transaction_id(request_id, transaction_id):
     return updated
 
 
+def get_request_id_for_transaction_id(transaction_id):
+    """
+    Looks up which REQUEST-ID a transactionId is currently linked to in
+    the index file, without resolving the full session record. Used by
+    the on-request callback handler (tracker case M3-2) to detect a
+    transactionId collision BEFORE calling link_transaction_id() -- see
+    that function's own docstring for why an unconditional relink is
+    dangerous: two overlapping Health Information Requests in flight at
+    once (two different REQUEST-IDs, each with its own pending session
+    and its own key_material) could otherwise have their sessions crossed
+    if a second on-request callback claims a transactionId already linked
+    to a different REQUEST-ID's session -- silently overwriting the index
+    entry so the later data push resolves to the WRONG session's
+    key_material, and a genuinely correct push gets decrypted with the
+    wrong key and reported as failed.
+
+    Args:
+        transaction_id (str): ABDM's real transactionId.
+
+    Returns:
+        str | None: The REQUEST-ID currently linked to this
+            transactionId, or None if nothing is linked yet.
+    """
+
+    return get_key(_INDEX_FILE, transaction_id)
+
+
 def get_pending_health_information_request_by_transaction_id(transaction_id):
     """
     Retrieves a pending health information request session by ABDM's

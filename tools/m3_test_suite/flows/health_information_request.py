@@ -164,16 +164,35 @@ def run_initiate_health_information_request():
     transaction_id = hi_request.get("transactionId")
     print_success(f"transactionId received: {transaction_id}")
 
-    def _is_our_push(entry):
+    # CHANGED 2026-08-12: a transfer covering more than one care context
+    # now arrives as MULTIPLE separate pushes (one per care context, each
+    # its own page) instead of a single push carrying every entry -- see
+    # health_information_request_service.py's _push_and_notify() and
+    # health_information_hiu_push_service.py's own docstrings for why
+    # (fixes an AES-GCM key/IV reuse issue on the sender side). The
+    # server only sends the final "transfer complete" notify once it's
+    # received the LAST page, so this now specifically waits for that
+    # last push rather than stopping at the first one it sees -- waiting
+    # for just the first push (the old behavior) would report a partial,
+    # possibly-empty result for any multi-care-context transfer.
+    def _is_our_last_push(entry):
         if transaction_id is None:
             return True
-        return (entry.get("request_body") or {}).get("transactionId") == transaction_id
+        body = entry.get("request_body") or {}
+        if body.get("transactionId") != transaction_id:
+            return False
+        page_number = body.get("pageNumber")
+        page_count = body.get("pageCount")
+        if page_count is None or page_number is None:
+            return True
+        return page_number >= page_count - 1
 
-    print_info("Waiting for the HIP to push encrypted records directly to our dataPushUrl...")
+    print_info("Waiting for the HIP to push encrypted records directly to our dataPushUrl "
+                "(may arrive as multiple pages, one per care context)...")
     push_entry = wait_for_callback(
         "health_information_hiu_push",
         since=start_time,
-        match_fn=_is_our_push,
+        match_fn=_is_our_last_push,
     )
 
     if push_entry is None:
@@ -181,10 +200,12 @@ def run_initiate_health_information_request():
         print_info("Is the HIP's own server actually running and able to reach our dataPushUrl?")
         print_info("(If another Health Information Request is running concurrently, also check "
                     "storage/api_capture/m3_*.jsonl directly for a push entry with this transactionId that "
-                    "arrived but wasn't matched here.)")
+                    "arrived but wasn't matched here. Also check for EARLIER pages of this same transfer that "
+                    "arrived but never got a final page -- that would mean the HIP sent fewer pages than its "
+                    "own pageCount promised.)")
         return {"consent_id": consent_id, "transaction_id": transaction_id}
 
-    log_response("data push callback", push_entry)
+    log_response("data push callback (last page)", push_entry)
 
     stored = get_hiu_health_information(transaction_id) if transaction_id else None
 

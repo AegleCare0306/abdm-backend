@@ -1,12 +1,22 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 
 from server.callbacks.dispatcher import dispatch_callback
 from server.callbacks.utils.response import success
+from server.callbacks.utils.jwt_auth import verify_abdm_callback
 
 router = APIRouter()
 
+# Applied to every route below via dependencies=[Depends(verify_abdm_callback)]
+# rather than copy-pasted per handler -- see
+# server/callbacks/utils/jwt_auth.py's own module docstring for what this
+# actually verifies (signature against ABDM's live JWKS, iss, exp, and a
+# sanity check on aud/azp) and why. Runs before the route body (and
+# therefore before dispatch_callback()), so an unverified request never
+# reaches application logic and gets a real 401.
+_AUTH = [Depends(verify_abdm_callback)]
 
-@router.post("/api/v3/hip/token/on-generate-token")
+
+@router.post("/api/v3/hip/token/on-generate-token", dependencies=_AUTH)
 async def on_generate_token(request: Request):
 
     await dispatch_callback(
@@ -17,7 +27,7 @@ async def on_generate_token(request: Request):
     return success()
 
 
-@router.post("/api/v3/link/on_carecontext")
+@router.post("/api/v3/link/on_carecontext", dependencies=_AUTH)
 async def on_carecontext(request: Request):
 
     await dispatch_callback(
@@ -28,7 +38,7 @@ async def on_carecontext(request: Request):
     return success()
 
 
-@router.post("/api/v3/consent/request/hip/notify")
+@router.post("/api/v3/consent/request/hip/notify", dependencies=_AUTH)
 async def consent_request_notify(request: Request):
 
     await dispatch_callback(
@@ -39,7 +49,7 @@ async def consent_request_notify(request: Request):
     return success()
 
 
-@router.post("/api/v3/hip/patient/care-context/discover")
+@router.post("/api/v3/hip/patient/care-context/discover", dependencies=_AUTH)
 async def discover_care_context(request: Request):
 
     await dispatch_callback(
@@ -49,7 +59,7 @@ async def discover_care_context(request: Request):
 
     return success()
 
-@router.post("/api/v3/hip/link/care-context/init")
+@router.post("/api/v3/hip/link/care-context/init", dependencies=_AUTH)
 async def care_context_init(request: Request):
 
     await dispatch_callback(
@@ -59,7 +69,7 @@ async def care_context_init(request: Request):
 
     return success()
 
-@router.post("/api/v3/hip/link/care-context/confirm")
+@router.post("/api/v3/hip/link/care-context/confirm", dependencies=_AUTH)
 async def care_context_confirm(request: Request):
 
     await dispatch_callback(
@@ -69,7 +79,7 @@ async def care_context_confirm(request: Request):
 
     return success()
 
-@router.post("/api/v3/hip/health-information/request")
+@router.post("/api/v3/hip/health-information/request", dependencies=_AUTH)
 async def health_information_request(
     request: Request,
 ):
@@ -81,7 +91,7 @@ async def health_information_request(
 
     return success()
 
-@router.post("/api/v3/links/context/on-notify")
+@router.post("/api/v3/links/context/on-notify", dependencies=_AUTH)
 async def links_context_on_notify(request: Request):
 
     await dispatch_callback(
@@ -91,7 +101,7 @@ async def links_context_on_notify(request: Request):
 
     return success()
 
-@router.post("/api/v3/patients/sms/on-notify")
+@router.post("/api/v3/patients/sms/on-notify", dependencies=_AUTH)
 async def patients_sms_on_notify(request: Request):
 
     await dispatch_callback(
@@ -101,7 +111,7 @@ async def patients_sms_on_notify(request: Request):
 
     return success()
 
-@router.post("/api/v3/hiu/consent/request/on-init")
+@router.post("/api/v3/hiu/consent/request/on-init", dependencies=_AUTH)
 async def hiu_consent_request_on_init(request: Request):
 
     await dispatch_callback(
@@ -111,7 +121,7 @@ async def hiu_consent_request_on_init(request: Request):
 
     return success()
 
-@router.post("/api/v3/hiu/consent/request/notify")
+@router.post("/api/v3/hiu/consent/request/notify", dependencies=_AUTH)
 async def hiu_consent_request_notify(request: Request):
 
     await dispatch_callback(
@@ -121,7 +131,7 @@ async def hiu_consent_request_notify(request: Request):
 
     return success()
 
-@router.post("/api/v3/hiu/consent/on-fetch")
+@router.post("/api/v3/hiu/consent/on-fetch", dependencies=_AUTH)
 async def hiu_consent_on_fetch(request: Request):
 
     await dispatch_callback(
@@ -131,7 +141,7 @@ async def hiu_consent_on_fetch(request: Request):
 
     return success()
 
-@router.post("/api/v3/hiu/health-information/on-request")
+@router.post("/api/v3/hiu/health-information/on-request", dependencies=_AUTH)
 async def hiu_health_information_on_request(request: Request):
     # CONFIRMED: this exact URL is stated explicitly in the M3 spec doc
     # (M3_Dcoument_16_02_2026_2319bac7bf.docx, section 5.3.2 "Data flow --
@@ -149,7 +159,7 @@ async def hiu_health_information_on_request(request: Request):
 
     return success()
 
-@router.post("/api/v3/hiu/health-information/push")
+@router.post("/api/v3/hiu/health-information/push", dependencies=_AUTH)
 async def hiu_health_information_push(request: Request):
     # Our own choice of path -- we supply it ourselves as dataPushUrl in
     # initiate_health_information_request() (server/hiu_health_information.py),

@@ -297,24 +297,38 @@ def select_granted_consent():
     (hiu_consent_repository.get_all_hiu_consents()), filters to status ==
     "GRANTED" (the only status Block 2 can act on -- a fetched consent
     can also be DENIED/REVOKED, which this excludes), then prompts in
-    THREE steps -- patient, then which HIU requested it, then which
-    facility (HIP) that HIU's request is for -- rather than one flat
-    numbered list.
+    FOUR steps -- patient, then which HIU requested it, then which
+    requesting DOCTOR (practitioner) it was requested under, then which
+    facility (HIP) that request is for -- rather than one flat numbered
+    list.
 
-    CHANGED 2026-08-11 (two passes): originally a single flat list.
-    First pass split it into patient -> consent (with HIU/HIP shown
-    inline on each row). Second pass (this one) splits the second level
-    further into its own HIU step, then a facility step -- explicit
-    per-level narrowing, not one combined row someone has to visually
-    parse -- since with more than one HIU identity being tested against
-    the same patient (each consent artefact already carries its own
-    consent_detail.hiu.id -- who requested it -- alongside
-    consent_detail.hip -- who holds the data, {id, name}), even the
-    patient->consent list read as one undifferentiated block and made it
-    easy to pick the wrong one. Matches how this would actually need to
-    work once this is UI-driven (a real user picks a patient, then which
-    of their own org's requests they're following up on, then which
-    facility).
+    CHANGED 2026-08-11 (two passes) + 2026-08-12 (this pass, adding the
+    doctor step): originally a single flat list. First pass split it
+    into patient -> consent (with HIU/HIP shown inline on each row).
+    Second pass split the second level further into its own HIU step,
+    then a facility step. This pass adds a third narrowing level between
+    those two: consent_detail.requester ({name, identifier}) -- the
+    treating practitioner the Consent Init Request was made under (see
+    server/hiu_consent.py's initiate_consent_request(), which sends this
+    from select_practitioner()'s choice) -- was already being captured
+    and stored on every artefact, but was invisible in this picker.
+    Confirmed via a real user question while testing (2026-08-12): with
+    the same patient/HIU/facility combination requested by two different
+    doctors on two different days (e.g. re-running Consent Init Request
+    daily during testing), those consents showed up here as visually
+    IDENTICAL rows with no way to tell them apart short of opening
+    storage/hiu_consents.jsonl directly -- a real gap, not just cosmetic,
+    since a real EMR absolutely needs "which of MY patient's consents is
+    this" to be answerable by the requesting doctor, not just by facility.
+
+    One requester currently applies to every facility resolved by a
+    single Consent Init Request call (hiu_consent.py sends hip=None and
+    ABDM resolves which HIP(s) hold the data; whichever practitioner was
+    selected for that one call is the requester for all facilities ABDM
+    returns under it) -- so narrowing by requester before facility is the
+    correct order, not the other way around: it's the doctor's own
+    request being followed up on, which then may cover multiple
+    facilities.
 
     Used by the Health Information Request flow (M3 Block 2) to pick
     which already-fetched consent to request data for.
@@ -334,6 +348,9 @@ def select_granted_consent():
             "hiu_id": ((data.get("consent_detail") or {}).get("hiu") or {}).get("id"),
             "hip_id": ((data.get("consent_detail") or {}).get("hip") or {}).get("id"),
             "hip_name": ((data.get("consent_detail") or {}).get("hip") or {}).get("name"),
+            "requester_name": ((data.get("consent_detail") or {}).get("requester") or {}).get("name"),
+            "requester_reg_no": (((data.get("consent_detail") or {}).get("requester") or {}).get("identifier") or {}).get("value"),
+            "created_at": (data.get("consent_detail") or {}).get("createdAt"),
         }
         for consent_id, data in all_consents.items()
         if data.get("status") == "GRANTED"
@@ -386,20 +403,66 @@ def select_granted_consent():
             break
         print_info("Invalid choice, try again.")
 
-    # Step 3: within that patient + HIU, pick which facility (HIP) holds
-    # the data -- shown by name, not just the raw hip_id, since that's
-    # what's actually stored on the artefact (consent_detail.hip.name)
-    # and what a real user would recognize.
     hiu_subset = [item for item in patient_subset if item["hiu_id"] == selected_hiu_id]
 
-    print_info(f"{len(hiu_subset)} facilit{'y' if len(hiu_subset) == 1 else 'ies'} granted to HIU {selected_hiu_id} for {selected_patient_id}:")
-    for i, item in enumerate(hiu_subset, start=1):
+    # Step 3 (added 2026-08-12): within that patient + HIU, pick which
+    # requesting doctor's consent this is -- see this function's own
+    # docstring for why. Keyed on (name, reg_no) rather than name alone,
+    # in case two practitioners ever share a display name. Order by most
+    # recent createdAt first, since "which request was this" is usually
+    # a recency question during testing (re-running Block 1 across
+    # multiple days/practitioners, as happened here).
+    requesters = []
+    for item in hiu_subset:
+        key = (item["requester_name"], item["requester_reg_no"])
+        if key not in [r["key"] for r in requesters]:
+            requesters.append({
+                "key": key,
+                "name": item["requester_name"],
+                "reg_no": item["requester_reg_no"],
+                "latest_created_at": item["created_at"],
+            })
+        else:
+            existing = next(r for r in requesters if r["key"] == key)
+            if (item["created_at"] or "") > (existing["latest_created_at"] or ""):
+                existing["latest_created_at"] = item["created_at"]
+    requesters.sort(key=lambda r: r["latest_created_at"] or "", reverse=True)
+
+    if len(requesters) > 1:
+        print_info(f"{len(requesters)} requesting doctor(s) with GRANTED consent(s) from HIU {selected_hiu_id} for {selected_patient_id}:")
+        for i, r in enumerate(requesters, start=1):
+            count = sum(1 for item in hiu_subset if (item["requester_name"], item["requester_reg_no"]) == r["key"])
+            label = r["name"] or "(no requester name on file)"
+            reg = f" ({r['reg_no']})" if r["reg_no"] else ""
+            when = f" -- requested {r['latest_created_at']}" if r["latest_created_at"] else ""
+            print_info(f"  [{i}] {label}{reg}  ({count} consent(s)){when}")
+
+        while True:
+            choice = prompt(f"Select a requesting doctor (1-{len(requesters)})")
+            if choice.isdigit() and 1 <= int(choice) <= len(requesters):
+                selected_requester_key = requesters[int(choice) - 1]["key"]
+                break
+            print_info("Invalid choice, try again.")
+
+        requester_subset = [item for item in hiu_subset if (item["requester_name"], item["requester_reg_no"]) == selected_requester_key]
+    else:
+        # Only one requester on file for this patient+HIU -- nothing to
+        # disambiguate, skip straight to the facility step (same
+        # behavior as before this change for the common case).
+        requester_subset = hiu_subset
+
+    # Step 4: within that patient + HIU + requester, pick which facility
+    # (HIP) holds the data -- shown by name, not just the raw hip_id,
+    # since that's what's actually stored on the artefact
+    # (consent_detail.hip.name) and what a real user would recognize.
+    print_info(f"{len(requester_subset)} facilit{'y' if len(requester_subset) == 1 else 'ies'} granted for {selected_patient_id}:")
+    for i, item in enumerate(requester_subset, start=1):
         print_info(f"  [{i}] {item['hip_name']} ({item['hip_id']})")
 
     while True:
-        choice = prompt(f"Select a facility (1-{len(hiu_subset)})")
-        if choice.isdigit() and 1 <= int(choice) <= len(hiu_subset):
-            selected = hiu_subset[int(choice) - 1]
+        choice = prompt(f"Select a facility (1-{len(requester_subset)})")
+        if choice.isdigit() and 1 <= int(choice) <= len(requester_subset):
+            selected = requester_subset[int(choice) - 1]
             return {"consent_id": selected["consent_id"], "consent_detail": selected["consent_detail"]}
         print_info("Invalid choice, try again.")
 

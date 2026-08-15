@@ -13,7 +13,7 @@ from collections import namedtuple
 import requests
 
 from server.config import HIECM_BASE_URL, X_CM_ID
-from server.utils import generate_request_id, generate_timestamp, get_gateway_token
+from server.utils import generate_request_id, generate_timestamp, get_gateway_token, call_with_retry
 from server.callbacks.repository.link_token_repository import save_pending_link_token
 from server.callbacks.repository.patient_link_token_repository import get_patient_link_token
 from server.callbacks.repository.care_context_link_repository import save_pending_care_context_link
@@ -266,12 +266,29 @@ def generate_link_token(
         "Content-Type": "application/json",
     }
 
+    # RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    # response -- see call_with_retry(). Not an ack to any inbound
+    # callback -- this is the initiating call. IDEMPOTENCY (unconfirmed):
+    # if a connection error/timeout happens after ABDM actually received
+    # this request, a retry resends the same request_id (generated once,
+    # above, before this block -- reused across every retry attempt of
+    # THIS call, not re-minted per attempt). Whether ABDM treats a
+    # same-REQUEST-ID resubmission as a safe no-op is not confirmed here
+    # -- but this endpoint's own documented failure table (see this
+    # function's docstring) already includes `400 ABDM-1092 "Duplicate
+    # link token request"` as a real, handled outcome: if the first
+    # attempt actually succeeded and the retry is genuinely redundant,
+    # the worst case is this specific, already-anticipated 400 coming
+    # back on the retry -- not an unhandled crash.
     try:
-        response = requests.post(
-            url=url,
-            json=payload,
-            headers=headers,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.post(
+                url=url,
+                json=payload,
+                headers=headers,
+                timeout=30,
+            ),
+            description="Link token generation",
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -480,12 +497,25 @@ def link_care_context(
         "Content-Type": "application/json",
     }
 
+    # RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    # response -- see call_with_retry(). Not an ack to any inbound
+    # callback -- this is the initiating call, same request_id reused
+    # across retry attempts. IDEMPOTENCY (unconfirmed, but low-risk in
+    # practice): if a connection error/timeout retry resends a request
+    # ABDM already processed, is_duplicate_link_error() immediately below
+    # already treats ABDM's real, confirmed "Duplicate HIP link request"
+    # response as an expected, non-error outcome (informational log, not
+    # log_error) -- so a redundant retry lands on an already-handled
+    # path, not a new failure mode.
     try:
-        response = requests.post(
-            url=url,
-            json=payload,
-            headers=headers,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.post(
+                url=url,
+                json=payload,
+                headers=headers,
+                timeout=30,
+            ),
+            description="Care context linking",
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -656,12 +686,26 @@ def notify_care_context_update(
         "Content-Type": "application/json",
     }
 
+    # RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    # response -- see call_with_retry(). Not an ack to any inbound
+    # callback. IDEMPOTENCY (unconfirmed): this is a "new care context
+    # available" notification, not a state-setting call -- ABDM's real
+    # behavior for a duplicate notify of the same care context is not
+    # confirmed in this codebase's docs, flagged here rather than
+    # assumed. Distinct from retry_count (this function's own param,
+    # used by care_context_notify_service.py for the separate,
+    # already-existing ABDM-1006 timing-race retry) -- that's a
+    # different retry mechanism at a different layer and is untouched by
+    # this wrapper, which only covers this one HTTP attempt.
     try:
-        response = requests.post(
-            url=url,
-            json=payload,
-            headers=headers,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.post(
+                url=url,
+                json=payload,
+                headers=headers,
+                timeout=30,
+            ),
+            description="Care context update notify",
         )
     except requests.exceptions.RequestException as exc:
         record_call(
@@ -707,6 +751,21 @@ def send_sms_notification(hip_id, hip_name, phone_no):
     """
     Ask ABDM to send an SMS notification to a patient's phone about
     pending care-context links (M2 doc §4.3.8).
+
+    RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    response -- see call_with_retry(). Confirmed by Aayush (2026-08-14):
+    same uniform policy as every other outbound call in this module,
+    despite this endpoint asking ABDM to trigger a real SMS send to a
+    patient's phone -- a deliberate choice to keep the retry policy
+    simple and consistent rather than carve out SMS-specific behavior
+    before real sandbox testing shows whether that's actually needed.
+    IDEMPOTENCY (unconfirmed, still worth knowing): a same-payload retry
+    after an ambiguous timeout could, in principle, result in a patient
+    receiving a duplicate SMS if ABDM had actually accepted the first
+    attempt -- unlike link_care_context()'s is_duplicate_link_error(),
+    there's no known "already handled gracefully" response shape for
+    this endpoint to fall back on. Revisit this decision if real sandbox
+    testing ever shows duplicate SMS deliveries.
 
     No X-HIP-ID header is sent on this endpoint -- confirmed absent
     from both the doc's header table and the real Postman capture; the
@@ -770,11 +829,14 @@ def send_sms_notification(hip_id, hip_name, phone_no):
     }
 
     try:
-        response = requests.post(
-            url=url,
-            json=payload,
-            headers=headers,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.post(
+                url=url,
+                json=payload,
+                headers=headers,
+                timeout=30,
+            ),
+            description="SMS notification send",
         )
     except requests.exceptions.RequestException as exc:
         record_call(

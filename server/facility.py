@@ -5,7 +5,7 @@ Health Facility Registry (HFR) related APIs.
 import requests
 
 from server.config import FACILITY_BASE_URL, CLIENT_ID
-from server.utils import get_gateway_token
+from server.utils import get_gateway_token, call_with_retry
 from server.callbacks.utils.flow_logger import log_error
 from server.callbacks.utils.api_capture import record_call
 
@@ -88,12 +88,24 @@ def register_bridge_service(
         "Authorization": f"Bearer {get_gateway_token()}",
     }
 
+    # RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    # response -- see call_with_retry(). Background/admin registration
+    # call. Idempotency: this is a register-OR-UPDATE call by design (the
+    # docstring already calls it "Register (or update)") -- resubmitting
+    # the same facility/bridge/hipName/type/active payload after a
+    # timeout should converge to the same end state either way, though
+    # this endpoint's response shape is explicitly UNCONFIRMED per this
+    # function's own docstring, so that's an inference from the API's
+    # documented shape, not a live-confirmed guarantee.
     try:
-        response = requests.post(
-            url=url,
-            json=payload,
-            headers=headers,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.post(
+                url=url,
+                json=payload,
+                headers=headers,
+                timeout=30,
+            ),
+            description="Bridge service registration",
         )
     except requests.exceptions.RequestException as exc:
         record_call(

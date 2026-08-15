@@ -15,8 +15,21 @@ from server.healthinformation import (
 )
 from server.fidelius_crypto import generate_key_material, encrypt_health_data, to_x509_public_key
 from server.utils import print_api_response, generate_timestamp, generate_expiry_time, generate_safe_past_timestamp
+from server.callbacks.utils.idempotency import already_processed, mark_processed
 from server.callbacks.utils.flow_logger import log_phase, log_api_call, log_waiting, log_error
 from server.callbacks.utils.attachment_metrics import time_block, mechanisms_in_bundle
+
+# See server/callbacks/utils/idempotency.py's own docstring, and
+# consent_notify_service.py's use of the same pattern (tracker case
+# M2-9) -- this closes the sibling case M2-10 ("replaying an old
+# health-data request causes the same patient data to be sent out
+# twice, under two different encryption keys"). _push_and_notify()
+# generates a fresh ECDH key pair per care context on every call (by
+# design, for forward secrecy -- see that function's own docstring), so
+# a raw replay of this callback with no guard would re-encrypt and
+# re-push every record under brand-new keys, and re-notify ABDM a
+# second time for a transfer that already completed.
+_IDEMPOTENCY_SCOPE = "health_information_request"
 
 
 def _compute_checksum(encrypted_content):
@@ -46,20 +59,70 @@ def _push_and_notify(
     dateRange), and zipping bundles against the full requested list would
     mis-attribute every bundle after the first gap, pushing one care
     context's data to ABDM labelled as another's.
+
+    ONE PUSH CALL PER CARE CONTEXT, EACH WITH ITS OWN FRESH KEY MATERIAL
+    (changed 2026-08-12 -- see the Notion flag this closes for the full
+    writeup): this used to generate ONE hip_key_material for the whole
+    transaction and reuse it (same derived AES key AND the same AES-GCM
+    IV, since both are deterministic functions of the two nonces --
+    see fidelius_crypto.py's _derive_key_and_iv()) across every entry in
+    a single push call. That's a real AES-GCM nonce-reuse condition for
+    any consent covering more than one care context.
+
+    This can't be fixed by just generating a fresh key without changing
+    the wire shape: ABDM's data-push payload carries exactly ONE
+    `keyMaterial` field alongside the `entries` array, so a receiving HIU
+    has no way to know a different key was used per entry within one
+    push call -- there is nowhere in the schema to carry more than one
+    keyMaterial per call. The payload's existing pageNumber/pageCount
+    fields are exactly the mechanism ABDM already defines for exactly
+    this situation: instead of one push carrying N entries under one
+    shared keyMaterial, this now makes N separate push calls -- one per
+    care context, each its own page, each with its own freshly generated
+    ephemeral ECDH key pair and nonce (hence its own independent derived
+    AES key and IV). No entry ever shares key material with another
+    again.
+
+    IMPACT ON THE RECEIVING SIDE: this is a wire-format change (multiple
+    pushes per transaction is now the normal case, not just a
+    theoretical possibility the schema always allowed). See
+    server/callbacks/services/health_information_hiu_push_service.py --
+    it previously treated every push as a complete, standalone
+    transaction (single notify per push, storage overwritten per push,
+    which would have silently discarded every page but the last). It was
+    updated in the same change to merge care_contexts across pages for a
+    transactionId and only send the final notify once the last page
+    (pageNumber == pageCount - 1) has arrived. See that file's own
+    docstring/comments for the details. tools/m3_test_suite's CLI poll
+    was updated to match (waits for the last page specifically, not just
+    the first push callback it sees).
+
+    A single-care-context transfer (the common case in testing so far)
+    is page_count=1, page_number=0 -- behaviourally identical to before
+    except for the fresh-key generation itself.
     """
 
-    entries = []
+    care_context_refs = list(fhir_bundles.keys())
+    total_entries = len(care_context_refs)
+
     status_responses = []
+    records_by_care_context = {}
+    encrypted_bundle_by_care_context = {}
+    checksum_by_care_context = {}
     all_mechanisms = set()
+    pushed_count = 0
 
-    hip_key_material = generate_key_material()
+    for page_number, care_context_reference in enumerate(care_context_refs):
 
-    for care_context_reference, bundle in fhir_bundles.items():
-
+        bundle = fhir_bundles[care_context_reference]
         bundle_mechanisms = mechanisms_in_bundle(bundle)
         all_mechanisms.update(bundle_mechanisms)
 
         plaintext = json.dumps(bundle)
+
+        # Fresh per entry/page -- this is the fix itself. See this
+        # function's own docstring above.
+        hip_key_material = generate_key_material()
 
         try:
             with time_block(
@@ -84,14 +147,16 @@ def _push_and_notify(
             })
             continue
 
-        entries.append({
+        entry = {
             "content": encrypted_content,
             "media": "application/fhir+json",
             "checksum": _compute_checksum(encrypted_content),
             "careContextReference": care_context_reference,
-        })
+        }
 
-    if entries:
+        records_by_care_context[care_context_reference] = bundle
+        encrypted_bundle_by_care_context[care_context_reference] = entry["content"]
+        checksum_by_care_context[care_context_reference] = entry["checksum"]
 
         # Our own public key must be sent in X.509 DER format -- confirmed
         # as the actual root cause of the earlier "ABDM-9999: Could not
@@ -109,49 +174,77 @@ def _push_and_notify(
             "nonce": hip_key_material["nonce"],
         }
 
-        with time_block(
-            "transmit",
-            transaction_id=transaction_id,
-            mechanisms=sorted(all_mechanisms),
-        ):
-            push_response = send_health_information_data(
-                data_push_url=data_push_url,
+        # Each page's HTTP call is isolated in its own try/except -- same
+        # pattern as the encryption step above. Confirmed live (2026-08-12)
+        # that WITHOUT this, a network-level exception (connection drop,
+        # timeout, DNS failure -- anything requests raises rather than
+        # returning a bad status for) on any one page propagates straight
+        # out of this whole function: remaining pages are never attempted,
+        # AND the final notify below never runs, even though earlier pages
+        # in this same loop may have already been genuinely delivered.
+        # Before per-page pushing existed there was only one push call for
+        # the whole transaction, so "exception -> no notify" meant "nothing
+        # was delivered" -- atomic and self-consistent. With per-page
+        # pushing that's no longer true: an exception on page 3 of 5 could
+        # leave pages 1-2 truly received by the HIU with zero record
+        # anywhere that it happened. This except turns that into one more
+        # ERRORED entry and lets the loop continue, so the final notify
+        # always fires with an honest picture of what did and didn't make
+        # it -- instead of silently dropping everything after the failure
+        # point. A graceful non-200 response (no exception) was already
+        # handled correctly before this change and is unaffected here.
+        try:
+            with time_block(
+                "transmit",
                 transaction_id=transaction_id,
-                entries=entries,
-                key_material=outbound_key_material,
-                attachment_mechanisms=sorted(all_mechanisms),
-            )
+                care_context_reference=care_context_reference,
+                mechanisms=sorted(bundle_mechanisms),
+            ):
+                push_response = send_health_information_data(
+                    data_push_url=data_push_url,
+                    transaction_id=transaction_id,
+                    entries=[entry],
+                    key_material=outbound_key_material,
+                    page_number=page_number,
+                    page_count=total_entries,
+                    attachment_mechanisms=sorted(bundle_mechanisms),
+                )
+        except Exception as exc:
+            log_error(f"Push failed for care context {care_context_reference}: {exc}")
+            status_responses.append({
+                "careContextReference": care_context_reference,
+                "hiStatus": "ERRORED",
+                "description": f"Push failed: {exc}",
+            })
+            continue
 
-        log_api_call("Pushing Encrypted Records to HIU", f"POST {data_push_url}", push_response.status_code)
+        log_api_call(
+            f"Pushing Encrypted Record ({care_context_reference}, page {page_number + 1}/{total_entries}) to HIU",
+            f"POST {data_push_url}",
+            push_response.status_code,
+        )
 
         pushed_ok = push_response.status_code == 200
+        if pushed_ok:
+            pushed_count += 1
 
-        for entry in entries:
-            status_responses.append({
-                "careContextReference": entry["careContextReference"],
-                "hiStatus": "DELIVERED" if pushed_ok else "ERRORED",
-                "description": "Transferred successfully" if pushed_ok else f"Push failed with status {push_response.status_code}",
-            })
+        status_responses.append({
+            "careContextReference": care_context_reference,
+            "hiStatus": "DELIVERED" if pushed_ok else "ERRORED",
+            "description": "Transferred successfully" if pushed_ok else f"Push failed with status {push_response.status_code}",
+        })
 
         if not pushed_ok:
             print_api_response(push_response)
 
-    else:
-        pushed_ok = False
+    session_status = "TRANSFERRED" if pushed_count > 0 else "FAILED"
 
-    session_status = "TRANSFERRED" if (entries and pushed_ok) else "FAILED"
-
-    # Already keyed exactly the way this field needs. Copied rather than
-    # aliased because update_health_information_session() stores what it is
-    # given by reference (no deepcopy on update), and the session shouldn't
-    # share a mutable dict with the caller.
-    records_by_care_context = dict(fhir_bundles)
-    encrypted_bundle_by_care_context = {
-        entry["careContextReference"]: entry["content"] for entry in entries
-    }
-    checksum_by_care_context = {
-        entry["careContextReference"]: entry["checksum"] for entry in entries
-    }
+    # records_by_care_context / encrypted_bundle_by_care_context /
+    # checksum_by_care_context were populated inside the loop above (only
+    # for entries that actually made it through encryption) -- no need to
+    # rebuild them here. Previously this rebuilt them post-loop from a
+    # single shared `entries` list; that list no longer exists now that
+    # each entry is pushed individually (see this function's docstring).
 
     update_health_information_session(
         transaction_id,
@@ -197,6 +290,20 @@ async def process_health_information_request(
         hip_id = headers.get("x-hip-id")
         transaction_id = body.get("transactionId")
 
+        if already_processed(_IDEMPOTENCY_SCOPE, request_id):
+            log_phase(f"REQUEST-ID {request_id} already processed for health_information_request -- treating as a replay, re-acking but skipping a second encrypt+push+notify cycle.")
+            response = await asyncio.to_thread(
+                send_on_health_information_request,
+                transaction_id=transaction_id,
+                request_id=request_id,
+            )
+            log_api_call("Acknowledging Data Request to ABDM (replay)", "POST .../hip/on-request", response.status_code)
+            if response.status_code != 200:
+                print_api_response(response)
+            return
+
+        mark_processed(_IDEMPOTENCY_SCOPE, request_id)
+
         hi_request = body.get("hiRequest",{})
         consent_id = (hi_request.get("consent", {}).get("id"))
         date_range = hi_request.get("dateRange",{})
@@ -213,13 +320,55 @@ async def process_health_information_request(
         if consent is None:
             log_error(f"No stored consent artifact found for consentId={consent_id} -- cannot build records (was it ever GRANTED?).")
         else:
+            # MALFORMED-SHAPE GUARD (edge-case-review pass, tracker case
+            # M2-16): the OLD code assumed consent.get("care_contexts", [])
+            # is always a list of dicts. A corrupted/hand-edited stored
+            # consent record (or a future write-side bug) with
+            # care_contexts stored as None, a string, a dict, or a list
+            # containing non-dict entries would raise an unhandled
+            # AttributeError/TypeError here -- caught by this function's
+            # outer try/except, but only AFTER mark_processed() already
+            # ran and BEFORE send_on_health_information_request() ever
+            # fires, so ABDM never gets an ack at all and just sees a
+            # silent timeout, with nothing but a log line as evidence.
+            # Normalizing defensively here (same "log clearly, treat as
+            # empty rather than crash" shape as the M1-10/M1-12 guards in
+            # login_runner.py) lets processing continue far enough to
+            # still send ABDM a proper ack -- with zero care contexts if
+            # the stored record is unusable, rather than none at all.
+            stored_care_contexts = consent.get("care_contexts")
+            if not isinstance(stored_care_contexts, list):
+                if stored_care_contexts is not None:
+                    log_error(
+                        f"Stored consent {consent_id} has a malformed 'care_contexts' field "
+                        f"(expected a list, got {type(stored_care_contexts).__name__}: "
+                        f"{stored_care_contexts!r}) -- treating as no approved care contexts "
+                        f"rather than crashing."
+                    )
+                stored_care_contexts = []
+
             care_context_references = [
                 care_context.get("careContextReference")
-                for care_context in consent.get("care_contexts", [])
-                if care_context.get("careContextReference")
+                for care_context in stored_care_contexts
+                if isinstance(care_context, dict) and care_context.get("careContextReference")
             ]
-            with time_block("bundle_assembly", transaction_id=transaction_id):
-                fhir_bundles = build_bundles_for_care_contexts(care_context_references, date_range=date_range)
+
+            # Off the event loop thread (tracker case M2-6): building the
+            # FHIR bundles for every approved care context is real
+            # CPU-bound work (reading/serializing potentially many large
+            # records/attachments), previously run directly inline in
+            # this async handler -- blocking the single uvicorn worker's
+            # event loop, and every other in-flight request on this
+            # server, for however long assembly takes. Same fix pattern
+            # as M2-5 (health_information_hiu_push_service.py's
+            # _decrypt_entries()) -- the whole timed block moves to a
+            # worker thread as one unit so time_block()'s own timing
+            # still wraps the real work being measured.
+            def _assemble_bundles():
+                with time_block("bundle_assembly", transaction_id=transaction_id):
+                    return build_bundles_for_care_contexts(care_context_references, date_range=date_range)
+
+            fhir_bundles = await asyncio.to_thread(_assemble_bundles)
             log_phase(f"Assembled {len(fhir_bundles)} FHIR record(s) for the approved care context(s)")
 
         session_data = {

@@ -5,7 +5,7 @@ Contains APIs for OTP requests and ABHA enrollment workflows.
 
 import requests
 from server.config import ABHA_BASE_URL
-from server.utils import generate_request_id, generate_timestamp, get_gateway_token
+from server.utils import generate_request_id, generate_timestamp, get_gateway_token, call_with_retry
 from server.callbacks.utils.flow_logger import log_error
 from server.callbacks.utils.api_capture import record_call
 
@@ -19,9 +19,41 @@ def _post(url, headers, payload, action_description):
     since callers of these functions expect to inspect response.status_code
     themselves (e.g. a non-200 OTP response is an expected, handled case,
     not an exceptional one).
+
+    RETRY: category 2 (transient/retryable) here is ONLY a connection
+    error/timeout, or a 5xx/429/408 response -- see
+    server/utils.py's call_with_retry(). This module never calls
+    raise_for_status(), so ABDM's own "wrong OTP"/validation-error shapes
+    (category 1: user-input error) always come back as a normal 200/400
+    response, not an exception -- those are NOT transient by the default
+    classifier and are returned on the first attempt exactly as before,
+    completely untouched. In particular, the wrong-OTP-retry loop in
+    tools/m1_test_suite/login_runner.py (verify_login_otp(), which
+    re-prompts the user based on response.status_code/authResult) never
+    sees a difference: it only ever gets called after _post() has already
+    settled on a final response, transient or not.
+
+    IDEMPOTENCY (unconfirmed, flagged per the retry-logic spec rather
+    than assumed): several of this module's endpoints consume a
+    single-use txnId/OTP (enroll_by_aadhaar, verify_otp,
+    verify_mobile_linking_otp). If a connection error/timeout happens
+    AFTER ABDM actually received and processed the request but BEFORE we
+    saw the response, our retry resubmits the same txnId/OTP a second
+    time. Whether ABDM's real sandbox treats a same-txnId resubmission as
+    safe (idempotent no-op / same result) or rejects it (e.g. "OTP
+    already used") is NOT confirmed anywhere in this codebase's docs or
+    comments -- flagging this explicitly, matching this codebase's own
+    convention (see server/auth.py's update_bridge_url() docstring) for
+    an unconfirmed-but-documented assumption, rather than guessing either
+    way. Only matters for the network-exception path -- a same-OTP retry
+    caused by ABDM returning a 5xx/429/408 (a response we DID receive)
+    is not this ambiguity, since we know ABDM never accepted that attempt.
     """
     try:
-        response = requests.post(url=url, headers=headers, json=payload, timeout=30)
+        response = call_with_retry(
+            lambda: requests.post(url=url, headers=headers, json=payload, timeout=30),
+            description=action_description,
+        )
     except requests.exceptions.RequestException as exc:
         record_call(
             label=action_description,
@@ -462,11 +494,17 @@ def get_resource(
 
     resource_label = f"get-resource ({action}{'/' + resource if resource else ''})"
 
+    # RETRY: category 2 is a connection error/timeout or a 5xx/429/408
+    # response -- see call_with_retry(). Read-only GET (profile/QR/card
+    # download) -- trivially safe to retry.
     try:
-        response = requests.get(
-            url=url,
-            headers=headers,
-            timeout=30,
+        response = call_with_retry(
+            lambda: requests.get(
+                url=url,
+                headers=headers,
+                timeout=30,
+            ),
+            description=resource_label,
         )
     except requests.exceptions.RequestException as exc:
         record_call(

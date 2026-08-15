@@ -8,7 +8,20 @@ from server.callbacks.services.otp_service import verify_otp
 from server.linking import send_on_confirm
 from server.utils import print_api_response
 from server.callbacks.repository.patient_identity_repository import get_patient_identity
+from server.callbacks.utils.idempotency import already_processed, mark_processed
 from server.callbacks.utils.flow_logger import log_phase, log_api_call, log_error
+
+# See server/callbacks/utils/idempotency.py's own docstring, and
+# consent_notify_service.py's use of the same pattern (tracker case
+# M2-9) -- this closes the sibling case M2-11 ("sending the same 'link
+# confirmed' message twice creates duplicate linked records"). On a
+# detected replay this skips re-verifying the OTP and re-triggering
+# send_on_confirm() entirely rather than attempting to resend an
+# identical ack -- the first, genuine processing already sent ABDM its
+# on-confirm; running verify_otp()/search_patient()/send_on_confirm()
+# a second time for the same message is exactly the duplicate-work this
+# guard exists to prevent.
+_IDEMPOTENCY_SCOPE = "link_confirm"
 
 
 async def process_link_confirm(callback_data):
@@ -23,6 +36,12 @@ async def process_link_confirm(callback_data):
         request_id = headers.get("request-id")
         otp = confirmation.get("token")
         link_reference_number = confirmation.get("linkRefNumber")
+
+        if already_processed(_IDEMPOTENCY_SCOPE, request_id):
+            log_phase(f"REQUEST-ID {request_id} already processed for link_confirm -- treating as a replay, skipping re-verification and re-confirmation.")
+            return
+
+        mark_processed(_IDEMPOTENCY_SCOPE, request_id)
 
         session = get_link_session(link_reference_number)
 
