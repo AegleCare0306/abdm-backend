@@ -20,6 +20,21 @@ from pathlib import Path
 
 import requests
 
+from server.config import DATABASE_URL
+from server.db import init_engine
+
+# P17 -- this CLI runs as its own OS process, separate from the FastAPI
+# server, and never goes through server/main.py's own startup -- so it
+# must initialise repo/'s DB engine itself, before hip_linking.py's own
+# imports (link_token_repository/patient_link_token_repository/
+# care_context_link_repository/care_context_notify_repository/
+# link_repository -- P17's own migration) can work. Mirrors
+# tools/m3_test_suite/common.py's own P16 fix exactly -- same
+# DATABASE_URL source, same idempotent init_engine() call, same
+# reasoning (see server/db.py's own docstring for why this can't just
+# reach into a host app's already-bootstrapped engine instead).
+init_engine(DATABASE_URL)
+
 from server.callbacks.repository.patient_repository import search_patient
 
 # tools/m2_test_suite/common.py -> parents[2] is the repo root. Resolved

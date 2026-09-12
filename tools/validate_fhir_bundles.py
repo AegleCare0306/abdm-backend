@@ -30,7 +30,6 @@ check against ABDM's real sandbox validator -- you should still run a
 sample of these through ABDM's actual validator before going live.
 """
 
-import csv
 import sys
 import json
 from pathlib import Path
@@ -38,7 +37,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from dummy_emr.config import MASTER_OUTPUT_FOLDER, TRANSACTION_OUTPUT_FOLDER
+from server.config import DATABASE_URL
+from server.db import init_engine
+
+init_engine(DATABASE_URL)
+
+from server.callbacks.repository import dummy_emr_repository as repository
 
 from server.fhir_builders.patient import build_patient
 from server.fhir_builders.practitioner import build_practitioner
@@ -52,14 +56,6 @@ from server.fhir_builders.diagnostic_report import build_diagnostic_report
 from server.fhir_builders.immunization import build_immunization
 
 
-def load_csv(folder, filename):
-    path = Path(folder) / filename
-    if not path.exists():
-        return None
-    with open(path, newline="", encoding="utf-8") as f:
-        return list(csv.DictReader(f))
-
-
 def run_builder_over_rows(label, rows, build_fn, sample_output_path):
     """
     Runs build_fn(row) for every row and reports pass/fail per row.
@@ -68,8 +64,8 @@ def run_builder_over_rows(label, rows, build_fn, sample_output_path):
     rather than just trust the PASS line.
     """
 
-    if rows is None:
-        print(f"[FAIL] {label}: source CSV not found -- run generate_dummy_emr.py first")
+    if not rows:
+        print(f"[FAIL] {label}: no rows found -- run generate_dummy_emr.py first")
         return False
 
     failures = []

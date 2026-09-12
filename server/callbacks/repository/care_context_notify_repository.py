@@ -17,29 +17,33 @@ outbound notify_care_context_update() call and read back if a retry is
 needed.
 
 Current Implementation:
-    - File-backed JSON storage under storage/pending_care_context_notifies.json
-      (via server/callbacks/utils/json_file_store.py), same pattern as
-      the other pending-session stores in this codebase.
-    - Still not appropriate for real concurrent writers -- see
-      json_file_store.py's own docstring.
-    - Contains real link tokens and ABHA addresses -- gitignored, same
-      as the other file-backed stores.
+    - Postgres, via server/db.py + server/db_models.py:PendingCareContextNotify
+      (P17, 2026-09-07) -- moved off the prior file-backed
+      storage/pending_care_context_notifies.jsonl. See
+      hiu_consent_repository.py's own banner for the full P16/P17 story.
+    - Every function's name, signature, and return contract is
+      byte-for-byte identical to the file-backed version -- no caller
+      outside this file needed to change.
 
-Future Implementation:
-    - Redis
-    - PostgreSQL
-    - MongoDB
+Prior Implementation (superseded, see storage/pending_care_context_notifies.jsonl
+-- kept as an inert audit trail, not the live source of truth anymore):
+    - File-backed JSON storage (via server/callbacks/utils/json_file_store.py),
+      same pattern as the other pending-session stores in this codebase.
 """
 
-from server.callbacks.utils.json_file_store import set_key, get_key, delete_key
+from sqlalchemy import func
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 
-_STORE_FILE = "pending_care_context_notifies.jsonl"
+from server.db import session_scope
+from server.db_models import PendingCareContextNotify
 
 
 def save_pending_care_context_notify(request_id, session_data):
     """
     Saves a pending Notify Care Context Update request using the
-    REQUEST-ID sent to ABDM as the key.
+    REQUEST-ID sent to ABDM as the key. Upsert -- always overwrites any
+    existing row for this request_id, same "no merge" contract the
+    file-backed set_key() had.
 
     Args:
         request_id (str): REQUEST-ID header value sent with the
@@ -50,8 +54,13 @@ def save_pending_care_context_notify(request_id, session_data):
     Returns:
         None
     """
-
-    set_key(_STORE_FILE, request_id, session_data)
+    with session_scope() as session:
+        stmt = pg_insert(PendingCareContextNotify).values(request_id=request_id, data=session_data)
+        stmt = stmt.on_conflict_do_update(
+            index_elements=[PendingCareContextNotify.request_id],
+            set_={"data": stmt.excluded.data, "updated_at": func.now()},
+        )
+        session.execute(stmt)
 
 
 def get_pending_care_context_notify(request_id):
@@ -65,8 +74,13 @@ def get_pending_care_context_notify(request_id):
     Returns:
         dict | None
     """
-
-    return get_key(_STORE_FILE, request_id)
+    with session_scope() as session:
+        row = (
+            session.query(PendingCareContextNotify)
+            .filter(PendingCareContextNotify.request_id == request_id)
+            .one_or_none()
+        )
+        return row.data if row is not None else None
 
 
 def delete_pending_care_context_notify(request_id):
@@ -80,5 +94,10 @@ def delete_pending_care_context_notify(request_id):
     Returns:
         bool
     """
-
-    return delete_key(_STORE_FILE, request_id)
+    with session_scope() as session:
+        deleted = (
+            session.query(PendingCareContextNotify)
+            .filter(PendingCareContextNotify.request_id == request_id)
+            .delete()
+        )
+        return deleted > 0

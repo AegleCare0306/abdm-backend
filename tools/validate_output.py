@@ -1,20 +1,21 @@
 """
 validate_output.py
 
-Standalone validation script for the Dummy EMR CSV output.
+Standalone validation script for the dummy EMR fixture data.
 
 WHAT THIS DOES
 --------------
 After running `generate_dummy_emr.py`, run this script to check that the
-generated CSVs (in server/data/master and server/data/transaction) are
-internally consistent and clinically sensible. It does NOT regenerate
-any data — it only reads and checks what's already on disk.
+generated data (in Postgres -- see server/callbacks/repository/
+dummy_emr_repository.py) is internally consistent and clinically
+sensible. It does NOT regenerate any data — it only reads and checks
+what's already in the database.
 
 HOW TO RUN
 ----------
     cd tools
-    python3 generate_dummy_emr.py     # generate/refresh the CSVs first
-    python3 validate_output.py        # then validate them
+    python3 generate_dummy_emr.py     # generate/refresh the data first
+    python3 validate_output.py        # then validate it
 
 HOW TO READ THE OUTPUT
 -----------------------
@@ -32,36 +33,24 @@ exists and gives a worked example, so this file also serves as a reference
 for anyone new to the project on what "correct" output looks like.
 """
 
-import csv
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from dummy_emr.config import MASTER_OUTPUT_FOLDER, TRANSACTION_OUTPUT_FOLDER
+from server.config import DATABASE_URL
+from server.db import init_engine
+
+init_engine(DATABASE_URL)
+
+from server.callbacks.repository import dummy_emr_repository as repository
 from dummy_emr.case_library import CLINICAL_CASES
 from dummy_emr.master_data.diagnoses import DIAGNOSES
 from dummy_emr.master_data.medications import MEDICATIONS
 from dummy_emr.master_data.lab_tests import LAB_TESTS
 from dummy_emr.master_data.procedures import PROCEDURES
 from dummy_emr.master_data.vaccines import VACCINES
-
-
-# ---------------------------------------------------------------------------
-# CSV loading helpers
-# ---------------------------------------------------------------------------
-
-def load_csv(folder, filename):
-    """Reads a CSV into a list of dicts. Returns [] if the file is missing
-    (the relevant check will report that explicitly rather than crashing)."""
-
-    path = Path(folder) / filename
-
-    if not path.exists():
-        return None
-
-    with open(path, newline="", encoding="utf-8") as f:
-        return list(csv.DictReader(f))
 
 
 class Result:
@@ -77,46 +66,27 @@ class Result:
 # Individual checks
 # ---------------------------------------------------------------------------
 
-def check_all_files_exist():
+def check_all_tables_populated(data):
     """
     WHY: If generate_dummy_emr.py silently failed partway through (e.g. an
-    exception after some writes), some CSVs might be missing entirely.
+    exception after some writes), some tables might be empty entirely.
     This check catches that before any of the other checks even run.
 
-    EXAMPLE: if 'billing.csv' is missing, this fails with
-    "missing: billing.csv" instead of every downstream check crashing
-    with a confusing FileNotFoundError.
+    EXAMPLE: if 'billing' has zero rows, this fails with "empty: billing"
+    instead of every downstream check crashing on missing data.
     """
 
-    expected_master = [
-        "organizations.csv",
-        "practitioners.csv",
-        "practitioner_organizations.csv",
-        "patients.csv",
-    ]
-    expected_transaction = [
-        "encounters.csv",
-        "conditions.csv",
-        "observations.csv",
-        "medication_requests.csv",
-        "diagnostic_reports.csv",
-        "procedures.csv",
-        "documents.csv",
-        "immunizations.csv",
-        "billing.csv",
+    expected_nonempty = [
+        "organizations", "practitioners", "practitioner_organizations", "patients",
+        "encounters", "conditions", "observations", "medication_requests",
+        "diagnostic_reports", "procedures", "documents", "immunizations", "billing",
     ]
 
-    missing = []
-    for filename in expected_master:
-        if not (Path(MASTER_OUTPUT_FOLDER) / filename).exists():
-            missing.append(filename)
-    for filename in expected_transaction:
-        if not (Path(TRANSACTION_OUTPUT_FOLDER) / filename).exists():
-            missing.append(filename)
+    empty = [name for name in expected_nonempty if not data[name]]
 
-    if missing:
-        return Result(False, f"missing: {', '.join(missing)}")
-    return Result(True, f"all {len(expected_master) + len(expected_transaction)} CSVs present")
+    if empty:
+        return Result(False, f"empty: {', '.join(empty)}")
+    return Result(True, f"all {len(expected_nonempty)} tables populated")
 
 
 def check_encounter_references_resolve(data):
@@ -563,13 +533,9 @@ def check_empty_reference_lists_produce_no_rows(data):
 # Runner
 # ---------------------------------------------------------------------------
 
-# Checks that only need the file-existence check (no CSV data required)
-STANDALONE_CHECKS = [
-    ("Output files exist", check_all_files_exist),
-]
-
-# Checks that need the loaded CSV data passed in
+# Checks that need the loaded data passed in
 DATA_CHECKS = [
+    ("All tables populated", check_all_tables_populated),
     ("Encounter references resolve", check_encounter_references_resolve),
     ("Patient references resolve", check_patient_references_resolve),
     ("Diagnosis references resolve", check_diagnosis_references_resolve),
@@ -588,30 +554,24 @@ DATA_CHECKS = [
 
 def main():
 
-    print("\nValidating Dummy EMR output...\n")
+    print("\nValidating dummy EMR output...\n")
 
     results = []
 
-    for name, check_fn in STANDALONE_CHECKS:
-        result = check_fn()
-        results.append((name, result))
-
-    # If files are missing, don't bother running the data checks —
-    # they'd all crash trying to read nonexistent files.
-    if not results[0][1].passed:
-        _print_results(results)
-        sys.exit(1)
-
     data = {
-        "encounters": load_csv(TRANSACTION_OUTPUT_FOLDER, "encounters.csv"),
-        "conditions": load_csv(TRANSACTION_OUTPUT_FOLDER, "conditions.csv"),
-        "observations": load_csv(TRANSACTION_OUTPUT_FOLDER, "observations.csv"),
-        "medication_requests": load_csv(TRANSACTION_OUTPUT_FOLDER, "medication_requests.csv"),
-        "diagnostic_reports": load_csv(TRANSACTION_OUTPUT_FOLDER, "diagnostic_reports.csv"),
-        "procedures": load_csv(TRANSACTION_OUTPUT_FOLDER, "procedures.csv"),
-        "documents": load_csv(TRANSACTION_OUTPUT_FOLDER, "documents.csv"),
-        "immunizations": load_csv(TRANSACTION_OUTPUT_FOLDER, "immunizations.csv"),
-        "billing": load_csv(TRANSACTION_OUTPUT_FOLDER, "billing.csv"),
+        "organizations": repository.get_all_organizations(),
+        "practitioners": repository.get_all_practitioners(),
+        "practitioner_organizations": repository.get_practitioner_organizations(),
+        "patients": repository.get_all_patients(),
+        "encounters": repository.get_all_encounters(),
+        "conditions": repository.get_all_conditions(),
+        "observations": repository.get_all_observations(),
+        "medication_requests": repository.get_all_medication_requests(),
+        "diagnostic_reports": repository.get_all_diagnostic_reports(),
+        "procedures": repository.get_all_procedures(),
+        "documents": repository.get_all_documents(),
+        "immunizations": repository.get_all_immunizations(),
+        "billing": repository.get_all_billing(),
     }
 
     for name, check_fn in DATA_CHECKS:

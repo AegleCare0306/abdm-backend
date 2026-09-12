@@ -46,6 +46,7 @@ from server.abha import search_abha_by_mobile
 
 from tools.m1_test_suite.common import (
     prompt,
+    prompt_digits,
     encrypt,
     print_header,
     print_info,
@@ -72,7 +73,7 @@ def _search_and_select():
     doc, an empty result is a normal "no account found" outcome, not an
     error, so it's reported via print_info() rather than report_failure().
     """
-    mobile_number = prompt("Mobile number (10 digits, no spaces/dashes)")
+    mobile_number = prompt_digits("Mobile number (10 digits, no spaces/dashes)", 10, "Mobile number")
 
     print_info("Searching for ABHA accounts linked to this mobile number...")
     response = search_abha_by_mobile(

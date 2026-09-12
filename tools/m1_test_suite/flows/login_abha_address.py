@@ -16,6 +16,7 @@ either of these.
 """
 
 from tools.m1_test_suite.login_runner import run_login_variant
+from tools.m1_test_suite.common import prompt_abha_address
 
 ACTION = "phr/web/login/abha"
 LOGIN_HINT = "abha-address"
@@ -31,6 +32,7 @@ def run_abha_registered_mobile():
         scope=["abha-address-login", "mobile-verify"],
         login_hint=LOGIN_HINT,
         otp_system="abdm",
+        identifier_validator=lambda: prompt_abha_address(IDENTIFIER_LABEL),
     )
 
 
@@ -43,4 +45,5 @@ def run_aadhaar_registered_mobile():
         scope=["abha-address-login", "aadhaar-verify"],
         login_hint=LOGIN_HINT,
         otp_system="aadhaar",
+        identifier_validator=lambda: prompt_abha_address(IDENTIFIER_LABEL),
     )

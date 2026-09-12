@@ -16,6 +16,8 @@ from server.healthinformation import send_health_information_notify
 from server.utils import print_api_response, generate_timestamp, generate_safe_past_timestamp
 from server.callbacks.repository.pending_health_information_request_repository import (
     get_pending_health_information_request_by_transaction_id,
+    get_unlinked_pending_health_information_requests,
+    link_transaction_id,
 )
 from server.callbacks.repository.hiu_health_information_repository import (
     save_hiu_health_information,
@@ -148,6 +150,135 @@ def _decrypt_entries(entries, authorized_care_context_refs, consent_id, hip_publ
     return care_contexts
 
 
+_PENDING_LOOKUP_RETRY_ATTEMPTS = 5
+_PENDING_LOOKUP_RETRY_DELAY_SECONDS = 1
+
+
+async def _find_pending_request_for_push(transaction_id, push_care_context_refs):
+    """
+    Resolves the pending Health Information Request session a data push
+    belongs to, tolerating the on-request ack (which normally supplies
+    this correlation -- see link_transaction_id()'s own docstring) either
+    arriving late, or not arriving at all.
+
+    CONFIRMED LIVE (2026-09-03): a real push arrived and decrypted
+    successfully (checked manually afterward) for a transactionId whose
+    on-request callback never showed up in this server's own capture
+    logs AT ALL, the entire time the server was up -- not just "hadn't
+    arrived yet" at the moment the push landed. The OLD code treated "no
+    linked session yet" as "this push is unusable" and dropped it,
+    silently discarding real, successfully-decryptable patient data with
+    nothing but one log line.
+
+    THREE-STAGE FALLBACK, in this order (the third stage added the SAME
+    day, after the second one's own "exactly one candidate" bar turned
+    out to be unmet in the very next real scenario -- see below):
+      1. RETRY the normal by-transactionId lookup a few times, a short
+         delay apart -- covers genuine lateness (the ack is still in
+         flight and arrives moments after the push).
+      2. If still unresolved, fall back to whichever pending session has
+         NOT yet been linked to any transactionId (see
+         get_unlinked_pending_health_information_requests()) -- but only
+         if there is EXACTLY ONE such candidate, so this stays a
+         confident match, not a guess.
+      3. CONFIRMED LIVE, same day: stage 2's "exactly one" bar is never
+         met once discover_self_view_consents() is doing its job --
+         three Health Information Requests now legitimately run
+         concurrently (one per linked HIP, all still waiting on their own
+         never-arriving ack), so stage 2 always finds 3 unlinked
+         candidates and always refuses, right back to a dropped push,
+         just with a clearer log line. This stage looks at what the push
+         actually CONTAINS -- the careContextReference(s) in its own
+         entries -- and matches it against each unlinked candidate's own
+         AUTHORIZED careContexts, read from hiu_consent_repository's
+         consent_detail.careContexts (the exact same field the consent-
+         scope check further down this module already trusts as the
+         source of truth for what a consent covers). If exactly one
+         candidate's authorized set is a superset of this push's
+         careContextReferences, that's a confident, content-based match
+         -- each HIU consent's own careContexts are HIP/care-context
+         specific, so two concurrent pulls covering genuinely different
+         care contexts don't collide here even though they collide on
+         "how many are pending." Still refuses if zero or more than one
+         candidate matches -- same "don't guess" discipline as stage 2.
+
+    On a successful fallback match (stage 2 or 3), permanently records
+    the correlation via link_transaction_id() -- the SAME call the
+    on-request handler itself makes -- so this transactionId resolves
+    normally on any later lookup (e.g. a retried/duplicate push for the
+    same transaction), exactly as if the ack HAD arrived and been
+    processed normally.
+
+    Args:
+        transaction_id: ABDM's transactionId from this push.
+        push_care_context_refs: set of careContextReference values
+            present in this push's own entries -- used only by stage 3,
+            ignored (harmlessly) if stage 1 or 2 already resolved it.
+
+    Returns:
+        dict | None: the resolved pending session (already carrying
+            transaction_id), or None if no safe match could be made --
+            the caller logs nothing further in that case, since every
+            path through here already logs its own specific reason.
+    """
+    for attempt in range(_PENDING_LOOKUP_RETRY_ATTEMPTS):
+        pending = get_pending_health_information_request_by_transaction_id(transaction_id)
+        if pending is not None:
+            return pending
+        if attempt < _PENDING_LOOKUP_RETRY_ATTEMPTS - 1:
+            await asyncio.sleep(_PENDING_LOOKUP_RETRY_DELAY_SECONDS)
+
+    unlinked = get_unlinked_pending_health_information_requests()
+
+    if len(unlinked) == 1:
+        (request_id, session), = unlinked.items()
+        log_error(
+            f"No on-request ack ever linked transactionId {transaction_id} (retried "
+            f"{_PENDING_LOOKUP_RETRY_ATTEMPTS} times) -- falling back to the sole unlinked pending "
+            f"request ({request_id}) as a best-effort match."
+        )
+        return link_transaction_id(request_id, transaction_id)
+
+    if len(unlinked) > 1:
+        matches = []
+        if push_care_context_refs:
+            for request_id, session in unlinked.items():
+                consent = get_hiu_consent(session.get("consent_id"))
+                if consent is None:
+                    continue
+                authorized_refs = {
+                    cc.get("careContextReference")
+                    for cc in (consent.get("consent_detail") or {}).get("careContexts", [])
+                    if cc.get("careContextReference")
+                }
+                if push_care_context_refs.issubset(authorized_refs):
+                    matches.append(request_id)
+
+        if len(matches) == 1:
+            request_id = matches[0]
+            log_error(
+                f"No on-request ack ever linked transactionId {transaction_id}, and {len(unlinked)} "
+                f"unlinked requests are in flight at once -- matched by care context instead "
+                f"({request_id} is the only pending request authorized for "
+                f"{sorted(push_care_context_refs)})."
+            )
+            return link_transaction_id(request_id, transaction_id)
+
+        log_error(
+            f"No pending health information request found for transactionId {transaction_id} after "
+            f"{_PENDING_LOOKUP_RETRY_ATTEMPTS} retries, {len(unlinked)} unlinked requests are in "
+            f"flight at once, and care-context matching found {len(matches)} candidate(s) (need "
+            f"exactly 1) -- refusing to guess which one this push belongs to."
+        )
+    else:
+        log_error(
+            f"No pending health information request found for transactionId {transaction_id} after "
+            f"{_PENDING_LOOKUP_RETRY_ATTEMPTS} retries -- none pending at all."
+        )
+
+    return None
+
+
 async def process_health_information_hiu_push(callback_data):
     """
     Confirmed inbound body shape (Postman collection, mirror image of
@@ -219,10 +350,10 @@ async def process_health_information_hiu_push(callback_data):
             log_error("Data push payload missing transactionId -- cannot correlate to a pending health information request.")
             return
 
-        pending = get_pending_health_information_request_by_transaction_id(transaction_id)
+        push_care_context_refs = {e.get("careContextReference") for e in entries if e.get("careContextReference")}
+        pending = await _find_pending_request_for_push(transaction_id, push_care_context_refs)
 
         if pending is None:
-            log_error(f"No pending health information request found for transactionId {transaction_id}.")
             return
 
         our_key_material = pending.get("key_material") or {}

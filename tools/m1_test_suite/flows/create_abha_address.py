@@ -33,8 +33,25 @@ def run():
         return {"abha_address": None, "txn_id": None}
 
     desired_address = prompt('Desired ABHA Address (e.g. "yourname" -- becomes "yourname@sbx")')
-    preferred_input = prompt("Make this the preferred ABHA Address? (Y/n)")
-    preferred = 0 if preferred_input.strip().lower() in ("n", "no") else 1
+
+    # Y/N INPUT-VALIDATION GUARD (tracker case M1-41, fixed 2026-08-17):
+    # the OLD code only recognized "n"/"no" as a "no" answer and treated
+    # ANYTHING else -- including "0", which a reasonable person would read
+    # as a false-y "no" -- as "yes". Confirmed via a live run: typing "0"
+    # at this prompt still set preferred=1, silently changing a real
+    # account setting the user did not actually agree to. Now an explicit
+    # allowlist for both "yes" and "no" spellings, with anything else
+    # re-prompted instead of guessed at -- same allowlist-over-best-effort
+    # standard already applied to Aadhaar/OTP/ABHA-Address input.
+    while True:
+        preferred_input = prompt("Make this the preferred ABHA Address? (Y/n)").strip().lower()
+        if preferred_input in ("", "y", "yes"):
+            preferred = 1
+            break
+        if preferred_input in ("n", "no"):
+            preferred = 0
+            break
+        print_failure(f'"{preferred_input}" is not a valid answer -- please enter Y or n.')
 
     print_info(f"Creating ABHA Address '{desired_address}' (preferred={preferred})...")
     response = create_abha_address(

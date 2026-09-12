@@ -13,7 +13,9 @@ from datetime import datetime, timezone
 from server.hiu_health_information import (
     initiate_health_information_request,
     validate_date_range_against_consent,
+    validate_consent_is_active,
     DateRangeValidationError,
+    ConsentNotActiveError,
 )
 from server.callbacks.repository.hiu_health_information_repository import get_hiu_health_information
 from server.utils import print_api_response
@@ -52,6 +54,21 @@ def run_initiate_health_information_request():
     hiu_id = (consent_detail.get("hiu") or {}).get("id")
     hip_id = (consent_detail.get("hip") or {}).get("id")
     consent_date_range = (consent_detail.get("permission") or {}).get("dateRange") or {}
+
+    # BUG FIX (Aayush, 2026-09-02): checked here too, not just inside
+    # initiate_health_information_request() itself -- select_granted_consent()
+    # now filters out revoked/expired consents at listing time (see
+    # consent_hiu_notify_service.py's own fix), but this closes the small
+    # remaining window where a consent gets revoked AFTER this menu was
+    # built but BEFORE the user finishes picking a date range below. A
+    # date-range re-prompt loop can't fix a dead consent, so this is
+    # checked once, up front, not folded into that loop.
+    try:
+        validate_consent_is_active(consent_id)
+    except ConsentNotActiveError as exc:
+        print_failure(str(exc))
+        print_info("This consent was likely revoked or expired after this menu was built -- rerun this flow to see an up-to-date list.")
+        return None
 
     now = datetime.now(timezone.utc)
 

@@ -200,12 +200,37 @@ def run_link_token_and_care_context():
         print_info("Is the server running? Is the ngrok tunnel up? Did ABDM actually receive the original call?")
         return {"hip_id": hip_id, "abha_address": patient["abha_address"]}
 
-    link_token = generate_token_entry.get("request_body", {}).get("linkToken")
+    callback_body = generate_token_entry.get("request_body", {})
+    link_token = callback_body.get("linkToken")
+    callback_error = callback_body.get("error")
 
     if link_token:
         print_success(f"linkToken received (length {len(link_token)}).")
+    elif isinstance(callback_error, dict) and (callback_error.get("message") or callback_error.get("code")):
+        # ABDM's on-generate-token callback can carry a real, specific
+        # failure (e.g. ABDM-1207 "does not match the details on record
+        # with Aadhaar" -- a demographic mismatch between what we sent and
+        # what ABDM/Aadhaar has on file for this ABHA) instead of a
+        # linkToken. The old code here only ever checked for linkToken and
+        # printed a generic "missing/empty" message on anything else,
+        # silently swallowing this -- confirmed 2026-09-02 when diagnosing
+        # a real HIP-Initiated-Linking failure required digging through
+        # raw api_capture JSONL to find this exact error. Surfacing it
+        # directly here means a future failure like this is diagnosable
+        # from the CLI's own output, no log dig required.
+        code = (callback_error.get("code") or "").strip() or "(no code)"
+        message = callback_error.get("message") or "(no message)"
+        print_failure(f"ABDM rejected the link token request: {code} -- {message}")
+        log_response("on-generate-token callback", generate_token_entry)
+        print_info("Not waiting for on_carecontext -- no linkToken means care-context linking was never triggered server-side.")
+        return {
+            "hip_id": hip_id,
+            "abha_address": patient["abha_address"],
+            "link_token_present": False,
+            "generate_token_error": callback_error,
+        }
     else:
-        print_failure("Callback arrived but linkToken is missing/empty.")
+        print_failure("Callback arrived but linkToken is missing/empty, and no error field was present either -- inspect the raw callback body below.")
 
     log_response("on-generate-token callback", generate_token_entry)
 

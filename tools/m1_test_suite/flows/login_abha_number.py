@@ -22,10 +22,11 @@ X-Token. Do not collapse this with login_mobile.py's handling.
 """
 
 from tools.m1_test_suite.login_runner import run_login_variant
+from tools.m1_test_suite.common import prompt_abha_number
 
 ACTION = "profile/login"
 LOGIN_HINT = "abha-number"
-IDENTIFIER_LABEL = "ABHA Number (e.g. 91-1234-5678-9012)"
+IDENTIFIER_LABEL = "ABHA Number (14 digits -- dashes/spaces OK, e.g. 91-1234-5678-9012)"
 
 
 def run_aadhaar_registered_mobile():
@@ -37,6 +38,7 @@ def run_aadhaar_registered_mobile():
         scope=["abha-login", "aadhaar-verify"],
         login_hint=LOGIN_HINT,
         otp_system="aadhaar",
+        identifier_validator=lambda: prompt_abha_number(IDENTIFIER_LABEL),
     )
 
 
@@ -49,4 +51,5 @@ def run_abha_registered_mobile():
         scope=["abha-login", "mobile-verify"],
         login_hint=LOGIN_HINT,
         otp_system="abdm",
+        identifier_validator=lambda: prompt_abha_number(IDENTIFIER_LABEL),
     )

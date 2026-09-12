@@ -1,23 +1,23 @@
 """
 generate_fhir_bundles.py
 
-Reads the generated CSVs (master + transaction) and assembles one FHIR R4
-document Bundle per encounter, writing each to server/data/fhir/<encounter_reference>.json
+Reads the dummy EMR fixture data from Postgres (master + transaction
+tables) and assembles one FHIR R4 document Bundle per encounter, writing
+each to server/data/fhir/<encounter_reference>.json
 
-This script is dummy-data-specific glue: it knows about CSV column names
-and file layout, which the tools/ folder won't need once real EMR data
+This script is dummy-data-specific glue: it knows about the dummy EMR's
+own row shapes, which the tools/ folder won't need once real EMR data
 exists. The actual resource-construction logic it calls (server/fhir_builders/)
 is the permanent, reusable part -- this script is just today's plumbing
-from CSV rows to that logic.
+from those rows to that logic.
 
 HOW TO RUN
 ----------
     cd tools
-    python generate_dummy_emr.py         # make sure CSVs exist and are current
+    python generate_dummy_emr.py         # make sure the DB fixture data exists and is current
     python generate_fhir_bundles.py
 """
 
-import csv
 import json
 import sys
 from pathlib import Path
@@ -25,7 +25,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from dummy_emr.config import MASTER_OUTPUT_FOLDER, TRANSACTION_OUTPUT_FOLDER
+from server.config import DATABASE_URL
+from server.db import init_engine
+
+init_engine(DATABASE_URL)
+
+from server.callbacks.repository import dummy_emr_repository as repository
 from dummy_emr.case_library import CLINICAL_CASES
 
 from server.fhir_builders.patient import build_patient
@@ -45,12 +50,6 @@ from server.fhir_builders.bundle import build_bundle
 FHIR_OUTPUT_FOLDER = Path(__file__).resolve().parents[1] / "server" / "data" / "fhir"
 
 
-def load_csv(folder, filename):
-    path = Path(folder) / filename
-    with open(path, newline="", encoding="utf-8") as f:
-        return list(csv.DictReader(f))
-
-
 def group_by(rows, key):
     grouped = {}
     for row in rows:
@@ -64,18 +63,18 @@ def _to_fhir_instant(value):
 
 def main():
 
-    print("\nAssembling FHIR bundles from generated CSV data...\n")
+    print("\nAssembling FHIR bundles from the dummy EMR fixture data (Postgres)...\n")
 
-    organizations = load_csv(MASTER_OUTPUT_FOLDER, "organizations.csv")
-    practitioners = load_csv(MASTER_OUTPUT_FOLDER, "practitioners.csv")
-    patients = load_csv(MASTER_OUTPUT_FOLDER, "patients.csv")
-    encounters = load_csv(TRANSACTION_OUTPUT_FOLDER, "encounters.csv")
-    conditions = load_csv(TRANSACTION_OUTPUT_FOLDER, "conditions.csv")
-    observations = load_csv(TRANSACTION_OUTPUT_FOLDER, "observations.csv")
-    medication_requests = load_csv(TRANSACTION_OUTPUT_FOLDER, "medication_requests.csv")
-    procedures = load_csv(TRANSACTION_OUTPUT_FOLDER, "procedures.csv")
-    diagnostic_reports = load_csv(TRANSACTION_OUTPUT_FOLDER, "diagnostic_reports.csv")
-    immunizations = load_csv(TRANSACTION_OUTPUT_FOLDER, "immunizations.csv")
+    organizations = repository.get_all_organizations()
+    practitioners = repository.get_all_practitioners()
+    patients = repository.get_all_patients()
+    encounters = repository.get_all_encounters()
+    conditions = repository.get_all_conditions()
+    observations = repository.get_all_observations()
+    medication_requests = repository.get_all_medication_requests()
+    procedures = repository.get_all_procedures()
+    diagnostic_reports = repository.get_all_diagnostic_reports()
+    immunizations = repository.get_all_immunizations()
 
     case_lookup = {case["case_id"]: case for case in CLINICAL_CASES}
 

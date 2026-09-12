@@ -11,44 +11,39 @@ link_care_context() call and read back once the callback confirms
 success.
 
 Current Implementation:
-    - File-backed JSON storage under storage/pending_care_context_links.json
-      (via server/callbacks/utils/json_file_store.py), NOT a plain
-      in-memory dict -- same reasoning as link_token_repository.py and
-      patient_link_token_repository.py: link_care_context() is called
-      from two different OS processes (the auto-chained path inside the
-      running `uvicorn server.main:app` process, and the M2 test CLI's
-      reuse-token path as its own separate process), and whichever
-      process receives ABDM's on_carecontext callback needs to read back
-      whatever was saved, regardless of which process did the saving. A
-      module-level dict is per-process state and would fail the same way
-      the original link_token_repository.py did before that fix.
-    - Still not appropriate for real concurrent writers -- see
-      json_file_store.py's own docstring.
-    - Still lost if storage/pending_care_context_links.json is
-      deleted/corrupted (same category of gap as the other two
-      file-backed stores).
-    - Contains real link tokens and ABHA addresses -- gitignored, same
-      as storage/pending_link_tokens.json and storage/patient_link_tokens.json.
+    - Postgres, via server/db.py + server/db_models.py:PendingCareContextLink
+      (P17, 2026-09-07) -- moved off the prior file-backed
+      storage/pending_care_context_links.jsonl. See
+      hiu_consent_repository.py's own banner for the full P16/P17 story
+      (why Postgres, why now).
+    - Every function's name, signature, and return contract is
+      byte-for-byte identical to the file-backed version -- no caller
+      outside this file needed to change.
 
-Future Implementation:
-    - Redis
-    - PostgreSQL
-    - MongoDB
+Prior Implementation (superseded, see storage/pending_care_context_links.jsonl
+-- kept as an inert audit trail, not the live source of truth anymore):
+    - File-backed JSON storage (via server/callbacks/utils/json_file_store.py),
+      NOT a plain in-memory dict -- link_care_context() is called from two
+      different OS processes (the auto-chained path inside the running
+      `uvicorn server.main:app` process, and the M2 test CLI's reuse-token
+      path as its own separate process), and whichever process receives
+      ABDM's on_carecontext callback needs to read back whatever was
+      saved, regardless of which process did the saving.
 """
 
-from server.callbacks.utils.json_file_store import set_key, get_key, delete_key
+from sqlalchemy import func
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 
-_STORE_FILE = "pending_care_context_links.jsonl"
+from server.db import session_scope
+from server.db_models import PendingCareContextLink
 
-
-# -----------------------------------------------------------------------------
-# Save Pending Care Context Link
-# -----------------------------------------------------------------------------
 
 def save_pending_care_context_link(request_id, session_data):
     """
     Saves a pending Linking Care Context request using the REQUEST-ID
-    sent to ABDM as the key.
+    sent to ABDM as the key. Upsert -- always overwrites any existing row
+    for this request_id, same "no merge" contract the file-backed
+    set_key() had.
 
     Args:
         request_id (str): REQUEST-ID header value sent with the
@@ -61,13 +56,14 @@ def save_pending_care_context_link(request_id, session_data):
     Returns:
         None
     """
+    with session_scope() as session:
+        stmt = pg_insert(PendingCareContextLink).values(request_id=request_id, data=session_data)
+        stmt = stmt.on_conflict_do_update(
+            index_elements=[PendingCareContextLink.request_id],
+            set_={"data": stmt.excluded.data, "updated_at": func.now()},
+        )
+        session.execute(stmt)
 
-    set_key(_STORE_FILE, request_id, session_data)
-
-
-# -----------------------------------------------------------------------------
-# Get Pending Care Context Link
-# -----------------------------------------------------------------------------
 
 def get_pending_care_context_link(request_id):
     """
@@ -80,13 +76,14 @@ def get_pending_care_context_link(request_id):
     Returns:
         dict | None
     """
+    with session_scope() as session:
+        row = (
+            session.query(PendingCareContextLink)
+            .filter(PendingCareContextLink.request_id == request_id)
+            .one_or_none()
+        )
+        return row.data if row is not None else None
 
-    return get_key(_STORE_FILE, request_id)
-
-
-# -----------------------------------------------------------------------------
-# Delete Pending Care Context Link
-# -----------------------------------------------------------------------------
 
 def delete_pending_care_context_link(request_id):
     """
@@ -99,5 +96,10 @@ def delete_pending_care_context_link(request_id):
     Returns:
         bool
     """
-
-    return delete_key(_STORE_FILE, request_id)
+    with session_scope() as session:
+        deleted = (
+            session.query(PendingCareContextLink)
+            .filter(PendingCareContextLink.request_id == request_id)
+            .delete()
+        )
+        return deleted > 0

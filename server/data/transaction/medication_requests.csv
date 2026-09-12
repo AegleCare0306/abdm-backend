@@ -31,3 +31,73 @@ MRQ0096,ENC9001AUC01,PAT9001,MED000002,Amlodipine,Amlong,5 mg,C08CA01,Tablet,Ora
 MRQ0097,ENC9001AUC01,PAT9001,MED000003,Telmisartan,Telma,40 mg,C09CA07,Tablet,Oral,Once daily,30,30,active,2026-07-06 09:42:10
 MRQ0098,ENC9001AUC02,PAT9001,MED000020,Isoniazid + Rifampicin + Pyrazinamide + Ethambutol,Akurit-4,Standard,,Tablet,Oral,Twice daily,14,28,active,2026-06-12 12:42:10
 MRQ0099,ENC9001AUC03,PAT9001,MED000001,Paracetamol,Crocin,500 mg,N02BE01,Tablet,Oral,Twice daily,14,28,active,2026-05-01 07:42:10
+MRQ0100,ENC9004AHC01,PAT9004,MED000002,Amlodipine,Amlong,5 mg,C08CA01,Tablet,Oral,Once daily,30,30,active,2025-09-05 05:47:22
+MRQ0101,ENC9004AHC01,PAT9004,MED000003,Telmisartan,Telma,40 mg,C09CA07,Tablet,Oral,Once daily,30,30,active,2025-09-05 05:47:22
+MRQ0102,ENC9004AHC02,PAT9004,MED000020,Isoniazid + Rifampicin + Pyrazinamide + Ethambutol,Akurit-4,Standard,,Tablet,Oral,Twice daily,14,28,active,2026-05-08 14:47:22
+MRQ0103,ENC9004AHC03,PAT9004,MED000001,Paracetamol,Crocin,500 mg,N02BE01,Tablet,Oral,Twice daily,14,28,active,2026-03-17 14:47:22
+MRQ0104,ENC9004PHS01,PAT9004,MED000002,Amlodipine,Amlong,5 mg,C08CA01,Tablet,Oral,Once daily,30,30,active,2025-12-28 12:47:22
+MRQ0105,ENC9004PHS01,PAT9004,MED000003,Telmisartan,Telma,40 mg,C09CA07,Tablet,Oral,Once daily,30,30,active,2025-12-28 12:47:22
+MRQ0106,ENC9004PHS02,PAT9004,MED000020,Isoniazid + Rifampicin + Pyrazinamide + Ethambutol,Akurit-4,Standard,,Tablet,Oral,Twice daily,14,28,active,2025-11-14 06:47:22
+MRQ0107,ENC9004PHS03,PAT9004,MED000001,Paracetamol,Crocin,500 mg,N02BE01,Tablet,Oral,Twice daily,14,28,active,2026-05-01 03:47:22
+MRQ0108,ENC9004MSH01,PAT9004,MED000002,Amlodipine,Amlong,5 mg,C08CA01,Tablet,Oral,Once daily,30,30,active,2026-07-15 05:47:22
+MRQ0109,ENC9004MSH01,PAT9004,MED000003,Telmisartan,Telma,40 mg,C09CA07,Tablet,Oral,Once daily,30,30,active,2026-07-15 05:47:22
+MRQ0110,ENC9004MSH02,PAT9004,MED000020,Isoniazid + Rifampicin + Pyrazinamide + Ethambutol,Akurit-4,Standard,,Tablet,Oral,Twice daily,14,28,active,2026-03-05 09:47:22
+MRQ0111,ENC9004MSH03,PAT9004,MED000001,Paracetamol,Crocin,500 mg,N02BE01,Tablet,Oral,Twice daily,14,28,active,2026-01-06 04:47:22
+MRQ0112,ENC9004AUC01,PAT9004,MED000002,Amlodipine,Amlong,5 mg,C08CA01,Tablet,Oral,Once daily,30,30,active,2026-08-02 09:47:22
+MRQ0113,ENC9004AUC01,PAT9004,MED000003,Telmisartan,Telma,40 mg,C09CA07,Tablet,Oral,Once daily,30,30,active,2026-08-02 09:47:22
+MRQ0114,ENC9004AUC02,PAT9004,MED000020,Isoniazid + Rifampicin + Pyrazinamide + Ethambutol,Akurit-4,Standard,,Tablet,Oral,Twice daily,14,28,active,2026-07-09 12:47:22
+MRQ0115,ENC9004AUC03,PAT9004,MED000001,Paracetamol,Crocin,500 mg,N02BE01,Tablet,Oral,Twice daily,14,28,active,2026-05-28 07:47:22
+MRQ0116,ENC9004AHC05,PAT9004,MED000002,Amlodipine,Amlong,5 mg,C08CA01,Tablet,Oral,Once daily,30,30,active,2026-08-17 11:01:07
+MRQ0117,ENC9004AHC05,PAT9004,MED000003,Telmisartan,Telma,40 mg,C09CA07,Tablet,Oral,Once daily,30,30,active,2026-08-17 11:01:07
+MRQ0118,ENC9004PHS05,PAT9004,MED000009,Amoxicillin,Mox,500 mg,J01CA04,Capsule,Oral,Thrice daily,5,15,active,2025-12-28 13:01:07
+MRQ0119,ENC9004PHS05,PAT9004,MED000001,Paracetamol,Crocin,500 mg,N02BE01,Tablet,Oral,Twice daily,7,14,active,2025-12-28 13:01:07
+MRQ0120,ENC9004AUC05,PAT9004,MED000005,Salbutamol,Asthalin,100 mcg,R03AC02,Inhaler,Inhalation,As needed (SOS),30,,active,2026-01-03 04:01:07
+MRQ0121,ENC9004PHS06,PAT9004,MED000009,Amoxicillin,Mox,500 mg,J01CA04,Capsule,Oral,Thrice daily,5,15,active,2025-09-30 10:01:07
+MRQ0122,ENC9004PHS06,PAT9004,MED000001,Paracetamol,Crocin,500 mg,N02BE01,Tablet,Oral,Twice daily,10,20,active,2025-09-30 10:01:07
+MRQ0123,ENC9004PHS07,PAT9004,MED000002,Amlodipine,Amlong,5 mg,C08CA01,Tablet,Oral,Once daily,30,30,active,2025-12-02 09:01:07
+MRQ0124,ENC9004AUC07,PAT9004,MED000002,Amlodipine,Amlong,5 mg,C08CA01,Tablet,Oral,Once daily,30,30,active,2026-01-09 13:01:07
+MRQ0125,ENC9004AUC08,PAT9004,MED000004,Metformin,Glycomet,500 mg,A10BA02,Tablet,Oral,Once daily,60,60,active,2025-11-25 15:01:07
+MRQ0126,ENC9004AHC07,PAT9004,MED000001,Paracetamol,Crocin,500 mg,N02BE01,Tablet,Oral,Twice daily,7,14,active,2026-05-04 14:01:07
+MRQ0127,ENC9004AUC09,PAT9004,MED000009,Amoxicillin,Mox,500 mg,J01CA04,Capsule,Oral,Thrice daily,5,15,active,2026-02-09 16:01:07
+MRQ0128,ENC9004AUC10,PAT9004,MED000002,Amlodipine,Amlong,5 mg,C08CA01,Tablet,Oral,Once daily,30,30,active,2026-02-15 12:01:07
+MRQ0129,ENC9004AUC10,PAT9004,MED000003,Telmisartan,Telma,40 mg,C09CA07,Tablet,Oral,Once daily,30,30,active,2026-02-15 12:01:07
+MRQ0130,ENC9004MSH05,PAT9004,MED000007,Iron + Folic Acid,IFA,100 mg,B03AD03,Tablet,Oral,Twice daily,14,28,active,2025-11-22 06:01:07
+MRQ0131,ENC9004PHS08,PAT9004,MED000002,Amlodipine,Amlong,5 mg,C08CA01,Tablet,Oral,Once daily,30,30,active,2026-05-14 16:01:07
+MRQ0132,ENC9004MSH06,PAT9004,MED000001,Paracetamol,Crocin,500 mg,N02BE01,Tablet,Oral,Twice daily,7,14,active,2025-11-07 09:01:07
+MRQ0133,ENC9004PHS09,PAT9004,MED000001,Paracetamol,Crocin,500 mg,N02BE01,Tablet,Oral,Twice daily,7,14,active,2025-12-16 15:01:07
+MRQ0134,ENC9004AHC08,PAT9004,MED000026,Benzoyl Peroxide,Persol,2.5%,D10AE01,Gel,Topical,Apply twice daily,30,60,active,2025-09-22 13:01:07
+MRQ0135,ENC9004AHC09,PAT9004,MED000008,Pantoprazole,Pantocid,40 mg,A02BC02,Tablet,Oral,Once daily,30,30,active,2025-11-15 13:01:07
+MRQ0136,ENC9004AHC10,PAT9004,MED000010,Cetirizine,Cetzine,10 mg,R06AE07,Tablet,Oral,Once daily,30,30,active,2026-01-31 06:01:07
+MRQ0137,ENC9004AHC10,PAT9004,MED000021,Clobetasol Propionate,Tenovate,0.05%,D07AD01,Cream,Topical,Apply twice daily,30,60,active,2026-01-31 06:01:07
+MRQ0138,ENC9005AHC01,PAT9005,MED000002,Amlodipine,Amlong,5 mg,C08CA01,Tablet,Oral,Once daily,30,30,active,2025-09-05 06:24:55
+MRQ0139,ENC9005AHC01,PAT9005,MED000003,Telmisartan,Telma,40 mg,C09CA07,Tablet,Oral,Once daily,30,30,active,2025-09-05 06:24:55
+MRQ0140,ENC9005AHC02,PAT9005,MED000020,Isoniazid + Rifampicin + Pyrazinamide + Ethambutol,Akurit-4,Standard,,Tablet,Oral,Twice daily,14,28,active,2026-05-08 15:24:55
+MRQ0141,ENC9005AHC03,PAT9005,MED000001,Paracetamol,Crocin,500 mg,N02BE01,Tablet,Oral,Twice daily,14,28,active,2026-03-17 15:24:55
+MRQ0142,ENC9005PHS01,PAT9005,MED000002,Amlodipine,Amlong,5 mg,C08CA01,Tablet,Oral,Once daily,30,30,active,2025-12-28 13:24:55
+MRQ0143,ENC9005PHS01,PAT9005,MED000003,Telmisartan,Telma,40 mg,C09CA07,Tablet,Oral,Once daily,30,30,active,2025-12-28 13:24:55
+MRQ0144,ENC9005PHS02,PAT9005,MED000020,Isoniazid + Rifampicin + Pyrazinamide + Ethambutol,Akurit-4,Standard,,Tablet,Oral,Twice daily,14,28,active,2025-11-14 07:24:55
+MRQ0145,ENC9005PHS03,PAT9005,MED000001,Paracetamol,Crocin,500 mg,N02BE01,Tablet,Oral,Twice daily,14,28,active,2026-05-01 04:24:55
+MRQ0146,ENC9005MSH01,PAT9005,MED000002,Amlodipine,Amlong,5 mg,C08CA01,Tablet,Oral,Once daily,30,30,active,2026-07-15 06:24:55
+MRQ0147,ENC9005MSH01,PAT9005,MED000003,Telmisartan,Telma,40 mg,C09CA07,Tablet,Oral,Once daily,30,30,active,2026-07-15 06:24:55
+MRQ0148,ENC9005MSH02,PAT9005,MED000020,Isoniazid + Rifampicin + Pyrazinamide + Ethambutol,Akurit-4,Standard,,Tablet,Oral,Twice daily,14,28,active,2026-03-05 10:24:55
+MRQ0149,ENC9005MSH03,PAT9005,MED000001,Paracetamol,Crocin,500 mg,N02BE01,Tablet,Oral,Twice daily,14,28,active,2026-01-06 05:24:55
+MRQ0150,ENC9005AUC01,PAT9005,MED000002,Amlodipine,Amlong,5 mg,C08CA01,Tablet,Oral,Once daily,30,30,active,2026-08-02 10:24:55
+MRQ0151,ENC9005AUC01,PAT9005,MED000003,Telmisartan,Telma,40 mg,C09CA07,Tablet,Oral,Once daily,30,30,active,2026-08-02 10:24:55
+MRQ0152,ENC9005AUC02,PAT9005,MED000020,Isoniazid + Rifampicin + Pyrazinamide + Ethambutol,Akurit-4,Standard,,Tablet,Oral,Twice daily,14,28,active,2026-07-09 13:24:55
+MRQ0153,ENC9005AUC03,PAT9005,MED000001,Paracetamol,Crocin,500 mg,N02BE01,Tablet,Oral,Twice daily,14,28,active,2026-05-28 08:24:55
+MRQ0154,ENC9002AHC01,PAT9002,MED000002,Amlodipine,Amlong,5 mg,C08CA01,Tablet,Oral,Once daily,30,30,active,2025-09-08 05:17:05
+MRQ0155,ENC9002AHC01,PAT9002,MED000003,Telmisartan,Telma,40 mg,C09CA07,Tablet,Oral,Once daily,30,30,active,2025-09-08 05:17:05
+MRQ0156,ENC9002AHC02,PAT9002,MED000020,Isoniazid + Rifampicin + Pyrazinamide + Ethambutol,Akurit-4,Standard,,Tablet,Oral,Twice daily,14,28,active,2026-05-11 14:17:05
+MRQ0157,ENC9002AHC03,PAT9002,MED000001,Paracetamol,Crocin,500 mg,N02BE01,Tablet,Oral,Twice daily,14,28,active,2026-03-20 14:17:05
+MRQ0158,ENC9002PHS01,PAT9002,MED000002,Amlodipine,Amlong,5 mg,C08CA01,Tablet,Oral,Once daily,30,30,active,2025-12-31 12:17:05
+MRQ0159,ENC9002PHS01,PAT9002,MED000003,Telmisartan,Telma,40 mg,C09CA07,Tablet,Oral,Once daily,30,30,active,2025-12-31 12:17:05
+MRQ0160,ENC9002PHS02,PAT9002,MED000020,Isoniazid + Rifampicin + Pyrazinamide + Ethambutol,Akurit-4,Standard,,Tablet,Oral,Twice daily,14,28,active,2025-11-17 06:17:05
+MRQ0161,ENC9002PHS03,PAT9002,MED000001,Paracetamol,Crocin,500 mg,N02BE01,Tablet,Oral,Twice daily,14,28,active,2026-05-04 03:17:05
+MRQ0162,ENC9002MSH01,PAT9002,MED000002,Amlodipine,Amlong,5 mg,C08CA01,Tablet,Oral,Once daily,30,30,active,2026-07-18 05:17:05
+MRQ0163,ENC9002MSH01,PAT9002,MED000003,Telmisartan,Telma,40 mg,C09CA07,Tablet,Oral,Once daily,30,30,active,2026-07-18 05:17:05
+MRQ0164,ENC9002MSH02,PAT9002,MED000020,Isoniazid + Rifampicin + Pyrazinamide + Ethambutol,Akurit-4,Standard,,Tablet,Oral,Twice daily,14,28,active,2026-03-08 09:17:05
+MRQ0165,ENC9002MSH03,PAT9002,MED000001,Paracetamol,Crocin,500 mg,N02BE01,Tablet,Oral,Twice daily,14,28,active,2026-01-09 04:17:05
+MRQ0166,ENC9002AUC01,PAT9002,MED000002,Amlodipine,Amlong,5 mg,C08CA01,Tablet,Oral,Once daily,30,30,active,2026-08-05 09:17:05
+MRQ0167,ENC9002AUC01,PAT9002,MED000003,Telmisartan,Telma,40 mg,C09CA07,Tablet,Oral,Once daily,30,30,active,2026-08-05 09:17:05
+MRQ0168,ENC9002AUC02,PAT9002,MED000020,Isoniazid + Rifampicin + Pyrazinamide + Ethambutol,Akurit-4,Standard,,Tablet,Oral,Twice daily,14,28,active,2026-07-12 12:17:05
+MRQ0169,ENC9002AUC03,PAT9002,MED000001,Paracetamol,Crocin,500 mg,N02BE01,Tablet,Oral,Twice daily,14,28,active,2026-05-31 07:17:05

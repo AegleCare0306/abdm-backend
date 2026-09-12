@@ -23,6 +23,7 @@ from server.abha import verify_user
 
 from tools.m1_test_suite.common import (
     prompt,
+    prompt_digits,
     encrypt,
     print_header,
     print_info,
@@ -33,6 +34,8 @@ from tools.m1_test_suite.common import (
     first_present,
     report_failure,
     select_account,
+    MAX_IDENTIFIER_ATTEMPTS,
+    RetryableIdentifierError,
 )
 from tools.m1_test_suite.login_runner import request_login_otp, verify_login_otp
 
@@ -43,15 +46,32 @@ SCOPE = ["abha-login", "mobile-verify"]
 def run():
     print_header("Flow 3: Login using Mobile Number")
 
-    mobile_number = prompt("Mobile number (10 digits, no spaces/dashes)")
-
-    txn_id = request_login_otp(
-        action=ACTION,
-        scope=SCOPE,
-        login_hint="mobile",
-        login_id=encrypt(mobile_number),
-        otp_system="abdm",
-    )
+    # IDENTIFIER-RETRY LOOP (2026-08-18, Aayush: "Incase of invalid
+    # mobile/aadhaar/abha display message and all to retry no quit") --
+    # same pattern as login_runner.run_login_variant() (which this flow
+    # doesn't use end-to-end -- see module docstring). A mobile number
+    # that passes the local 10-digit check but that ABDM itself rejects
+    # (known signature: 400 {"loginId": "Invalid Mobile Number"}) now
+    # re-prompts instead of quitting the flow.
+    txn_id = None
+    for attempt in range(1, MAX_IDENTIFIER_ATTEMPTS + 1):
+        mobile_number = prompt_digits("Mobile number (10 digits, no spaces/dashes)", 10, "Mobile number")
+        try:
+            txn_id = request_login_otp(
+                action=ACTION,
+                scope=SCOPE,
+                login_hint="mobile",
+                login_id=encrypt(mobile_number),
+                otp_system="abdm",
+                raise_on_retryable_identifier_error=True,
+            )
+            break
+        except RetryableIdentifierError:
+            if attempt < MAX_IDENTIFIER_ATTEMPTS:
+                print_info(f"({MAX_IDENTIFIER_ATTEMPTS - attempt} attempt(s) remaining -- try again.)")
+                continue
+            print_failure(f"All {MAX_IDENTIFIER_ATTEMPTS} attempts exhausted -- giving up.")
+            return {"x_token": None, "accounts": [], "txn_id": None}
 
     if txn_id is None:
         return {"x_token": None, "accounts": [], "txn_id": None}

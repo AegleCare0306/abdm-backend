@@ -3,6 +3,7 @@ import asyncio
 from server.hiu_consent import fetch_consent, send_consent_hiu_on_notify
 from server.utils import print_api_response
 from server.callbacks.repository.pending_consent_request_repository import get_pending_consent_request_by_consent_request_id
+from server.callbacks.repository.hiu_consent_repository import delete_hiu_consent
 from server.callbacks.utils.flow_logger import log_phase, log_api_call, log_waiting, log_error
 
 
@@ -103,6 +104,29 @@ async def process_consent_hiu_notify(callback_data):
                     except Exception as exc:
                         log_error(f"fetch_consent() failed for artefact {consent_id} (consentRequestId {consent_request_id}): {exc} -- continuing with the remaining artefact(s) in this notification.")
                 log_phase("Consent granted -- fetch attempted for each artefact")
+        elif status in ("REVOKED", "EXPIRED"):
+            # BUG FIX (Aayush, reported live via the M3 CLI, 2026-09-02):
+            # "even though I revoked the consent I still get an option to
+            # request data from that consent." Root cause: this branch
+            # used to just log and never touched hiu_consent_repository,
+            # so an artefact's locally cached copy (saved once, at
+            # on-fetch time, by consent_hiu_on_fetch_service.py) kept
+            # reading status="GRANTED" forever, even after ABDM notified
+            # us the patient revoked it. select_granted_consent()
+            # (tools/m3_test_suite/common.py) filters its own picker on
+            # exactly that stored field, so a revoked consent kept
+            # showing up there as if still active. Mirrors the M2/HIP-
+            # side handling of this same status pair already established
+            # in consent_notify_service.py's process_consent_notify()
+            # (delete_consent() on REVOKED/EXPIRED) -- delete_hiu_consent()
+            # already existed in hiu_consent_repository.py for exactly
+            # this, but was never actually called from anywhere until now.
+            for artefact in consent_artefacts:
+                consent_id = artefact.get("id")
+                if not consent_id:
+                    continue
+                if delete_hiu_consent(consent_id):
+                    log_phase(f"Consent {status.lower()} -- removed stored HIU consent artefact for consentId={consent_id}")
         else:
             log_phase(f"Consent notification status='{status}' -- not fetching (only GRANTED artefacts are fetched)")
 

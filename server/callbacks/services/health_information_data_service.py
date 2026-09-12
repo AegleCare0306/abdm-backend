@@ -4,24 +4,26 @@ Health Information Data Service.
 Given a list of consented care context references, fetches the underlying
 records and assembles one FHIR document Bundle per care context.
 
-CURRENT DATA SOURCE: the dummy EMR CSVs under tools/dummy_emr, since
-that's the only "database" that exists right now. This is the one part
-of this file that will need to change once real EMR data access exists --
-swap the CSV loads below for real queries (by care context / encounter
-reference) and everything else stays the same, since server/fhir_builders/
-was written to take plain dicts, not CSV rows specifically -- it doesn't
-know or care where the dict came from.
+DATA SOURCE: Postgres, via server.callbacks.repository.dummy_emr_repository
+(the dummy EMR fixture dataset -- organizations/patients/practitioners/
+encounters/conditions/etc). That repository's own read functions return
+the SAME csv.DictReader-shaped string dicts the old
+server/data/master/*.csv + server/data/transaction/*.csv files always
+did, so every function below (_is_within_date_range, _rows_in_range, the
+fhir_builders/* calls) is unchanged from the CSV era -- only the load
+calls at the top of build_bundles_for_care_contexts() changed. This is
+the one part of this file that will need to change again once real
+(non-fixture) EMR data access exists.
 
 This duplicates some of tools/generate_fhir_bundles.py's logic by design:
 that script builds bundles for EVERY encounter (for testing/dev), while
 this service builds bundles only for the SPECIFIC care contexts a real
 consent actually covers. Worth consolidating into one shared data-access
-layer once real EMR queries replace the CSV reads here -- premature to
-force that abstraction now, before knowing what the real data access
-pattern looks like.
+layer once real EMR queries replace the dummy EMR fixture reads here --
+premature to force that abstraction now, before knowing what the real
+data access pattern looks like.
 """
 
-import csv
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -30,10 +32,10 @@ _TOOLS_DIR = Path(__file__).resolve().parents[3] / "tools"
 if str(_TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(_TOOLS_DIR))
 
-from dummy_emr.config import MASTER_OUTPUT_FOLDER, TRANSACTION_OUTPUT_FOLDER
 from dummy_emr.case_library import CLINICAL_CASES
 from dummy_emr.hi_types import DOCUMENT_TYPE_TO_HI_TYPE
 
+from server.callbacks.repository import dummy_emr_repository as repository
 from server.fhir_builders.patient import build_patient
 from server.fhir_builders.practitioner import build_practitioner
 from server.fhir_builders.organization import build_organization
@@ -52,11 +54,6 @@ from server.fhir_builders.composition import build_composition
 from server.fhir_builders.bundle import build_bundle
 from server.callbacks.utils.attachment_metrics import record_payload_size
 from server.config import ATTACHMENT_STRATEGY_OVERRIDE
-
-
-def _load_csv(folder, filename):
-    with open(Path(folder) / filename, newline="", encoding="utf-8") as f:
-        return list(csv.DictReader(f))
 
 
 def _to_fhir_instant(value):
@@ -381,17 +378,17 @@ def build_bundles_for_care_contexts(care_context_references, date_range=None):
     after the first gap.
     """
 
-    organizations = _load_csv(MASTER_OUTPUT_FOLDER, "organizations.csv")
-    practitioners = _load_csv(MASTER_OUTPUT_FOLDER, "practitioners.csv")
-    patients = _load_csv(MASTER_OUTPUT_FOLDER, "patients.csv")
-    encounters = _load_csv(TRANSACTION_OUTPUT_FOLDER, "encounters.csv")
-    conditions = _load_csv(TRANSACTION_OUTPUT_FOLDER, "conditions.csv")
-    observations = _load_csv(TRANSACTION_OUTPUT_FOLDER, "observations.csv")
-    medication_requests = _load_csv(TRANSACTION_OUTPUT_FOLDER, "medication_requests.csv")
-    procedures = _load_csv(TRANSACTION_OUTPUT_FOLDER, "procedures.csv")
-    diagnostic_reports = _load_csv(TRANSACTION_OUTPUT_FOLDER, "diagnostic_reports.csv")
-    immunizations = _load_csv(TRANSACTION_OUTPUT_FOLDER, "immunizations.csv")
-    documents = _load_csv(TRANSACTION_OUTPUT_FOLDER, "documents.csv")
+    organizations = repository.get_all_organizations()
+    practitioners = repository.get_all_practitioners()
+    patients = repository.get_all_patients()
+    encounters = repository.get_all_encounters()
+    conditions = repository.get_all_conditions()
+    observations = repository.get_all_observations()
+    medication_requests = repository.get_all_medication_requests()
+    procedures = repository.get_all_procedures()
+    diagnostic_reports = repository.get_all_diagnostic_reports()
+    immunizations = repository.get_all_immunizations()
+    documents = repository.get_all_documents()
 
     case_lookup = {case["case_id"]: case for case in CLINICAL_CASES}
     organization_by_hip = {org["hip_id"]: org for org in organizations}

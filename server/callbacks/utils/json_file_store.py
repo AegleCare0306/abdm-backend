@@ -82,12 +82,19 @@ def _lock_for(file_name):
         return _file_locks[file_name]
 
 
+# Per-file in-process incremental replay cache (tracker case M2-3): see
+# _replay()'s own docstring below for why this exists. Guarded by the
+# same per-file lock _append() already uses (_lock_for()), so a replay
+# can never race a concurrent write to the same file.
+_replay_cache = {}  # file_name -> {"state": dict, "offset": int}
+
+
 def _replay(file_name):
     """
-    Reads every line of the log and replays it into the current state:
-    the latest line for a key wins, and a delete tombstone removes the
-    key from the result (even if an older "set" line for it exists
-    earlier in the file).
+    Reads the log and replays it into the current state: the latest
+    line for a key wins, and a delete tombstone removes the key from
+    the result (even if an older "set" line for it exists earlier in
+    the file).
 
     Corrupt/partially-written individual lines (e.g. a crash mid-append)
     are skipped rather than failing the whole read -- losing one record
@@ -95,36 +102,110 @@ def _replay(file_name):
     category as the old version's "lost on restart" gap), not a new
     risk introduced here.
 
+    PERFORMANCE (tracker case M2-3, found via a timing script against a
+    generated tens-of-thousands-of-entries consents.jsonl): this used
+    to re-read and re-parse EVERY line in the file from byte 0 on
+    EVERY call -- O(file size) per lookup, forever, even for a
+    get_key() of one key that hasn't changed in months. Since this
+    store is append-only by design (see module docstring) and never
+    compacts, a long-running server's storage file only grows, so that
+    cost was unbounded and strictly worsening over the server's
+    lifetime -- exactly the "does it slow down as the file grows"
+    question M2-3 asks.
+
+    FIX: cache the replayed state per file_name IN THIS PROCESS,
+    remembering how many bytes of the file were already folded into
+    it. A later call only reads and replays the NEW bytes appended
+    since then (raw binary seek/tell -- exact byte offsets, no text-mode
+    decode-cookie ambiguity), turning repeat-read cost into O(bytes
+    appended since the last read) instead of O(total file size). The
+    common case (many get_key() calls between occasional
+    set_key()/delete_key() calls) gets dramatically cheaper; the worst
+    case (every call preceded by a write) is no worse than before.
+
+    Correctness: safe against this module's own write path specifically
+    BECAUSE it's append-only (_append() only ever adds bytes at the
+    end, under the same per-file lock this function now also takes --
+    see _lock_for() -- so a cached prefix is never invalidated by a
+    later write, only extended, and never read mid-write). NOT safe
+    against something truncating/rewriting the file out from under this
+    process (nothing in this codebase does that -- guarded anyway below
+    via the size-shrank fallback), and NOT shared across OS processes --
+    each process keeps its own cache, same "not database-grade, good
+    enough for a couple of testers" scope the rest of this module's
+    docstring already establishes.
+
     Returns:
         dict: {key: value} for every key whose latest line was a set,
             not a delete.
     """
     path = _STORAGE_ROOT / file_name
     if not path.exists():
+        _replay_cache.pop(file_name, None)
         return {}
 
-    state = {}
+    with _lock_for(file_name):
+        cached = _replay_cache.get(file_name)
+        # IMPORTANT: reuse the SAME dict object already sitting in the
+        # cache (mutate it in place below) rather than `dict(cached
+        # ["state"])`-copying it here on every call. Copying an
+        # n-key dict is itself O(n) -- doing that unconditionally, even
+        # when there's nothing new to read, would silently defeat the
+        # entire point of this cache (a hot get_key() loop would still
+        # pay O(file size) per call, just via a dict-copy instead of a
+        # file-read). Safe to mutate in place: this dict is never handed
+        # to code outside this module -- get_key()/delete_key() only
+        # ever read from _replay()'s return value, and get_all() (the
+        # one caller that hands a dict to external code) copies it
+        # before returning, below.
+        state = cached["state"] if cached else {}
+        offset = cached["offset"] if cached else 0
 
-    with open(path, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                record = json.loads(line)
-            except ValueError:
-                continue
+        size = path.stat().st_size
+        if size < offset:
+            # File shrank/was replaced out from under us (shouldn't
+            # happen given this module's own append-only write path) --
+            # don't silently serve stale/wrong data, fall back to a
+            # full re-read from scratch.
+            state = {}
+            offset = 0
 
-            key = record.get("key")
-            if key is None:
-                continue
+        if size > offset:
+            with open(path, "rb") as f:
+                f.seek(offset)
+                for raw_line in f:
+                    line = raw_line.strip()
+                    if not line:
+                        continue
+                    try:
+                        record = json.loads(line.decode("utf-8"))
+                    except (ValueError, UnicodeDecodeError):
+                        continue
 
-            if record.get("deleted"):
-                state.pop(key, None)
-            else:
-                state[key] = record.get("value")
+                    key = record.get("key")
+                    if key is None:
+                        continue
 
-    return state
+                    if record.get("deleted"):
+                        state.pop(key, None)
+                    else:
+                        state[key] = record.get("value")
+                offset = f.tell()
+
+        _replay_cache[file_name] = {"state": state, "offset": offset}
+        # Returns the ACTUAL cached dict, not a copy (added alongside the
+        # caching fix above -- returning `dict(state)` here, as the old
+        # per-call-fresh-dict version safely could, would silently defeat
+        # the whole point of caching: building a fresh len(state)-sized
+        # dict copy on every single call is itself O(n), so a hot
+        # get_key() loop against a large file would still cost O(file
+        # size) per call even with zero new lines to read. Callers below
+        # (get_key/delete_key's membership check) only ever read from
+        # this, never mutate it. get_all() -- the one caller that hands
+        # this dict to code outside this module, which might reasonably
+        # mutate what it gets back -- copies it before returning, same
+        # as its previous contract.
+        return state
 
 
 def _ends_with_newline_or_empty(path):
@@ -201,5 +282,9 @@ def delete_key(file_name, key):
 def get_all(file_name):
     """Replays the log and returns every key's current value -- e.g.
     for a debugging helper that wants to see everything currently
-    stored, not just one key."""
-    return _replay(file_name)
+    stored, not just one key. Returns a COPY of the cached state (see
+    _replay()'s own comment on its return value) -- callers of get_all()
+    are outside this module and might reasonably mutate what they get
+    back; that must never corrupt the shared, cached state other calls
+    rely on."""
+    return dict(_replay(file_name))

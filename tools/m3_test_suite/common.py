@@ -15,6 +15,20 @@ from pathlib import Path
 
 import requests
 
+from server.config import DATABASE_URL
+from server.db import init_engine
+
+# P16 -- this CLI runs as its own OS process, separate from the FastAPI
+# server, and never goes through server/main.py's own startup -- so it
+# must initialise repo/'s DB engine itself, before the get_all_hiu_consents()
+# import right below (and any other call into hiu_consent_repository.py/
+# consent_repository.py/patient_identity_repository.py) can work. See
+# server/db.py's own docstring for why this can't just reach into a
+# host app's already-bootstrapped engine instead. init_engine() is
+# idempotent, so this is safe even if something else in the same process
+# already called it.
+init_engine(DATABASE_URL)
+
 from server.callbacks.repository.hiu_consent_repository import get_all_hiu_consents
 
 # tools/m3_test_suite/common.py -> parents[2] is the repo root. Resolved

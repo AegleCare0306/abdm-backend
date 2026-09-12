@@ -18,12 +18,7 @@ token is issued under a specific hip_id and isn't meaningful for a
 different one; reusing across facilities was never actually correct.
 Fixed by keying on (abha_address, hip_id) together: a saved token is
 now only ever found and reused for the EXACT facility it was issued
-under. A different facility for the same patient is treated as if no
-token exists at all, and a brand-new one is generated for it (and saved
-under its own key) -- this is now the standard behavior for any
-patient/facility pair with no saved token, not a fallback or an edge
-case. The hip_id-mismatch warning/log in generate_link_token() and the
-CLI's reuse flow is no longer possible to hit and has been removed.
+under.
 
 This is deliberately separate from link_token_repository.py, which
 stores a PENDING session keyed by REQUEST-ID between the outbound
@@ -36,37 +31,45 @@ reuse afterward.
 UNCONFIRMED (flagged, not guessed): there is no confirmed information
 anywhere -- the M2 doc or the Postman collection -- about a link token's
 expiry/TTL, or how many times it can be reused before ABDM requires a
-new one. The M2 doc does document `400 ABDM-1092 "Duplicate link token
-request"` as a real generate-token failure mode, which confirms ABDM
-does NOT want repeated generate-token calls for a patient who already
-has a valid/pending token -- but that's the only signal available. No
-expiry/TTL enforcement is implemented here as a result: a saved token is
-reused indefinitely until ABDM's real behavior is confirmed otherwise.
-`received_at` is stored for future reference in case that confirmation
-ever arrives. Flagged on the Notion "Needs ABDM Spec Confirmation"
-tracker.
+new one. No expiry/TTL enforcement is implemented here as a result: a
+saved token is reused indefinitely until ABDM's real behavior is
+confirmed otherwise. `received_at` is stored for future reference in
+case that confirmation ever arrives. Flagged on the Notion "Needs ABDM
+Spec Confirmation" tracker.
 
 Current Implementation:
-    - File-backed, append-only JSON log under storage/patient_link_tokens.jsonl
-      (via server/callbacks/utils/json_file_store.py), NOT a plain
-      in-memory dict. File-backed since 2026-08-04 (so the M2 test CLI,
-      a separate OS process from the running server, and the server
-      share state); append-only since 2026-08-05 (see
-      json_file_store.py's own docstring for why -- light concurrent
-      testing, not a database-grade guarantee).
-    - Contains real link tokens (JWTs) -- gitignored, same as
-      storage/api_capture.jsonl and storage/callbacks/*.
+    - Postgres, via server/db.py + server/db_models.py:PatientLinkToken
+      (P17, 2026-09-07) -- moved off the prior file-backed
+      storage/patient_link_tokens.jsonl. `_composite_key()`'s own
+      "{abha_address}|{hip_id}" string is kept EXACTLY as-is, stored in
+      the table's single `composite_key` column -- not split into two
+      columns + a composite unique constraint (that's a real improvement
+      but a bigger redesign than this pass needs; a future cleanup can
+      normalize it). See hiu_consent_repository.py's own banner for the
+      full P16/P17 story (why Postgres, why now).
+    - Every function's name, signature, and return contract is
+      byte-for-byte identical to the file-backed version -- no caller
+      outside this file needed to change.
+
+Prior Implementation (superseded, see storage/patient_link_tokens.jsonl --
+kept as an inert audit trail, not the live source of truth anymore):
+    - File-backed, append-only JSON log (via
+      server/callbacks/utils/json_file_store.py), NOT a plain in-memory
+      dict. File-backed since 2026-08-04 (so the M2 test CLI, a separate
+      OS process from the running server, and the server share state);
+      append-only since 2026-08-05 (light concurrent testing, not a
+      database-grade guarantee).
 
 Future Implementation:
-    - Redis
-    - PostgreSQL
-    - MongoDB
+    - Normalize composite_key into (abha_address, hip_id) columns.
 """
 
-from server.callbacks.utils.json_file_store import set_key, get_key, delete_key
-from server.utils import generate_timestamp
+from sqlalchemy import func
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 
-_STORE_FILE = "patient_link_tokens.jsonl"
+from server.db import session_scope
+from server.db_models import PatientLinkToken
+from server.utils import generate_timestamp
 
 
 def _composite_key(abha_address, hip_id):
@@ -87,7 +90,9 @@ def save_patient_link_token(abha_address, link_token, hip_id):
     """
     Saves a patient's confirmed link token, keyed by (ABHA address,
     HIP id) together -- a token issued under one facility is never
-    returned for a lookup under a different one.
+    returned for a lookup under a different one. Upsert -- always
+    overwrites any existing row for this composite key, same "no merge"
+    contract the file-backed set_key() had.
 
     Args:
         abha_address (str): Patient's ABHA address.
@@ -98,16 +103,20 @@ def save_patient_link_token(abha_address, link_token, hip_id):
     Returns:
         None
     """
-
-    set_key(
-        _STORE_FILE,
-        _composite_key(abha_address, hip_id),
-        {
-            "link_token": link_token,
-            "hip_id": hip_id,
-            "received_at": generate_timestamp(),
-        },
-    )
+    data = {
+        "link_token": link_token,
+        "hip_id": hip_id,
+        "received_at": generate_timestamp(),
+    }
+    with session_scope() as session:
+        stmt = pg_insert(PatientLinkToken).values(
+            composite_key=_composite_key(abha_address, hip_id), data=data
+        )
+        stmt = stmt.on_conflict_do_update(
+            index_elements=[PatientLinkToken.composite_key],
+            set_={"data": stmt.excluded.data, "updated_at": func.now()},
+        )
+        session.execute(stmt)
 
 
 # -----------------------------------------------------------------------------
@@ -131,8 +140,13 @@ def get_patient_link_token(abha_address, hip_id):
         dict | None: {link_token, hip_id, received_at}, or None if
             nothing is saved for this exact (patient, facility) pair.
     """
-
-    return get_key(_STORE_FILE, _composite_key(abha_address, hip_id))
+    with session_scope() as session:
+        row = (
+            session.query(PatientLinkToken)
+            .filter(PatientLinkToken.composite_key == _composite_key(abha_address, hip_id))
+            .one_or_none()
+        )
+        return row.data if row is not None else None
 
 
 # -----------------------------------------------------------------------------
@@ -153,5 +167,10 @@ def delete_patient_link_token(abha_address, hip_id):
     Returns:
         bool
     """
-
-    return delete_key(_STORE_FILE, _composite_key(abha_address, hip_id))
+    with session_scope() as session:
+        deleted = (
+            session.query(PatientLinkToken)
+            .filter(PatientLinkToken.composite_key == _composite_key(abha_address, hip_id))
+            .delete()
+        )
+        return deleted > 0

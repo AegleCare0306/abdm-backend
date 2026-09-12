@@ -1,53 +1,214 @@
-document_reference,encounter_reference,patient_reference,document_type,title,status,authored_datetime
-DOCREF0001,ENC0001,PAT9001,Prescription,Prescription - Childhood Fever,final,2025-08-08 08:54:17
-DOCREF0002,ENC0002,PAT9001,Prescription,Prescription - Type 2 Diabetes Mellitus,final,2026-07-01 08:54:17
-DOCREF0003,ENC0002,PAT9001,Diagnostic Report,Diagnostic Report - Type 2 Diabetes Mellitus,final,2026-07-01 08:54:17
-DOCREF0004,ENC0003,PAT9001,Prescription,Prescription - Atopic Dermatitis,final,2025-11-30 09:54:17
-DOCREF0005,ENC0004,PAT9001,Prescription,Prescription - Otitis Media,final,2025-12-21 04:54:17
-DOCREF0006,ENC0005,PAT9001,Prescription,Prescription - Stable Angina,final,2024-11-18 00:54:17
-DOCREF0007,ENC0005,PAT9001,Diagnostic Report,Diagnostic Report - Stable Angina,final,2024-11-18 00:54:17
-DOCREF0008,ENC0006,PAT9002,Prescription,Prescription - Acute Gastroenteritis,final,2026-07-06 07:54:17
-DOCREF0009,ENC0007,PAT9002,Prescription,Prescription - Cholelithiasis,final,2026-01-10 10:54:17
-DOCREF0010,ENC0007,PAT9002,Diagnostic Report,Diagnostic Report - Cholelithiasis,final,2026-01-10 10:54:17
-DOCREF0011,ENC0008,PAT9003,Prescription,Prescription - Migraine,final,2024-08-31 02:54:17
-DOCREF0012,ENC0009,PAT9003,Prescription,Prescription - Tension Headache,final,2025-08-11 03:54:17
-DOCREF0013,ENC0010,PAT9003,Prescription,Prescription - Acute Viral Fever,final,2024-10-07 06:54:17
-DOCREF0014,ENC0011,PAT9004,Prescription,Prescription - Acute Gastroenteritis,final,2025-07-27 01:54:17
-DOCREF0015,ENC0012,PAT9004,Prescription,Prescription - Normal Pregnancy,final,2025-02-13 01:54:17
-DOCREF0016,ENC0012,PAT9004,Diagnostic Report,Diagnostic Report - Normal Pregnancy,final,2025-02-13 01:54:17
-DOCREF0115,ENC9001AHC01,PAT9001,Prescription,Prescription - Essential Hypertension,final,2025-08-09 05:42:10
-DOCREF0116,ENC9001AHC01,PAT9001,Invoice,Invoice - Essential Hypertension,final,2025-08-09 05:42:10
-DOCREF0117,ENC9001AHC02,PAT9001,Prescription,Prescription - Pulmonary Tuberculosis,final,2026-04-11 14:42:10
-DOCREF0118,ENC9001AHC02,PAT9001,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2026-04-11 14:42:10
-DOCREF0119,ENC9001AHC02,PAT9001,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2026-04-11 14:42:10
-DOCREF0120,ENC9001AHC03,PAT9001,Prescription,Prescription - Distal Radius Fracture,final,2026-02-18 14:42:10
-DOCREF0121,ENC9001AHC03,PAT9001,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2026-02-18 14:42:10
-DOCREF0122,ENC9001AHC04,PAT9001,Wellness Record,Wellness Record - Routine Immunization Visit,final,2026-04-07 11:42:10
-DOCREF0123,ENC9001AHC04,PAT9001,Immunization,Immunization - Routine Immunization Visit,final,2026-04-07 11:42:10
-DOCREF0124,ENC9001PHS01,PAT9001,Prescription,Prescription - Essential Hypertension,final,2025-12-01 12:42:10
-DOCREF0125,ENC9001PHS01,PAT9001,Invoice,Invoice - Essential Hypertension,final,2025-12-01 12:42:10
-DOCREF0126,ENC9001PHS02,PAT9001,Prescription,Prescription - Pulmonary Tuberculosis,final,2025-10-18 06:42:10
-DOCREF0127,ENC9001PHS02,PAT9001,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2025-10-18 06:42:10
-DOCREF0128,ENC9001PHS02,PAT9001,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2025-10-18 06:42:10
-DOCREF0129,ENC9001PHS03,PAT9001,Prescription,Prescription - Distal Radius Fracture,final,2026-04-04 03:42:10
-DOCREF0130,ENC9001PHS03,PAT9001,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2026-04-04 03:42:10
-DOCREF0131,ENC9001PHS04,PAT9001,Wellness Record,Wellness Record - Routine Immunization Visit,final,2026-01-10 12:42:10
-DOCREF0132,ENC9001PHS04,PAT9001,Immunization,Immunization - Routine Immunization Visit,final,2026-01-10 12:42:10
-DOCREF0133,ENC9001MSH01,PAT9001,Prescription,Prescription - Essential Hypertension,final,2026-06-18 05:42:10
-DOCREF0134,ENC9001MSH01,PAT9001,Invoice,Invoice - Essential Hypertension,final,2026-06-18 05:42:10
-DOCREF0135,ENC9001MSH02,PAT9001,Prescription,Prescription - Pulmonary Tuberculosis,final,2026-02-06 09:42:10
-DOCREF0136,ENC9001MSH02,PAT9001,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2026-02-06 09:42:10
-DOCREF0137,ENC9001MSH02,PAT9001,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2026-02-06 09:42:10
-DOCREF0138,ENC9001MSH03,PAT9001,Prescription,Prescription - Distal Radius Fracture,final,2025-12-10 04:42:10
-DOCREF0139,ENC9001MSH03,PAT9001,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2025-12-10 04:42:10
-DOCREF0140,ENC9001MSH04,PAT9001,Wellness Record,Wellness Record - Routine Immunization Visit,final,2025-08-27 05:42:10
-DOCREF0141,ENC9001MSH04,PAT9001,Immunization,Immunization - Routine Immunization Visit,final,2025-08-27 05:42:10
-DOCREF0142,ENC9001AUC01,PAT9001,Prescription,Prescription - Essential Hypertension,final,2026-07-06 09:42:10
-DOCREF0143,ENC9001AUC01,PAT9001,Invoice,Invoice - Essential Hypertension,final,2026-07-06 09:42:10
-DOCREF0144,ENC9001AUC02,PAT9001,Prescription,Prescription - Pulmonary Tuberculosis,final,2026-06-12 12:42:10
-DOCREF0145,ENC9001AUC02,PAT9001,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2026-06-12 12:42:10
-DOCREF0146,ENC9001AUC02,PAT9001,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2026-06-12 12:42:10
-DOCREF0147,ENC9001AUC03,PAT9001,Prescription,Prescription - Distal Radius Fracture,final,2026-05-01 07:42:10
-DOCREF0148,ENC9001AUC03,PAT9001,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2026-05-01 07:42:10
-DOCREF0149,ENC9001AUC04,PAT9001,Wellness Record,Wellness Record - Routine Immunization Visit,final,2026-05-27 09:42:10
-DOCREF0150,ENC9001AUC04,PAT9001,Immunization,Immunization - Routine Immunization Visit,final,2026-05-27 09:42:10
+document_reference,encounter_reference,patient_reference,document_type,title,status,authored_datetime,file_path,content_type,file_size_bytes
+DOCREF0001,ENC0001,PAT9001,Prescription,Prescription - Childhood Fever,final,2025-08-08 08:54:17,,,
+DOCREF0002,ENC0002,PAT9001,Prescription,Prescription - Type 2 Diabetes Mellitus,final,2026-07-01 08:54:17,,,
+DOCREF0003,ENC0002,PAT9001,Diagnostic Report,Diagnostic Report - Type 2 Diabetes Mellitus,final,2026-07-01 08:54:17,,,
+DOCREF0004,ENC0003,PAT9001,Prescription,Prescription - Atopic Dermatitis,final,2025-11-30 09:54:17,,,
+DOCREF0005,ENC0004,PAT9001,Prescription,Prescription - Otitis Media,final,2025-12-21 04:54:17,,,
+DOCREF0006,ENC0005,PAT9001,Prescription,Prescription - Stable Angina,final,2024-11-18 00:54:17,,,
+DOCREF0007,ENC0005,PAT9001,Diagnostic Report,Diagnostic Report - Stable Angina,final,2024-11-18 00:54:17,,,
+DOCREF0008,ENC0006,PAT9002,Prescription,Prescription - Acute Gastroenteritis,final,2026-07-06 07:54:17,,,
+DOCREF0009,ENC0007,PAT9002,Prescription,Prescription - Cholelithiasis,final,2026-01-10 10:54:17,,,
+DOCREF0010,ENC0007,PAT9002,Diagnostic Report,Diagnostic Report - Cholelithiasis,final,2026-01-10 10:54:17,,,
+DOCREF0011,ENC0008,PAT9003,Prescription,Prescription - Migraine,final,2024-08-31 02:54:17,,,
+DOCREF0012,ENC0009,PAT9003,Prescription,Prescription - Tension Headache,final,2025-08-11 03:54:17,,,
+DOCREF0013,ENC0010,PAT9003,Prescription,Prescription - Acute Viral Fever,final,2024-10-07 06:54:17,,,
+DOCREF0014,ENC0011,PAT9004,Prescription,Prescription - Acute Gastroenteritis,final,2025-07-27 01:54:17,,,
+DOCREF0015,ENC0012,PAT9004,Prescription,Prescription - Normal Pregnancy,final,2025-02-13 01:54:17,,,
+DOCREF0016,ENC0012,PAT9004,Diagnostic Report,Diagnostic Report - Normal Pregnancy,final,2025-02-13 01:54:17,,,
+DOCREF0115,ENC9001AHC01,PAT9001,Prescription,Prescription - Essential Hypertension,final,2025-08-09 05:42:10,,,
+DOCREF0116,ENC9001AHC01,PAT9001,Invoice,Invoice - Essential Hypertension,final,2025-08-09 05:42:10,,,
+DOCREF0117,ENC9001AHC02,PAT9001,Prescription,Prescription - Pulmonary Tuberculosis,final,2026-04-11 14:42:10,,,
+DOCREF0118,ENC9001AHC02,PAT9001,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2026-04-11 14:42:10,,,
+DOCREF0119,ENC9001AHC02,PAT9001,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2026-04-11 14:42:10,,,
+DOCREF0120,ENC9001AHC03,PAT9001,Prescription,Prescription - Distal Radius Fracture,final,2026-02-18 14:42:10,,,
+DOCREF0121,ENC9001AHC03,PAT9001,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2026-02-18 14:42:10,,,
+DOCREF0122,ENC9001AHC04,PAT9001,Wellness Record,Wellness Record - Routine Immunization Visit,final,2026-04-07 11:42:10,,,
+DOCREF0123,ENC9001AHC04,PAT9001,Immunization,Immunization - Routine Immunization Visit,final,2026-04-07 11:42:10,,,
+DOCREF0124,ENC9001PHS01,PAT9001,Prescription,Prescription - Essential Hypertension,final,2025-12-01 12:42:10,,,
+DOCREF0125,ENC9001PHS01,PAT9001,Invoice,Invoice - Essential Hypertension,final,2025-12-01 12:42:10,,,
+DOCREF0126,ENC9001PHS02,PAT9001,Prescription,Prescription - Pulmonary Tuberculosis,final,2025-10-18 06:42:10,,,
+DOCREF0127,ENC9001PHS02,PAT9001,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2025-10-18 06:42:10,,,
+DOCREF0128,ENC9001PHS02,PAT9001,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2025-10-18 06:42:10,,,
+DOCREF0129,ENC9001PHS03,PAT9001,Prescription,Prescription - Distal Radius Fracture,final,2026-04-04 03:42:10,,,
+DOCREF0130,ENC9001PHS03,PAT9001,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2026-04-04 03:42:10,,,
+DOCREF0131,ENC9001PHS04,PAT9001,Wellness Record,Wellness Record - Routine Immunization Visit,final,2026-01-10 12:42:10,,,
+DOCREF0132,ENC9001PHS04,PAT9001,Immunization,Immunization - Routine Immunization Visit,final,2026-01-10 12:42:10,,,
+DOCREF0133,ENC9001MSH01,PAT9001,Prescription,Prescription - Essential Hypertension,final,2026-06-18 05:42:10,,,
+DOCREF0134,ENC9001MSH01,PAT9001,Invoice,Invoice - Essential Hypertension,final,2026-06-18 05:42:10,,,
+DOCREF0135,ENC9001MSH02,PAT9001,Prescription,Prescription - Pulmonary Tuberculosis,final,2026-02-06 09:42:10,,,
+DOCREF0136,ENC9001MSH02,PAT9001,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2026-02-06 09:42:10,,,
+DOCREF0137,ENC9001MSH02,PAT9001,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2026-02-06 09:42:10,,,
+DOCREF0138,ENC9001MSH03,PAT9001,Prescription,Prescription - Distal Radius Fracture,final,2025-12-10 04:42:10,,,
+DOCREF0139,ENC9001MSH03,PAT9001,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2025-12-10 04:42:10,,,
+DOCREF0140,ENC9001MSH04,PAT9001,Wellness Record,Wellness Record - Routine Immunization Visit,final,2025-08-27 05:42:10,,,
+DOCREF0141,ENC9001MSH04,PAT9001,Immunization,Immunization - Routine Immunization Visit,final,2025-08-27 05:42:10,,,
+DOCREF0142,ENC9001AUC01,PAT9001,Prescription,Prescription - Essential Hypertension,final,2026-07-06 09:42:10,,,
+DOCREF0143,ENC9001AUC01,PAT9001,Invoice,Invoice - Essential Hypertension,final,2026-07-06 09:42:10,,,
+DOCREF0144,ENC9001AUC02,PAT9001,Prescription,Prescription - Pulmonary Tuberculosis,final,2026-06-12 12:42:10,,,
+DOCREF0145,ENC9001AUC02,PAT9001,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2026-06-12 12:42:10,,,
+DOCREF0146,ENC9001AUC02,PAT9001,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2026-06-12 12:42:10,,,
+DOCREF0147,ENC9001AUC03,PAT9001,Prescription,Prescription - Distal Radius Fracture,final,2026-05-01 07:42:10,,,
+DOCREF0148,ENC9001AUC03,PAT9001,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2026-05-01 07:42:10,,,
+DOCREF0149,ENC9001AUC04,PAT9001,Wellness Record,Wellness Record - Routine Immunization Visit,final,2026-05-27 09:42:10,,,
+DOCREF0150,ENC9001AUC04,PAT9001,Immunization,Immunization - Routine Immunization Visit,final,2026-05-27 09:42:10,,,
+DOCREF0151,ENC9004AHC01,PAT9004,Prescription,Prescription - Essential Hypertension,final,2025-09-05 05:47:22,tools/dummy_emr/sample_attachments/Prescription_2.pdf,application/pdf,1798
+DOCREF0152,ENC9004AHC01,PAT9004,Invoice,Invoice - Essential Hypertension,final,2025-09-05 05:47:22,tools/dummy_emr/sample_attachments/Medical_Invoice_1.pdf,application/pdf,1798
+DOCREF0153,ENC9004AHC02,PAT9004,Prescription,Prescription - Pulmonary Tuberculosis,final,2026-05-08 14:47:22,tools/dummy_emr/sample_attachments/Prescription_3.pdf,application/pdf,1798
+DOCREF0154,ENC9004AHC02,PAT9004,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2026-05-08 14:47:22,,,
+DOCREF0155,ENC9004AHC02,PAT9004,Diagnostic Report Imaging,Diagnostic Imaging (small) - Pulmonary Tuberculosis,final,2026-05-08 14:47:22,tools/dummy_emr/sample_attachments/Xray_1_small.jpg,image/jpeg,45167
+DOCREF0156,ENC9004AHC02,PAT9004,Diagnostic Report Imaging,Diagnostic Imaging (large) - Pulmonary Tuberculosis,final,2026-05-08 14:47:22,tools/dummy_emr/sample_attachments/Xray_1_large.jpg,image/jpeg,310998
+DOCREF0157,ENC9004AHC02,PAT9004,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2026-05-08 14:47:22,tools/dummy_emr/sample_attachments/Referral_Letter_3.pdf,application/pdf,1801
+DOCREF0158,ENC9004AHC03,PAT9004,Prescription,Prescription - Distal Radius Fracture,final,2026-03-17 14:47:22,tools/dummy_emr/sample_attachments/Prescription_Image_3.jpg,image/jpeg,97357
+DOCREF0159,ENC9004AHC03,PAT9004,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2026-03-17 14:47:22,tools/dummy_emr/sample_attachments/Discharge_Summary_3.pdf,application/pdf,1804
+DOCREF0160,ENC9004AHC04,PAT9004,Wellness Record,Wellness Record - Routine Immunization Visit,final,2026-05-04 11:47:22,,,
+DOCREF0161,ENC9004AHC04,PAT9004,Immunization,Immunization - Routine Immunization Visit,final,2026-05-04 11:47:22,tools/dummy_emr/sample_attachments/Vaccination_Certificate_1.pdf,application/pdf,1803
+DOCREF0162,ENC9004PHS01,PAT9004,Prescription,Prescription - Essential Hypertension,final,2025-12-28 12:47:22,tools/dummy_emr/sample_attachments/Prescription_Image_3.jpg,image/jpeg,97357
+DOCREF0163,ENC9004PHS01,PAT9004,Invoice,Invoice - Essential Hypertension,final,2025-12-28 12:47:22,tools/dummy_emr/sample_attachments/Medical_Invoice_2.pdf,application/pdf,1798
+DOCREF0164,ENC9004PHS02,PAT9004,Prescription,Prescription - Pulmonary Tuberculosis,final,2025-11-14 06:47:22,tools/dummy_emr/sample_attachments/Prescription_1.pdf,application/pdf,1798
+DOCREF0165,ENC9004PHS02,PAT9004,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2025-11-14 06:47:22,,,
+DOCREF0166,ENC9004PHS02,PAT9004,Diagnostic Report Imaging,Diagnostic Imaging (small) - Pulmonary Tuberculosis,final,2025-11-14 06:47:22,tools/dummy_emr/sample_attachments/Xray_2_small.jpg,image/jpeg,45391
+DOCREF0167,ENC9004PHS02,PAT9004,Diagnostic Report Imaging,Diagnostic Imaging (large) - Pulmonary Tuberculosis,final,2025-11-14 06:47:22,tools/dummy_emr/sample_attachments/Xray_2_large.jpg,image/jpeg,312293
+DOCREF0168,ENC9004PHS02,PAT9004,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2025-11-14 06:47:22,tools/dummy_emr/sample_attachments/Referral_Letter_3.pdf,application/pdf,1801
+DOCREF0169,ENC9004PHS03,PAT9004,Prescription,Prescription - Distal Radius Fracture,final,2026-05-01 03:47:22,tools/dummy_emr/sample_attachments/Prescription_Image_2.jpg,image/jpeg,97196
+DOCREF0170,ENC9004PHS03,PAT9004,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2026-05-01 03:47:22,tools/dummy_emr/sample_attachments/Discharge_Summary_1.pdf,application/pdf,1804
+DOCREF0171,ENC9004PHS04,PAT9004,Wellness Record,Wellness Record - Routine Immunization Visit,final,2026-02-06 12:47:22,,,
+DOCREF0172,ENC9004PHS04,PAT9004,Immunization,Immunization - Routine Immunization Visit,final,2026-02-06 12:47:22,tools/dummy_emr/sample_attachments/Vaccination_Certificate_1.pdf,application/pdf,1803
+DOCREF0173,ENC9004MSH01,PAT9004,Prescription,Prescription - Essential Hypertension,final,2026-07-15 05:47:22,tools/dummy_emr/sample_attachments/Prescription_Image_2.jpg,image/jpeg,97196
+DOCREF0174,ENC9004MSH01,PAT9004,Invoice,Invoice - Essential Hypertension,final,2026-07-15 05:47:22,tools/dummy_emr/sample_attachments/Medical_Invoice_1.pdf,application/pdf,1798
+DOCREF0175,ENC9004MSH02,PAT9004,Prescription,Prescription - Pulmonary Tuberculosis,final,2026-03-05 09:47:22,tools/dummy_emr/sample_attachments/Prescription_2.pdf,application/pdf,1798
+DOCREF0176,ENC9004MSH02,PAT9004,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2026-03-05 09:47:22,,,
+DOCREF0177,ENC9004MSH02,PAT9004,Diagnostic Report Imaging,Diagnostic Imaging (small) - Pulmonary Tuberculosis,final,2026-03-05 09:47:22,tools/dummy_emr/sample_attachments/Xray_1_small.jpg,image/jpeg,45167
+DOCREF0178,ENC9004MSH02,PAT9004,Diagnostic Report Imaging,Diagnostic Imaging (large) - Pulmonary Tuberculosis,final,2026-03-05 09:47:22,tools/dummy_emr/sample_attachments/Xray_1_large.jpg,image/jpeg,310998
+DOCREF0179,ENC9004MSH02,PAT9004,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2026-03-05 09:47:22,tools/dummy_emr/sample_attachments/Referral_Letter_3.pdf,application/pdf,1801
+DOCREF0180,ENC9004MSH03,PAT9004,Prescription,Prescription - Distal Radius Fracture,final,2026-01-06 04:47:22,tools/dummy_emr/sample_attachments/Prescription_2.pdf,application/pdf,1798
+DOCREF0181,ENC9004MSH03,PAT9004,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2026-01-06 04:47:22,tools/dummy_emr/sample_attachments/Discharge_Summary_2.pdf,application/pdf,1804
+DOCREF0182,ENC9004MSH04,PAT9004,Wellness Record,Wellness Record - Routine Immunization Visit,final,2025-09-23 05:47:22,,,
+DOCREF0183,ENC9004MSH04,PAT9004,Immunization,Immunization - Routine Immunization Visit,final,2025-09-23 05:47:22,tools/dummy_emr/sample_attachments/Vaccination_Certificate_1.pdf,application/pdf,1803
+DOCREF0184,ENC9004AUC01,PAT9004,Prescription,Prescription - Essential Hypertension,final,2026-08-02 09:47:22,tools/dummy_emr/sample_attachments/Prescription_Image_2.jpg,image/jpeg,97196
+DOCREF0185,ENC9004AUC01,PAT9004,Invoice,Invoice - Essential Hypertension,final,2026-08-02 09:47:22,tools/dummy_emr/sample_attachments/Medical_Invoice_1.pdf,application/pdf,1798
+DOCREF0186,ENC9004AUC02,PAT9004,Prescription,Prescription - Pulmonary Tuberculosis,final,2026-07-09 12:47:22,tools/dummy_emr/sample_attachments/Prescription_Image_2.jpg,image/jpeg,97196
+DOCREF0187,ENC9004AUC02,PAT9004,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2026-07-09 12:47:22,,,
+DOCREF0188,ENC9004AUC02,PAT9004,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2026-07-09 12:47:22,tools/dummy_emr/sample_attachments/Referral_Letter_3.pdf,application/pdf,1801
+DOCREF0189,ENC9004AUC03,PAT9004,Prescription,Prescription - Distal Radius Fracture,final,2026-05-28 07:47:22,tools/dummy_emr/sample_attachments/Prescription_1.pdf,application/pdf,1798
+DOCREF0190,ENC9004AUC03,PAT9004,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2026-05-28 07:47:22,tools/dummy_emr/sample_attachments/Discharge_Summary_2.pdf,application/pdf,1804
+DOCREF0191,ENC9004AUC04,PAT9004,Wellness Record,Wellness Record - Routine Immunization Visit,final,2026-06-23 09:47:22,,,
+DOCREF0192,ENC9004AUC04,PAT9004,Immunization,Immunization - Routine Immunization Visit,final,2026-06-23 09:47:22,tools/dummy_emr/sample_attachments/Vaccination_Certificate_3.pdf,application/pdf,1803
+DOCREF0193,ENC9004AHC05,PAT9004,Prescription,Prescription - Hypertensive Heart Disease,final,2026-08-17 11:01:07,tools/dummy_emr/sample_attachments/Prescription_Image_3.jpg,image/jpeg,97357
+DOCREF0194,ENC9004AHC05,PAT9004,Diagnostic Report,Diagnostic Report - Hypertensive Heart Disease,final,2026-08-17 11:01:07,,,
+DOCREF0195,ENC9004PHS05,PAT9004,Prescription,Prescription - Community Acquired Pneumonia,final,2025-12-28 13:01:07,tools/dummy_emr/sample_attachments/Prescription_Image_3.jpg,image/jpeg,97357
+DOCREF0196,ENC9004PHS05,PAT9004,Diagnostic Report,Diagnostic Report - Community Acquired Pneumonia,final,2025-12-28 13:01:07,,,
+DOCREF0197,ENC9004AUC05,PAT9004,Prescription,Prescription - Bronchial Asthma,final,2026-01-03 04:01:07,tools/dummy_emr/sample_attachments/Prescription_3.pdf,application/pdf,1798
+DOCREF0198,ENC9004PHS06,PAT9004,Prescription,Prescription - Typhoid Fever,final,2025-09-30 10:01:07,tools/dummy_emr/sample_attachments/Prescription_Image_2.jpg,image/jpeg,97196
+DOCREF0199,ENC9004PHS06,PAT9004,Diagnostic Report,Diagnostic Report - Typhoid Fever,final,2025-09-30 10:01:07,,,
+DOCREF0200,ENC9004AUC06,PAT9004,Prescription,Prescription - Ankle Sprain,final,2026-08-06 06:01:07,tools/dummy_emr/sample_attachments/Prescription_1.pdf,application/pdf,1798
+DOCREF0201,ENC9004AHC06,PAT9004,Prescription,Prescription - Ankle Sprain,final,2026-03-13 04:01:07,tools/dummy_emr/sample_attachments/Prescription_1.pdf,application/pdf,1798
+DOCREF0202,ENC9004PHS07,PAT9004,Prescription,Prescription - Congestive Heart Failure,final,2025-12-02 09:01:07,tools/dummy_emr/sample_attachments/Prescription_Image_3.jpg,image/jpeg,97357
+DOCREF0203,ENC9004PHS07,PAT9004,Diagnostic Report,Diagnostic Report - Congestive Heart Failure,final,2025-12-02 09:01:07,,,
+DOCREF0204,ENC9004AUC07,PAT9004,Prescription,Prescription - Stable Angina,final,2026-01-09 13:01:07,tools/dummy_emr/sample_attachments/Prescription_3.pdf,application/pdf,1798
+DOCREF0205,ENC9004AUC07,PAT9004,Diagnostic Report,Diagnostic Report - Stable Angina,final,2026-01-09 13:01:07,,,
+DOCREF0206,ENC9004AUC07,PAT9004,Diagnostic Report Imaging,Diagnostic Imaging (small) - Stable Angina,final,2026-01-09 13:01:07,tools/dummy_emr/sample_attachments/Xray_2_small.jpg,image/jpeg,45391
+DOCREF0207,ENC9004AUC07,PAT9004,Diagnostic Report Imaging,Diagnostic Imaging (large) - Stable Angina,final,2026-01-09 13:01:07,tools/dummy_emr/sample_attachments/Xray_2_large.jpg,image/jpeg,312293
+DOCREF0208,ENC9004AUC08,PAT9004,Prescription,Prescription - Peripheral Neuropathy,final,2025-11-25 15:01:07,tools/dummy_emr/sample_attachments/Prescription_2.pdf,application/pdf,1798
+DOCREF0209,ENC9004AUC08,PAT9004,Diagnostic Report,Diagnostic Report - Peripheral Neuropathy,final,2025-11-25 15:01:07,,,
+DOCREF0210,ENC9004AHC07,PAT9004,Discharge Summary,Discharge Summary - Road Traffic Accident,final,2026-05-04 14:01:07,tools/dummy_emr/sample_attachments/Discharge_Summary_2.pdf,application/pdf,1804
+DOCREF0211,ENC9004AUC09,PAT9004,Prescription,Prescription - Urinary Tract Infection,final,2026-02-09 16:01:07,tools/dummy_emr/sample_attachments/Prescription_2.pdf,application/pdf,1798
+DOCREF0212,ENC9004AUC09,PAT9004,Diagnostic Report,Diagnostic Report - Urinary Tract Infection,final,2026-02-09 16:01:07,,,
+DOCREF0213,ENC9004AUC10,PAT9004,Prescription,Prescription - Essential Hypertension,final,2026-02-15 12:01:07,tools/dummy_emr/sample_attachments/Prescription_Image_2.jpg,image/jpeg,97196
+DOCREF0214,ENC9004AUC10,PAT9004,Invoice,Invoice - Essential Hypertension,final,2026-02-15 12:01:07,tools/dummy_emr/sample_attachments/Medical_Invoice_3.pdf,application/pdf,1798
+DOCREF0215,ENC9004MSH05,PAT9004,Prescription,Prescription - Normal Pregnancy,final,2025-11-22 06:01:07,tools/dummy_emr/sample_attachments/Prescription_Image_1.jpg,image/jpeg,97190
+DOCREF0216,ENC9004MSH05,PAT9004,Diagnostic Report,Diagnostic Report - Normal Pregnancy,final,2025-11-22 06:01:07,,,
+DOCREF0217,ENC9004PHS08,PAT9004,Prescription,Prescription - Congestive Heart Failure,final,2026-05-14 16:01:07,tools/dummy_emr/sample_attachments/Prescription_1.pdf,application/pdf,1798
+DOCREF0218,ENC9004PHS08,PAT9004,Diagnostic Report,Diagnostic Report - Congestive Heart Failure,final,2026-05-14 16:01:07,,,
+DOCREF0219,ENC9004PHS08,PAT9004,Diagnostic Report Imaging,Diagnostic Imaging (small) - Congestive Heart Failure,final,2026-05-14 16:01:07,tools/dummy_emr/sample_attachments/Xray_3_small.jpg,image/jpeg,45392
+DOCREF0220,ENC9004PHS08,PAT9004,Diagnostic Report Imaging,Diagnostic Imaging (large) - Congestive Heart Failure,final,2026-05-14 16:01:07,tools/dummy_emr/sample_attachments/Xray_3_large.jpg,image/jpeg,311407
+DOCREF0221,ENC9004MSH06,PAT9004,Prescription,Prescription - Acute Viral Fever,final,2025-11-07 09:01:07,tools/dummy_emr/sample_attachments/Prescription_2.pdf,application/pdf,1798
+DOCREF0222,ENC9004PHS09,PAT9004,Prescription,Prescription - Acute Viral Fever,final,2025-12-16 15:01:07,tools/dummy_emr/sample_attachments/Prescription_Image_2.jpg,image/jpeg,97196
+DOCREF0223,ENC9004AHC08,PAT9004,Prescription,Prescription - Acne Vulgaris,final,2025-09-22 13:01:07,tools/dummy_emr/sample_attachments/Prescription_1.pdf,application/pdf,1798
+DOCREF0224,ENC9004AHC09,PAT9004,Prescription,Prescription - Cholelithiasis,final,2025-11-15 13:01:07,tools/dummy_emr/sample_attachments/Prescription_3.pdf,application/pdf,1798
+DOCREF0225,ENC9004AHC09,PAT9004,Diagnostic Report,Diagnostic Report - Cholelithiasis,final,2025-11-15 13:01:07,,,
+DOCREF0226,ENC9004AHC10,PAT9004,Prescription,Prescription - Atopic Dermatitis,final,2026-01-31 06:01:07,tools/dummy_emr/sample_attachments/Prescription_2.pdf,application/pdf,1798
+DOCREF0227,ENC9004MSH07,PAT9004,Referral Note,Referral Note - Inguinal Hernia,final,2026-05-21 06:01:07,tools/dummy_emr/sample_attachments/Referral_Letter_2.pdf,application/pdf,1801
+DOCREF0228,ENC9005AHC01,PAT9005,Prescription,Prescription - Essential Hypertension,final,2025-09-05 06:24:55,tools/dummy_emr/sample_attachments/Prescription_2.pdf,application/pdf,1798
+DOCREF0229,ENC9005AHC01,PAT9005,Invoice,Invoice - Essential Hypertension,final,2025-09-05 06:24:55,tools/dummy_emr/sample_attachments/Medical_Invoice_1.pdf,application/pdf,1798
+DOCREF0230,ENC9005AHC02,PAT9005,Prescription,Prescription - Pulmonary Tuberculosis,final,2026-05-08 15:24:55,tools/dummy_emr/sample_attachments/Prescription_3.pdf,application/pdf,1798
+DOCREF0231,ENC9005AHC02,PAT9005,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2026-05-08 15:24:55,,,
+DOCREF0232,ENC9005AHC02,PAT9005,Diagnostic Report Imaging,Diagnostic Imaging (small) - Pulmonary Tuberculosis,final,2026-05-08 15:24:55,tools/dummy_emr/sample_attachments/Xray_1_small.jpg,image/jpeg,45167
+DOCREF0233,ENC9005AHC02,PAT9005,Diagnostic Report Imaging,Diagnostic Imaging (large) - Pulmonary Tuberculosis,final,2026-05-08 15:24:55,tools/dummy_emr/sample_attachments/Xray_1_large.jpg,image/jpeg,310998
+DOCREF0234,ENC9005AHC02,PAT9005,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2026-05-08 15:24:55,tools/dummy_emr/sample_attachments/Referral_Letter_3.pdf,application/pdf,1801
+DOCREF0235,ENC9005AHC03,PAT9005,Prescription,Prescription - Distal Radius Fracture,final,2026-03-17 15:24:55,tools/dummy_emr/sample_attachments/Prescription_Image_3.jpg,image/jpeg,97357
+DOCREF0236,ENC9005AHC03,PAT9005,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2026-03-17 15:24:55,tools/dummy_emr/sample_attachments/Discharge_Summary_3.pdf,application/pdf,1804
+DOCREF0237,ENC9005AHC04,PAT9005,Wellness Record,Wellness Record - Routine Immunization Visit,final,2026-05-04 12:24:55,,,
+DOCREF0238,ENC9005AHC04,PAT9005,Immunization,Immunization - Routine Immunization Visit,final,2026-05-04 12:24:55,tools/dummy_emr/sample_attachments/Vaccination_Certificate_1.pdf,application/pdf,1803
+DOCREF0239,ENC9005PHS01,PAT9005,Prescription,Prescription - Essential Hypertension,final,2025-12-28 13:24:55,tools/dummy_emr/sample_attachments/Prescription_Image_3.jpg,image/jpeg,97357
+DOCREF0240,ENC9005PHS01,PAT9005,Invoice,Invoice - Essential Hypertension,final,2025-12-28 13:24:55,tools/dummy_emr/sample_attachments/Medical_Invoice_2.pdf,application/pdf,1798
+DOCREF0241,ENC9005PHS02,PAT9005,Prescription,Prescription - Pulmonary Tuberculosis,final,2025-11-14 07:24:55,tools/dummy_emr/sample_attachments/Prescription_1.pdf,application/pdf,1798
+DOCREF0242,ENC9005PHS02,PAT9005,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2025-11-14 07:24:55,,,
+DOCREF0243,ENC9005PHS02,PAT9005,Diagnostic Report Imaging,Diagnostic Imaging (small) - Pulmonary Tuberculosis,final,2025-11-14 07:24:55,tools/dummy_emr/sample_attachments/Xray_2_small.jpg,image/jpeg,45391
+DOCREF0244,ENC9005PHS02,PAT9005,Diagnostic Report Imaging,Diagnostic Imaging (large) - Pulmonary Tuberculosis,final,2025-11-14 07:24:55,tools/dummy_emr/sample_attachments/Xray_2_large.jpg,image/jpeg,312293
+DOCREF0245,ENC9005PHS02,PAT9005,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2025-11-14 07:24:55,tools/dummy_emr/sample_attachments/Referral_Letter_3.pdf,application/pdf,1801
+DOCREF0246,ENC9005PHS03,PAT9005,Prescription,Prescription - Distal Radius Fracture,final,2026-05-01 04:24:55,tools/dummy_emr/sample_attachments/Prescription_Image_2.jpg,image/jpeg,97196
+DOCREF0247,ENC9005PHS03,PAT9005,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2026-05-01 04:24:55,tools/dummy_emr/sample_attachments/Discharge_Summary_1.pdf,application/pdf,1804
+DOCREF0248,ENC9005PHS04,PAT9005,Wellness Record,Wellness Record - Routine Immunization Visit,final,2026-02-06 13:24:55,,,
+DOCREF0249,ENC9005PHS04,PAT9005,Immunization,Immunization - Routine Immunization Visit,final,2026-02-06 13:24:55,tools/dummy_emr/sample_attachments/Vaccination_Certificate_1.pdf,application/pdf,1803
+DOCREF0250,ENC9005MSH01,PAT9005,Prescription,Prescription - Essential Hypertension,final,2026-07-15 06:24:55,tools/dummy_emr/sample_attachments/Prescription_Image_2.jpg,image/jpeg,97196
+DOCREF0251,ENC9005MSH01,PAT9005,Invoice,Invoice - Essential Hypertension,final,2026-07-15 06:24:55,tools/dummy_emr/sample_attachments/Medical_Invoice_1.pdf,application/pdf,1798
+DOCREF0252,ENC9005MSH02,PAT9005,Prescription,Prescription - Pulmonary Tuberculosis,final,2026-03-05 10:24:55,tools/dummy_emr/sample_attachments/Prescription_2.pdf,application/pdf,1798
+DOCREF0253,ENC9005MSH02,PAT9005,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2026-03-05 10:24:55,,,
+DOCREF0254,ENC9005MSH02,PAT9005,Diagnostic Report Imaging,Diagnostic Imaging (small) - Pulmonary Tuberculosis,final,2026-03-05 10:24:55,tools/dummy_emr/sample_attachments/Xray_1_small.jpg,image/jpeg,45167
+DOCREF0255,ENC9005MSH02,PAT9005,Diagnostic Report Imaging,Diagnostic Imaging (large) - Pulmonary Tuberculosis,final,2026-03-05 10:24:55,tools/dummy_emr/sample_attachments/Xray_1_large.jpg,image/jpeg,310998
+DOCREF0256,ENC9005MSH02,PAT9005,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2026-03-05 10:24:55,tools/dummy_emr/sample_attachments/Referral_Letter_3.pdf,application/pdf,1801
+DOCREF0257,ENC9005MSH03,PAT9005,Prescription,Prescription - Distal Radius Fracture,final,2026-01-06 05:24:55,tools/dummy_emr/sample_attachments/Prescription_2.pdf,application/pdf,1798
+DOCREF0258,ENC9005MSH03,PAT9005,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2026-01-06 05:24:55,tools/dummy_emr/sample_attachments/Discharge_Summary_2.pdf,application/pdf,1804
+DOCREF0259,ENC9005MSH04,PAT9005,Wellness Record,Wellness Record - Routine Immunization Visit,final,2025-09-23 06:24:55,,,
+DOCREF0260,ENC9005MSH04,PAT9005,Immunization,Immunization - Routine Immunization Visit,final,2025-09-23 06:24:55,tools/dummy_emr/sample_attachments/Vaccination_Certificate_1.pdf,application/pdf,1803
+DOCREF0261,ENC9005AUC01,PAT9005,Prescription,Prescription - Essential Hypertension,final,2026-08-02 10:24:55,tools/dummy_emr/sample_attachments/Prescription_Image_2.jpg,image/jpeg,97196
+DOCREF0262,ENC9005AUC01,PAT9005,Invoice,Invoice - Essential Hypertension,final,2026-08-02 10:24:55,tools/dummy_emr/sample_attachments/Medical_Invoice_1.pdf,application/pdf,1798
+DOCREF0263,ENC9005AUC02,PAT9005,Prescription,Prescription - Pulmonary Tuberculosis,final,2026-07-09 13:24:55,tools/dummy_emr/sample_attachments/Prescription_Image_2.jpg,image/jpeg,97196
+DOCREF0264,ENC9005AUC02,PAT9005,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2026-07-09 13:24:55,,,
+DOCREF0265,ENC9005AUC02,PAT9005,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2026-07-09 13:24:55,tools/dummy_emr/sample_attachments/Referral_Letter_3.pdf,application/pdf,1801
+DOCREF0266,ENC9005AUC03,PAT9005,Prescription,Prescription - Distal Radius Fracture,final,2026-05-28 08:24:55,tools/dummy_emr/sample_attachments/Prescription_1.pdf,application/pdf,1798
+DOCREF0267,ENC9005AUC03,PAT9005,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2026-05-28 08:24:55,tools/dummy_emr/sample_attachments/Discharge_Summary_2.pdf,application/pdf,1804
+DOCREF0268,ENC9005AUC04,PAT9005,Wellness Record,Wellness Record - Routine Immunization Visit,final,2026-06-23 10:24:55,,,
+DOCREF0269,ENC9005AUC04,PAT9005,Immunization,Immunization - Routine Immunization Visit,final,2026-06-23 10:24:55,tools/dummy_emr/sample_attachments/Vaccination_Certificate_3.pdf,application/pdf,1803
+DOCREF0270,ENC9002AHC01,PAT9002,Prescription,Prescription - Essential Hypertension,final,2025-09-08 05:17:05,tools/dummy_emr/sample_attachments/Prescription_2.pdf,application/pdf,1798
+DOCREF0271,ENC9002AHC01,PAT9002,Invoice,Invoice - Essential Hypertension,final,2025-09-08 05:17:05,tools/dummy_emr/sample_attachments/Medical_Invoice_1.pdf,application/pdf,1798
+DOCREF0272,ENC9002AHC02,PAT9002,Prescription,Prescription - Pulmonary Tuberculosis,final,2026-05-11 14:17:05,tools/dummy_emr/sample_attachments/Prescription_3.pdf,application/pdf,1798
+DOCREF0273,ENC9002AHC02,PAT9002,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2026-05-11 14:17:05,,,
+DOCREF0274,ENC9002AHC02,PAT9002,Diagnostic Report Imaging,Diagnostic Imaging (small) - Pulmonary Tuberculosis,final,2026-05-11 14:17:05,tools/dummy_emr/sample_attachments/Xray_1_small.jpg,image/jpeg,45167
+DOCREF0275,ENC9002AHC02,PAT9002,Diagnostic Report Imaging,Diagnostic Imaging (large) - Pulmonary Tuberculosis,final,2026-05-11 14:17:05,tools/dummy_emr/sample_attachments/Xray_1_large.jpg,image/jpeg,310998
+DOCREF0276,ENC9002AHC02,PAT9002,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2026-05-11 14:17:05,tools/dummy_emr/sample_attachments/Referral_Letter_3.pdf,application/pdf,1801
+DOCREF0277,ENC9002AHC03,PAT9002,Prescription,Prescription - Distal Radius Fracture,final,2026-03-20 14:17:05,tools/dummy_emr/sample_attachments/Prescription_Image_3.jpg,image/jpeg,97357
+DOCREF0278,ENC9002AHC03,PAT9002,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2026-03-20 14:17:05,tools/dummy_emr/sample_attachments/Discharge_Summary_3.pdf,application/pdf,1804
+DOCREF0279,ENC9002AHC04,PAT9002,Wellness Record,Wellness Record - Routine Immunization Visit,final,2026-05-07 11:17:05,,,
+DOCREF0280,ENC9002AHC04,PAT9002,Immunization,Immunization - Routine Immunization Visit,final,2026-05-07 11:17:05,tools/dummy_emr/sample_attachments/Vaccination_Certificate_1.pdf,application/pdf,1803
+DOCREF0281,ENC9002PHS01,PAT9002,Prescription,Prescription - Essential Hypertension,final,2025-12-31 12:17:05,tools/dummy_emr/sample_attachments/Prescription_Image_3.jpg,image/jpeg,97357
+DOCREF0282,ENC9002PHS01,PAT9002,Invoice,Invoice - Essential Hypertension,final,2025-12-31 12:17:05,tools/dummy_emr/sample_attachments/Medical_Invoice_2.pdf,application/pdf,1798
+DOCREF0283,ENC9002PHS02,PAT9002,Prescription,Prescription - Pulmonary Tuberculosis,final,2025-11-17 06:17:05,tools/dummy_emr/sample_attachments/Prescription_1.pdf,application/pdf,1798
+DOCREF0284,ENC9002PHS02,PAT9002,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2025-11-17 06:17:05,,,
+DOCREF0285,ENC9002PHS02,PAT9002,Diagnostic Report Imaging,Diagnostic Imaging (small) - Pulmonary Tuberculosis,final,2025-11-17 06:17:05,tools/dummy_emr/sample_attachments/Xray_2_small.jpg,image/jpeg,45391
+DOCREF0286,ENC9002PHS02,PAT9002,Diagnostic Report Imaging,Diagnostic Imaging (large) - Pulmonary Tuberculosis,final,2025-11-17 06:17:05,tools/dummy_emr/sample_attachments/Xray_2_large.jpg,image/jpeg,312293
+DOCREF0287,ENC9002PHS02,PAT9002,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2025-11-17 06:17:05,tools/dummy_emr/sample_attachments/Referral_Letter_3.pdf,application/pdf,1801
+DOCREF0288,ENC9002PHS03,PAT9002,Prescription,Prescription - Distal Radius Fracture,final,2026-05-04 03:17:05,tools/dummy_emr/sample_attachments/Prescription_Image_2.jpg,image/jpeg,97196
+DOCREF0289,ENC9002PHS03,PAT9002,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2026-05-04 03:17:05,tools/dummy_emr/sample_attachments/Discharge_Summary_1.pdf,application/pdf,1804
+DOCREF0290,ENC9002PHS04,PAT9002,Wellness Record,Wellness Record - Routine Immunization Visit,final,2026-02-09 12:17:05,,,
+DOCREF0291,ENC9002PHS04,PAT9002,Immunization,Immunization - Routine Immunization Visit,final,2026-02-09 12:17:05,tools/dummy_emr/sample_attachments/Vaccination_Certificate_1.pdf,application/pdf,1803
+DOCREF0292,ENC9002MSH01,PAT9002,Prescription,Prescription - Essential Hypertension,final,2026-07-18 05:17:05,tools/dummy_emr/sample_attachments/Prescription_Image_2.jpg,image/jpeg,97196
+DOCREF0293,ENC9002MSH01,PAT9002,Invoice,Invoice - Essential Hypertension,final,2026-07-18 05:17:05,tools/dummy_emr/sample_attachments/Medical_Invoice_1.pdf,application/pdf,1798
+DOCREF0294,ENC9002MSH02,PAT9002,Prescription,Prescription - Pulmonary Tuberculosis,final,2026-03-08 09:17:05,tools/dummy_emr/sample_attachments/Prescription_2.pdf,application/pdf,1798
+DOCREF0295,ENC9002MSH02,PAT9002,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2026-03-08 09:17:05,,,
+DOCREF0296,ENC9002MSH02,PAT9002,Diagnostic Report Imaging,Diagnostic Imaging (small) - Pulmonary Tuberculosis,final,2026-03-08 09:17:05,tools/dummy_emr/sample_attachments/Xray_1_small.jpg,image/jpeg,45167
+DOCREF0297,ENC9002MSH02,PAT9002,Diagnostic Report Imaging,Diagnostic Imaging (large) - Pulmonary Tuberculosis,final,2026-03-08 09:17:05,tools/dummy_emr/sample_attachments/Xray_1_large.jpg,image/jpeg,310998
+DOCREF0298,ENC9002MSH02,PAT9002,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2026-03-08 09:17:05,tools/dummy_emr/sample_attachments/Referral_Letter_3.pdf,application/pdf,1801
+DOCREF0299,ENC9002MSH03,PAT9002,Prescription,Prescription - Distal Radius Fracture,final,2026-01-09 04:17:05,tools/dummy_emr/sample_attachments/Prescription_2.pdf,application/pdf,1798
+DOCREF0300,ENC9002MSH03,PAT9002,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2026-01-09 04:17:05,tools/dummy_emr/sample_attachments/Discharge_Summary_2.pdf,application/pdf,1804
+DOCREF0301,ENC9002MSH04,PAT9002,Wellness Record,Wellness Record - Routine Immunization Visit,final,2025-09-26 05:17:05,,,
+DOCREF0302,ENC9002MSH04,PAT9002,Immunization,Immunization - Routine Immunization Visit,final,2025-09-26 05:17:05,tools/dummy_emr/sample_attachments/Vaccination_Certificate_1.pdf,application/pdf,1803
+DOCREF0303,ENC9002AUC01,PAT9002,Prescription,Prescription - Essential Hypertension,final,2026-08-05 09:17:05,tools/dummy_emr/sample_attachments/Prescription_Image_2.jpg,image/jpeg,97196
+DOCREF0304,ENC9002AUC01,PAT9002,Invoice,Invoice - Essential Hypertension,final,2026-08-05 09:17:05,tools/dummy_emr/sample_attachments/Medical_Invoice_1.pdf,application/pdf,1798
+DOCREF0305,ENC9002AUC02,PAT9002,Prescription,Prescription - Pulmonary Tuberculosis,final,2026-07-12 12:17:05,tools/dummy_emr/sample_attachments/Prescription_Image_2.jpg,image/jpeg,97196
+DOCREF0306,ENC9002AUC02,PAT9002,Diagnostic Report,Diagnostic Report - Pulmonary Tuberculosis,final,2026-07-12 12:17:05,,,
+DOCREF0307,ENC9002AUC02,PAT9002,Referral Note,Referral Note - Pulmonary Tuberculosis,final,2026-07-12 12:17:05,tools/dummy_emr/sample_attachments/Referral_Letter_3.pdf,application/pdf,1801
+DOCREF0308,ENC9002AUC03,PAT9002,Prescription,Prescription - Distal Radius Fracture,final,2026-05-31 07:17:05,tools/dummy_emr/sample_attachments/Prescription_1.pdf,application/pdf,1798
+DOCREF0309,ENC9002AUC03,PAT9002,Discharge Summary,Discharge Summary - Distal Radius Fracture,final,2026-05-31 07:17:05,tools/dummy_emr/sample_attachments/Discharge_Summary_2.pdf,application/pdf,1804
+DOCREF0310,ENC9002AUC04,PAT9002,Wellness Record,Wellness Record - Routine Immunization Visit,final,2026-06-26 09:17:05,,,
+DOCREF0311,ENC9002AUC04,PAT9002,Immunization,Immunization - Routine Immunization Visit,final,2026-06-26 09:17:05,tools/dummy_emr/sample_attachments/Vaccination_Certificate_3.pdf,application/pdf,1803

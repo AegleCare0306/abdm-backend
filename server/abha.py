@@ -3,6 +3,8 @@ ABHA-related APIs.
 Contains APIs for OTP requests and ABHA enrollment workflows.
 """
 
+import time
+
 import requests
 from server.config import ABHA_BASE_URL
 from server.utils import generate_request_id, generate_timestamp, get_gateway_token, call_with_retry
@@ -459,6 +461,56 @@ def search_abha_by_address(
 
     return _post(url, headers, payload, "ABHA search by address")
 
+_DOWNLOAD_WALL_CLOCK_TIMEOUT = 30  # seconds -- matches every other outbound call's timeout=30 convention
+
+
+def _download_with_wall_clock_timeout(url, headers, resource_label, max_seconds=_DOWNLOAD_WALL_CLOCK_TIMEOUT):
+    """
+    GETs `url`, enforcing `max_seconds` as a genuine TOTAL wall-clock
+    deadline on the download -- not the per-read gap `requests`' own
+    `timeout=` parameter actually bounds (tracker case M1-24).
+
+    WHY: `requests.get(..., timeout=30)` -- even for a plain,
+    non-streaming call like get_resource()'s original version -- only
+    bounds the gap BETWEEN individual socket reads under the hood
+    (urllib3 applies the read timeout per chunk read, not once for the
+    whole response). A response that trickles in a few bytes every
+    <30s (e.g. a misbehaving proxy in front of ABDM, or just a slow
+    connection on a large ABHA card image) never triggers that
+    per-chunk timeout and can hang effectively forever, even though the
+    call site asked for `timeout=30`.
+
+    FIX: stream=True + iter_content() with an explicit
+    time.monotonic() deadline checked between chunks -- the only way to
+    bound TOTAL call duration rather than inter-byte gaps. Manually
+    re-populates response._content/_content_consumed the same way
+    requests' own Response.content property does internally (see its
+    source: `self._content = b"".join(self.iter_content(...))`), so
+    every caller of get_resource() (get_profile/get_qr_code/
+    get_abha_card and their own callers) keeps working exactly as
+    before -- .json()/.text/.content on the returned Response object
+    are unaffected by this change.
+    """
+    response = requests.get(url=url, headers=headers, timeout=max_seconds, stream=True)
+
+    deadline = time.monotonic() + max_seconds
+    chunks = []
+    for chunk in response.iter_content(chunk_size=8192):
+        if chunk:
+            chunks.append(chunk)
+        if time.monotonic() > deadline:
+            response.close()
+            raise requests.exceptions.Timeout(
+                f"{resource_label}: download exceeded {max_seconds}s total wall-clock time "
+                f"(slow-loris style response -- bytes kept arriving just under the per-chunk "
+                f"timeout without the download ever completing)"
+            )
+
+    response._content = b"".join(chunks)
+    response._content_consumed = True
+    return response
+
+
 def get_resource(
     x_token,
     action="profile/account",
@@ -499,11 +551,7 @@ def get_resource(
     # download) -- trivially safe to retry.
     try:
         response = call_with_retry(
-            lambda: requests.get(
-                url=url,
-                headers=headers,
-                timeout=30,
-            ),
+            lambda: _download_with_wall_clock_timeout(url, headers, resource_label),
             description=resource_label,
         )
     except requests.exceptions.RequestException as exc:

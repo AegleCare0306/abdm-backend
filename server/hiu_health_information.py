@@ -78,8 +78,69 @@ class DateRangeValidationError(ValueError):
     """
 
 
+class ConsentNotActiveError(ValueError):
+    """
+    Raised by initiate_health_information_request() (and independently
+    callable, same pattern as DateRangeValidationError) when the locally
+    stored consent artefact's own status isn't "GRANTED" -- e.g. the
+    patient has since revoked it, or it expired.
+
+    Confirmed live bug report (Aayush, 2026-09-02): "even though I
+    revoked the consent I still get an option to request data from that
+    consent." The root cause was consent_hiu_notify_service.py's
+    REVOKED/EXPIRED branch never touching the locally cached artefact --
+    fixed there (see that file's own comment) by deleting the stale
+    artefact on notify, so select_granted_consent() (tools/m3_test_suite/
+    common.py) no longer offers it in the first place. This check is a
+    second, independent layer on top of that fix: it protects any caller
+    that reaches this function WITHOUT going through that picker at all
+    (e.g. aegle-phr's own phr/data_flow.py, which resolves a consent_id
+    from its own request body, not from this CLI's menu) and the narrow
+    window between a revoke happening and its notify callback actually
+    reaching this server.
+    """
+
+
 def _parse_iso8601(value):
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
+def validate_consent_is_active(consent_id):
+    """
+    Checks the locally stored consent artefact's own status == "GRANTED",
+    without making any ABDM call -- same "cheap local check before a live
+    round trip" reasoning as validate_date_range_against_consent() right
+    below. This is only as fresh as our own local cache (see
+    consent_hiu_notify_service.py for what keeps it in sync, and
+    ConsentNotActiveError's own docstring for the residual staleness
+    window that doesn't close) -- not a live ABDM status lookup, since no
+    such endpoint is used anywhere else in this pass either.
+
+    Args:
+        consent_id (str)
+
+    Raises:
+        ConsentNotActiveError: if the consent isn't found locally, or its
+            stored status isn't "GRANTED".
+
+    Returns:
+        None (no exception raised means the consent is currently usable).
+    """
+
+    consent = get_hiu_consent(consent_id)
+    if consent is None:
+        raise ConsentNotActiveError(
+            f"No stored consent artefact found for consentId={consent_id} -- "
+            f"cannot request health information for a consent we don't have."
+        )
+
+    status = consent.get("status")
+    if status != "GRANTED":
+        raise ConsentNotActiveError(
+            f"Consent {consent_id} is no longer usable -- its last known status is "
+            f"{status!r}, not GRANTED (revoked/expired/denied consents cannot be used "
+            f"to request health information)."
+        )
 
 
 def validate_date_range_against_consent(consent_id, date_range_from, date_range_to):
@@ -207,6 +268,12 @@ def initiate_health_information_request(
             false timeout for the request whose own callback never gets
             matched, or misattributing another request's transactionId.
     Raises:
+        ConsentNotActiveError: if the locally stored consent artefact
+            isn't found, or its own status isn't "GRANTED" -- checked
+            BEFORE any ABDM call, same "don't spend a live round trip on
+            something we can already rule out locally" reasoning as
+            DateRangeValidationError below. See that exception's own
+            docstring for the bug this closes.
         DateRangeValidationError: if date_range_from/date_range_to fall
             outside this consent's own approved dateRange -- checked
             against our own locally-stored consent artefact, BEFORE any
@@ -219,6 +286,7 @@ def initiate_health_information_request(
             (network error or non-2xx response).
     """
 
+    validate_consent_is_active(consent_id)
     validate_date_range_against_consent(consent_id, date_range_from, date_range_to)
 
     key_material = generate_key_material()
