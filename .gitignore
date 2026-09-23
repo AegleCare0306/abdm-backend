@@ -73,6 +73,8 @@ storage/hiu_consents.jsonl
 storage/pending_health_information_requests.jsonl
 storage/pending_health_information_requests_by_transaction_id.jsonl
 storage/hiu_health_information.jsonl
+# Same reasoning -- runtime dedupe state, not source.
+storage/processed_callback_request_ids.jsonl
 
 # M1 test CLI response logs (tools/m1_test_suite/common.py's log_response())
 # -- contain full session tokens (JWTs), OTPs, ABHA numbers, and mobile

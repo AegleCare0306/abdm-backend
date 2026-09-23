@@ -41,6 +41,8 @@ def initiate_consent_request(
     date_range_from,
     date_range_to,
     data_erase_at,
+    hip_id=None,
+    care_contexts=None,
 ):
     """
     Initiates an HIU Consent Request against ABDM (M3 Block 1, step 1):
@@ -86,6 +88,19 @@ def initiate_consent_request(
         date_range_from (str): consent.permission.dateRange.from (ISO 8601).
         date_range_to (str): consent.permission.dateRange.to (ISO 8601).
         data_erase_at (str): consent.permission.dataEraseAt (ISO 8601).
+        hip_id (str, optional): consent.hip.id -- scopes the request to ONE
+            hospital instead of all of them. ADDED for the Health Locker
+            flow (aegle-phr's P19): an 8.3.11 LINK alert names the exact
+            HIP whose care contexts just became available, and the consent
+            the locker raises in response should cover that HIP, not
+            everything. Defaults to None, which sends "hip": null exactly
+            as this function always has -- every existing caller is
+            unaffected.
+        care_contexts (list, optional): consent.careContexts -- the
+            specific care contexts to scope to, each
+            {"patientReference": ..., "careContextReference": ...}, as
+            carried by the same alert. Defaults to None, sending
+            "careContexts": null, unchanged from before.
     Returns:
         requests.Response: The raw consent/v3/request/init response (202
             expected).
@@ -123,8 +138,12 @@ def initiate_consent_request(
             "hiu": {
                 "id": hiu_id,
             },
-            "hip": None,
-            "careContexts": None,
+            # Both default to None -- the shape this call has always sent.
+            # Populated only when a caller explicitly scopes the request to
+            # one hospital / specific care contexts (the Health Locker's
+            # own LINK-alert path). See this function's own Args.
+            "hip": {"id": hip_id} if hip_id else None,
+            "careContexts": care_contexts if care_contexts else None,
             "requester": {
                 "name": requester_name,
                 "identifier": {

@@ -133,3 +133,21 @@ ATTACHMENT_STRATEGY_OVERRIDE = {}
 # data on an already-granted consent return fresh data?) and should stay a
 # no-op stub, functionally identical to "manual", until that's answered.
 HEALTH_INFORMATION_TRIGGER_MODE = "manual"
+
+# PER-HIU EXCEPTION to HEALTH_INFORMATION_TRIGGER_MODE above, added for
+# aegle-phr's Health Locker flow (P19). A consent whose own hiu.id appears
+# here auto-triggers Block 2 the moment it is fetched as GRANTED, whatever
+# the global mode says; every other consent keeps following the global
+# mode exactly as before.
+#
+# WHY AN ALLOWLIST RATHER THAN FLIPPING THE MODE TO "auto": the mode is
+# global, so flipping it would auto-pull data for EVERY granted consent,
+# including the ones the M3 test CLI raises by hand -- changing that
+# suite's behaviour as a side effect of a PHR feature. Scoping by hiu.id
+# keeps the locker's own automatic path automatic and leaves everything
+# else manual, which is what both flows actually want.
+#
+# The locker's service id (IN2410002590, "Aegle Urgent Care") is the only
+# entry: the locker raises its consents under that id, so this is exactly
+# "auto-trigger our own locker's consents, nothing else".
+HEALTH_INFORMATION_AUTO_TRIGGER_HIU_IDS = {"IN2410002590"}

@@ -79,6 +79,7 @@ lifetime. This is PyJWT's own built-in behavior, not custom code here.
 
 import asyncio
 import json
+import os
 import urllib.request
 
 import jwt
@@ -101,7 +102,28 @@ ABDM_JWKS_URL = f"{ABDM_ISSUER}/protocol/openid-connect/certs"
 ALLOWED_ALGORITHMS = ["RS256", "RS512"]
 
 ALLOWED_AUDIENCE = "account"
-ALLOWED_AZP_VALUES = {"gateway", CLIENT_ID}
+
+# EXTENSIBLE PER ENVIRONMENT (2026-09-22). Beyond "gateway" and our own
+# CLIENT_ID, ABDM turns out to use further service accounts for some
+# callback families: its Health Locker callbacks arrive signed correctly
+# by ABDM's Keycloak but carrying azp="TEST_PHR" on the sandbox, and were
+# rejected 401 until this existed (found live via aegle-phr's own P19
+# locker work -- the same fix is in aegle-abdm-core's callback_auth.py,
+# which is where aegle_phr's own callback routes are gated).
+#
+# Kept as an env var with an EMPTY default, so with nothing configured
+# this file behaves exactly as it always has. "TEST_PHR" is a sandbox
+# account name and does not belong hardcoded in either codebase.
+#
+# Does not weaken the boundary: signature, iss and exp are all verified
+# against ABDM's live JWKS BEFORE azp is inspected (see _verify_token()),
+# so no caller lacking ABDM's signing key can present any azp at all.
+EXTRA_ALLOWED_AZP = {
+    value.strip()
+    for value in (os.environ.get("EXTRA_ALLOWED_AZP") or "").split(",")
+    if value.strip()
+}
+ALLOWED_AZP_VALUES = {"gateway", CLIENT_ID} | EXTRA_ALLOWED_AZP
 
 
 class _TimeoutPyJWKClient(PyJWKClient):
